@@ -43,19 +43,19 @@ export default function MobileNav() {
       )}
 
       {open && (
-        <div className="pointer-events-auto fixed inset-0 z-40 flex flex-col justify-center overflow-auto bg-midnight px-10 transition duration-500">
+        <div className="animate-fade animate-once animate-duration-1000 animate-ease-in-out pointer-events-auto fixed inset-0 z-40 flex flex-col justify-center overflow-auto bg-midnight px-10 transition duration-500">
           <ul className="flex flex-col gap-6 text-4xl text-pearl">
             <li className="pointer-events-auto cursor-pointer transition duration-500 hover:brightness-200 focus-visible:outline-0">
-              BRAND
+              BRAND {">"}
             </li>
             <li className="pointer-events-auto cursor-pointer transition duration-500 hover:brightness-200 focus-visible:outline-0">
-              QUIENES SOMOS
+              QUIENES SOMOS {">"}
             </li>
             <li className="pointer-events-auto cursor-pointer transition duration-500 hover:brightness-200 focus-visible:outline-0">
-              SERVICIOS
+              SERVICIOS {">"}
             </li>
             <li className="pointer-events-auto cursor-pointer transition duration-500 hover:brightness-200 focus-visible:outline-0">
-              CONTACTO{" "}
+              CONTACTO {">"}
             </li>
           </ul>
         </div>

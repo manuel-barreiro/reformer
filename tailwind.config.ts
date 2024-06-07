@@ -1,4 +1,4 @@
-import type { Config } from "tailwindcss";
+import type { Config } from "tailwindcss"
 
 const config: Config = {
   content: [
@@ -9,18 +9,18 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        "marcellus": "var(--font-marcellus)",
-        "dm_sans": "var(--font-dm_sans)",
-        "dm_mono": "var(--font-dm_mono)"
+        marcellus: "var(--font-marcellus)",
+        dm_sans: "var(--font-dm_sans)",
+        dm_mono: "var(--font-dm_mono)",
       },
       colors: {
-        "grey_pebble": "#414141",
-        "pearl": "#f2f0e5",
-        "midnight": "#231f20",
-        "rust": "#893f24"
-      }
+        grey_pebble: "#414141",
+        pearl: "#f2f0e5",
+        midnight: "#231f20",
+        rust: "#893f24",
+      },
     },
   },
-  plugins: [],
-};
-export default config;
+  plugins: [require("tailwindcss-animated")],
+}
+export default config
