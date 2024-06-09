@@ -43,8 +43,8 @@ export default function MobileNav() {
       )}
 
       {open && (
-        <div className="animate-fade animate-once animate-duration-1000 animate-ease-in-out pointer-events-auto fixed inset-0 z-40 flex flex-col justify-center overflow-auto bg-midnight px-10 transition duration-500">
-          <ul className="flex flex-col gap-6 text-4xl text-pearl">
+        <div className="pointer-events-auto fixed inset-0 z-40 flex animate-fade flex-col justify-center overflow-auto bg-midnight px-10 transition duration-500 animate-duration-1000 animate-once animate-ease-in-out">
+          <ul className="flex flex-col gap-6 text-3xl text-pearl sm:text-4xl">
             <li className="pointer-events-auto cursor-pointer transition duration-500 hover:brightness-200 focus-visible:outline-0">
               BRAND {">"}
             </li>
