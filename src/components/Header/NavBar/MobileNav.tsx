@@ -9,7 +9,12 @@ export default function MobileNav() {
 
   return (
     <nav className="flex items-center justify-between bg-midnight p-10 lg:hidden">
-      <Image src={logo} width={150} alt="logo" className="z-50" />
+      <Image
+        src={logo}
+        width={150}
+        alt="logo"
+        className="z-50 animate-fade ease-in-out animate-normal animate-duration-[3000ms] animate-fill-both animate-once"
+      />
 
       {/* Botón para abrir o cerrar menú */}
       {!open ? (
