@@ -4,7 +4,7 @@ import HeroText from "./HeroText"
 
 export default function Hero() {
   return (
-    <section className="relative h-[80dvh] w-full md:h-[90dvh]">
+    <section className="relative h-[80vh] w-full md:h-[90vh]">
       <Image
         alt="Reformer Wellness Club"
         title="Reformer"

@@ -4,7 +4,7 @@ import BrandBottom from "./BrandBottom"
 
 function Brand() {
   return (
-    <section className="h-[100dvh] w-full">
+    <section className="h-[100vh] w-full">
       <BrandTop />
       <BrandBottom />
     </section>
