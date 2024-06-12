@@ -31,13 +31,17 @@ export const metadata: Metadata = {
     ],
     shortcut: ["/icons/favicon-light.png"],
     apple: [
-      { url: "/icons/logo.png" },
-      { url: "/icons/logo.png", sizes: "180x180", type: "image/png" },
+      { url: "/icons/opengraph-image.png" },
+      {
+        url: "/icons/opengraph-image.png",
+        sizes: "180x180",
+        type: "image/png",
+      },
     ],
     other: [
       {
-        rel: "logo",
-        url: "/icons/logo.png",
+        rel: "opengraph-image",
+        url: "/icons/opengraph-image.png",
       },
     ],
   },
