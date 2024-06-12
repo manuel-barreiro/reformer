@@ -57,9 +57,9 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
+    <html lang="es" className="scrollbar-hide">
       <body
-        className={`${marcellus.variable} ${dm_sans.variable} ${dm_sans.className} ${dm_mono.variable}`}
+        className={`${marcellus.variable} ${dm_sans.variable} ${dm_sans.className} ${dm_mono.variable} scrollbar-hide`}
       >
         {children}
       </body>

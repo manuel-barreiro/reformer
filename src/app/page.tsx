@@ -1,3 +1,4 @@
+import Brand from "@/components/Brand/Brand"
 import Header from "@/components/Header/Header"
 import Hero from "@/components/Hero/Hero"
 
@@ -6,6 +7,7 @@ export default function Home() {
     <main className="">
       <Header />
       <Hero />
+      <Brand />
     </main>
   )
 }
