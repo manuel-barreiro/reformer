@@ -4,7 +4,7 @@ import Image from "next/image"
 
 function BrandBottom() {
   return (
-    <div className="relative h-[70%] w-full">
+    <div className="relative h-auto w-full">
       <Image
         alt="Reformer Wellness Club"
         title="Reformer"
