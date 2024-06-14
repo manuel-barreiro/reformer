@@ -12,8 +12,8 @@ export default function QuienesSomos() {
   })
   const y = useTransform(scrollYProgress, [0, 1], ["-20%", "10%"])
   return (
-    <section className="flex h-auto w-full flex-col overflow-hidden lg:h-[100vh] lg:flex-row">
-      <div className="relative h-screen lg:block lg:basis-[40%]">
+    <section className="flex h-auto w-full flex-col lg:h-[100vh] lg:flex-row">
+      <div className="relative h-screen overflow-hidden lg:block lg:basis-[40%]">
         <motion.div className="absolute h-[120%] w-full" style={{ top: y }}>
           <Image
             alt="Reformer Wellness Club"
