@@ -13,19 +13,19 @@ export default function QuienesSomos() {
   const y = useTransform(scrollYProgress, [0, 1], ["-30%", "10%"])
   return (
     <section className="flex h-auto w-full flex-col lg:h-[100vh] lg:flex-row">
-      <div className="relative h-screen overflow-hidden lg:block lg:basis-[40%]">
+      <div className="relative h-screen overflow-hidden lg:basis-[40%]">
         <motion.div className="absolute h-[110%] w-full" style={{ top: y }}>
           <Image
             alt="Reformer Wellness Club"
             title="Reformer"
             priority={true}
-            className="inset-0 h-full w-full object-cover object-center"
+            className="inset-0 h-full w-full object-cover object-bottom sm:object-center"
             src={quienes_somos}
           />
         </motion.div>
       </div>
 
-      <div className="flex h-auto flex-col items-center justify-center bg-pearl px-14 py-28 lg:basis-[60%] lg:px-20">
+      <div className="flex h-auto flex-col items-center justify-center bg-pearl px-14 py-20 lg:basis-[60%] lg:px-20 lg:py-28">
         <div className="flex max-w-lg flex-col items-start gap-9 text-justify font-dm_sans">
           <p className="font-dm_mono text-midnight">QUIENES SOMOS</p>
           <p>
