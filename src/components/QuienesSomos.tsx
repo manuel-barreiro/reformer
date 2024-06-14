@@ -1,17 +1,28 @@
+"use client"
 import { quienes_somos, cuerpo, bienestar, espiritu, mente } from "../../public"
 import Image from "next/image"
+import { useRef } from "react"
+import { motion, useScroll, useTransform } from "framer-motion"
 
 export default function QuienesSomos() {
+  const sectionRef = useRef(null)
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start end", "end start"],
+  })
+  const y = useTransform(scrollYProgress, [0, 1], ["-20%", "10%"])
   return (
-    <section className="flex h-auto w-full flex-col lg:h-[100vh] lg:flex-row">
+    <section className="flex h-auto w-full flex-col overflow-hidden lg:h-[100vh] lg:flex-row">
       <div className="relative h-screen lg:block lg:basis-[40%]">
-        <Image
-          alt="Reformer Wellness Club"
-          title="Reformer"
-          priority={true}
-          className="absolute inset-0 h-full w-full object-cover object-center"
-          src={quienes_somos}
-        />
+        <motion.div className="absolute h-[120%] w-full" style={{ top: y }}>
+          <Image
+            alt="Reformer Wellness Club"
+            title="Reformer"
+            priority={true}
+            className="inset-0 h-full w-full object-cover object-center"
+            src={quienes_somos}
+          />
+        </motion.div>
       </div>
 
       <div className="flex h-full flex-col items-center justify-center bg-pearl px-14 py-28 lg:basis-[60%] lg:px-20">
