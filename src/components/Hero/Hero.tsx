@@ -12,14 +12,14 @@ export default function Hero() {
     target: sectionRef,
     offset: ["start end", "end start"],
   })
-  const y = useTransform(scrollYProgress, [0, 1], ["-20%", "10%"])
+  const y = useTransform(scrollYProgress, [0, 1], ["-10%", "10%"])
 
   return (
     <section
       ref={sectionRef}
       className="relative h-[80vh] w-full overflow-hidden md:h-[90vh]"
     >
-      <motion.div className="absolute h-[120%] w-full" style={{ top: y }}>
+      <motion.div className="absolute h-[110%] w-full" style={{ top: y }}>
         <Image
           alt="Reformer Wellness Club"
           title="Reformer"
