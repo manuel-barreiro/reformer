@@ -57,7 +57,11 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="es" className="scrollbar-hide">
+    <html
+      lang="es"
+      className="scrollbar-hide"
+      style={{ cursor: "url(icons/solPearl.svg),auto" }}
+    >
       <body
         className={`${marcellus.variable} ${dm_sans.variable} ${dm_sans.className} ${dm_mono.variable} scrollbar-hide`}
       >

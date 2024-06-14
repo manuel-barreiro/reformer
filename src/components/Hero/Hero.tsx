@@ -18,6 +18,7 @@ export default function Hero() {
     <section
       ref={sectionRef}
       className="relative h-[80vh] w-full overflow-hidden md:h-[90vh]"
+      // style={{ cursor: "url(icons/sol.svg),auto" }}
     >
       <motion.div className="absolute h-[110%] w-full" style={{ top: y }}>
         <Image

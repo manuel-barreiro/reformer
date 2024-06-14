@@ -4,7 +4,10 @@ import Image from "next/image"
 
 function BrandTop() {
   return (
-    <div className="flex h-auto flex-col items-center justify-center gap-6 bg-pearl py-10">
+    <div
+      className="flex h-auto flex-col items-center justify-center gap-6 bg-pearl py-10"
+      style={{ cursor: "url(icons/solGreyPebble.svg),auto" }}
+    >
       <Image src={isotipo} alt="Isotipo Reformer" width={30} />
       <h2 className="text-center font-marcellus text-xl text-midnight sm:text-2xl md:text-3xl lg:text-4xl">
         Más que estudio de pilates y yoga;
