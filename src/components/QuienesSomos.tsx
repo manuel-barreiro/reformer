@@ -43,7 +43,7 @@ export default function QuienesSomos() {
             clases con el propósito de que logres una transformación tanto
             externa como interna. Buscamos que logres esa plenitud integral.
           </p>
-          <div className="grid w-full grid-cols-2 gap-10 sm:flex sm:h-20 sm:items-center sm:justify-between">
+          <div className="grid h-auto w-full grid-cols-2 gap-10 sm:flex sm:h-20 sm:items-center sm:justify-between">
             <div className="flex h-full flex-col items-center gap-4">
               <Image src={cuerpo} alt="cuerpo" className="h-4/5" />
               <span className="font-dm_mono text-xs text-midnight">CUERPO</span>
