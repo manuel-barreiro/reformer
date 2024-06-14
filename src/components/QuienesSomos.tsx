@@ -32,7 +32,7 @@ export default function QuienesSomos() {
         </motion.div>
       </div>
 
-      <div className="flex h-auto flex-col items-center justify-center bg-pearl px-14 py-20 lg:basis-[60%] lg:px-20 lg:py-28">
+      <div className="flex h-auto flex-col items-start justify-center bg-pearl px-14 py-20 lg:basis-[60%] lg:py-28 lg:pl-36">
         <div className="flex max-w-lg flex-col items-start gap-10 text-justify font-dm_sans">
           <p className="font-dm_mono text-midnight">QUIENES SOMOS</p>
           <p>

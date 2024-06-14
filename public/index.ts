@@ -7,6 +7,7 @@ import cuerpo from "./icons/CUERPO.svg"
 import espiritu from "./icons/ESPIRITU.svg"
 import bienestar from "./icons/BIENESTAR.svg"
 import mente from "./icons/MENTE.svg"
+import footer_logo from "./icons/LOGO IZQ FOOTER.svg"
 
 export {
   logo,
@@ -18,4 +19,5 @@ export {
   espiritu,
   bienestar,
   mente,
+  footer_logo,
 }
