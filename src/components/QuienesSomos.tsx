@@ -3,8 +3,8 @@ import Image from "next/image"
 
 export default function QuienesSomos() {
   return (
-    <section className="flex h-[100vh] w-full">
-      <div className="relative h-full basis-[40%]">
+    <section className="flex h-auto w-full flex-col lg:h-[100vh] lg:flex-row">
+      <div className="relative h-screen lg:block lg:basis-[40%]">
         <Image
           alt="Reformer Wellness Club"
           title="Reformer"
@@ -14,7 +14,7 @@ export default function QuienesSomos() {
         />
       </div>
 
-      <div className="flex h-full basis-[60%] flex-col items-center justify-center bg-pearl px-20 py-28">
+      <div className="flex h-full flex-col items-center justify-center bg-pearl px-14 py-28 lg:basis-[60%] lg:px-20">
         <div className="flex max-w-lg flex-col items-start gap-7 text-justify font-dm_sans">
           <p className="font-dm_mono text-midnight">QUIENES SOMOS</p>
           <p>

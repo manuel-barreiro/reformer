@@ -9,7 +9,7 @@ const marcellus = Marcellus({
 })
 
 const dm_sans = DM_Sans({
-  weight: ["300", "400", "500", "700"],
+  weight: ["200", "300", "400", "500", "700"],
   subsets: ["latin"],
   variable: "--font-dm_sans",
 })
