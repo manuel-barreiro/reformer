@@ -5,12 +5,19 @@ import { useRef } from "react"
 import { motion, useScroll, useTransform } from "framer-motion"
 
 export default function QuienesSomos() {
+  // Parallax
   const sectionRef = useRef(null)
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ["start end", "end start"],
   })
   const y = useTransform(scrollYProgress, [0, 1], ["-30%", "10%"])
+
+  //Framer motion for icons
+  const iconAnimationVariants = {
+    initial: { y: 15, opacity: 0 },
+    animate: { y: 0, opacity: 1 },
+  }
   return (
     <section className="flex h-auto w-full flex-col lg:h-[100vh] lg:flex-row">
       <div className="relative h-screen overflow-hidden lg:basis-[40%]">
@@ -44,26 +51,58 @@ export default function QuienesSomos() {
             externa como interna. Buscamos que logres esa plenitud integral.
           </p>
           <div className="grid h-auto w-full grid-cols-2 gap-8 sm:flex sm:items-center sm:justify-between">
-            <div className="flex h-32 flex-col items-center justify-center gap-4">
+            <motion.div
+              variants={iconAnimationVariants}
+              initial="initial"
+              whileInView="animate"
+              viewport={{ once: true }}
+              whileHover={{ scale: 1.1, transition: { ease: "easeInOut" } }}
+              transition={{ duration: 0.5, delay: 0.4 }}
+              className="flex h-32 flex-col items-center justify-center gap-4"
+            >
               <Image src={cuerpo} alt="cuerpo" className="h-3/5" />
               <span className="font-dm_mono text-xs text-midnight">CUERPO</span>
-            </div>
-            <div className="flex h-32 flex-col items-center justify-center gap-4">
+            </motion.div>
+            <motion.div
+              variants={iconAnimationVariants}
+              initial="initial"
+              whileInView="animate"
+              viewport={{ once: true }}
+              whileHover={{ scale: 1.1, transition: { ease: "easeInOut" } }}
+              transition={{ duration: 0.5, delay: 0.6 }}
+              className="flex h-32 flex-col items-center justify-center gap-4"
+            >
               <Image src={mente} alt="mente" className="h-3/5" />
               <span className="font-dm_mono text-xs text-midnight">MENTE</span>
-            </div>
-            <div className="flex h-32 flex-col items-center justify-center gap-4">
+            </motion.div>
+            <motion.div
+              variants={iconAnimationVariants}
+              initial="initial"
+              whileInView="animate"
+              viewport={{ once: true }}
+              whileHover={{ scale: 1.1, transition: { ease: "easeInOut" } }}
+              transition={{ duration: 0.5, delay: 0.8 }}
+              className="flex h-32 flex-col items-center justify-center gap-4"
+            >
               <Image src={espiritu} alt="espiritu" className="h-3/5" />
               <span className="font-dm_mono text-xs text-midnight">
                 ESPÍRITU
               </span>
-            </div>
-            <div className="flex h-32 flex-col items-center justify-center gap-4">
+            </motion.div>
+            <motion.div
+              variants={iconAnimationVariants}
+              initial="initial"
+              whileInView="animate"
+              viewport={{ once: true }}
+              whileHover={{ scale: 1.1, transition: { ease: "easeInOut" } }}
+              transition={{ duration: 0.5, delay: 1 }}
+              className="flex h-32 flex-col items-center justify-center gap-4"
+            >
               <Image src={bienestar} alt="bienestar" className="h-3/5" />
               <span className="font-dm_mono text-xs text-midnight">
                 BIENESTAR
               </span>
-            </div>
+            </motion.div>
           </div>
           <p>
             El verdadero cambio proviene de tomar consciencia sobre nuestra
