@@ -7,6 +7,7 @@ import QuienesSomos from "@/components/QuienesSomos"
 import { useEffect } from "react"
 import Lenis from "lenis"
 import Footer from "@/components/Footer"
+import ServiciosGrid from "@/components/Servicios/ServiciosGrid"
 
 export default function Home() {
   useEffect(() => {
@@ -25,6 +26,7 @@ export default function Home() {
       <Brand />
       <QuienesSomos />
       <ComingSoon />
+      <ServiciosGrid />
       <Footer />
     </main>
   )

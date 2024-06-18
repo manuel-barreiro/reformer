@@ -11,7 +11,7 @@ export default function QuienesSomos() {
     target: sectionRef,
     offset: ["start end", "end start"],
   })
-  const y = useTransform(scrollYProgress, [0, 1], ["-30%", "10%"])
+  const y = useTransform(scrollYProgress, [0, 1], ["-17%", "10%"])
 
   //Framer motion for icons
   const iconAnimationVariants = {
