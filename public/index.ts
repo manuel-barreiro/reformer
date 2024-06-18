@@ -8,8 +8,8 @@ import espiritu from "./icons/ESPIRITU.svg"
 import bienestar from "./icons/BIENESTAR.svg"
 import mente from "./icons/MENTE.svg"
 import footer_logo from "./icons/LOGO IZQ FOOTER.svg"
-import yoga from "./images/WEB_reformer_img-04.jpg"
-import pilates from "./images/WEB_reformer_img-05.jpg"
+import pilates from "./images/WEB_reformer_img-04.jpg"
+import yoga from "./images/WEB_reformer_img-05.jpg"
 import masajes from "./images/WEB_reformer_img-06.jpg"
 
 export {
