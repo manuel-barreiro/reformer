@@ -8,7 +8,7 @@ export default function MobileNav() {
   const [open, setOpen] = useState(false)
 
   return (
-    <nav className="flex items-center justify-between bg-midnight p-10 lg:hidden">
+    <nav className="flex items-center justify-between bg-midnight px-10 py-8 lg:hidden">
       <Image
         src={logo}
         width={150}
@@ -54,7 +54,7 @@ export default function MobileNav() {
               BRAND {">"}
             </li>
             <li className="pointer-events-auto cursor-pointer transition duration-500 hover:brightness-200 focus-visible:outline-0">
-              QUIENES SOMOS {">"}
+              QUIÉNES SOMOS {">"}
             </li>
             <li className="pointer-events-auto cursor-pointer transition duration-500 hover:brightness-200 focus-visible:outline-0">
               SERVICIOS {">"}

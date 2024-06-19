@@ -10,7 +10,7 @@ type ServicioProps = {
 
 export default function Servicio({ img, service, info }: ServicioProps) {
   return (
-    <div className="group relative flex h-screen w-full animate-fade flex-col items-center justify-center gap-12 overflow-hidden hover:justify-end hover:transition-all hover:ease-in-out">
+    <div className="group relative flex h-auto min-h-screen w-full animate-fade flex-col items-center justify-center gap-12 overflow-hidden hover:justify-end hover:transition-all hover:ease-in-out sm:pt-10 lg:pt-0">
       <div className="absolute inset-0 z-30 bg-midnight/40 duration-1000 group-hover:bg-midnight/70 group-hover:transition-all group-hover:ease-in-out" />
       <Image
         alt="Reformer Wellness Club"

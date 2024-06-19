@@ -1,4 +1,3 @@
-import React from "react"
 import { isotipo } from "../../../public"
 import Image from "next/image"
 

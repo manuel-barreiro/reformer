@@ -19,7 +19,21 @@ const config: Config = {
         midnight: "#231f20",
         rust: "#893f24",
       },
+      animation: {
+        "marquee-slow": "marquee 8s linear infinite",
+        "marquee-normal": "marquee 10s linear infinite",
+        "marquee-fast": "marquee 13s linear infinite",
+      },
+      keyframes: {
+        marquee: {
+          "0%": { transform: "translateX(-100%)" },
+          "100%": { transform: "translateX(100%)" },
+        },
+      },
     },
+  },
+  variants: {
+    animation: ["responsive"], // This enables responsive variants for the animation utility
   },
   plugins: [require("tailwindcss-animated")],
 }
