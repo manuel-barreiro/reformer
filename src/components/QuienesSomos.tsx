@@ -37,7 +37,7 @@ export default function QuienesSomos() {
         style={{ cursor: "url(icons/solGreyPebble.svg),auto" }}
       >
         <div className="flex max-w-lg flex-col items-start gap-10 text-justify font-dm_sans">
-          <p className="font-dm_mono text-midnight">QUIENES SOMOS</p>
+          <p className="font-dm_mono text-midnight">QUIÉNES SOMOS</p>
           <p>
             Hacemos de tu bienestar nuestra prioridad. Reformer Wellness Club
             ofrece una experiencia única para desarrollar y perfeccionar tu
