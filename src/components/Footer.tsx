@@ -4,8 +4,8 @@ import Image from "next/image"
 
 export default function Footer() {
   return (
-    <footer className="bg-midnight">
-      <div className="relative mx-auto px-10 pb-10 pt-20 lg:px-20">
+    <footer className="bg-midnight px-10 pb-10 pt-20 lg:px-20">
+      <div className="relative mx-auto">
         <div className="mb-12 h-[1px] w-full bg-pearl" />
         <div className="flex flex-col items-start gap-12 sm:flex-row sm:justify-between">
           <Image src={footer_logo} alt="footer logo" width={200} />

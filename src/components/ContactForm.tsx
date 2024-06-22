@@ -6,34 +6,32 @@ import { z } from "zod"
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form"
-import { ToastAction } from "@/components/ui/toast"
 import { useToast } from "@/components/ui/use-toast"
 
 const formSchema = z.object({
-  nombre: z.string().min(3, {
+  nombre: z.string().min(1, {
     message: "Ingrese un nombre válido",
   }),
-  apellido: z.string().min(3, {
+  apellido: z.string().min(1, {
     message: "Ingrese un apellido válido",
   }),
-  email: z.string().email({
-    message: "Ingrese un email válido",
+  email: z.string().min(1, {
+    message: "Ingrese un apellido válido",
   }),
-  telefono: z.string().min(8, {
+  telefono: z.string().min(1, {
     message: "Ingrese un teléfono válido",
   }),
   mensaje: z
     .string()
-    .min(10, {
+    .min(1, {
       message: "Mínimo 10 caracteres",
     })
-    .max(160, {
+    .max(16, {
       message: "Máximo 160 caracteres",
     }),
 })
@@ -68,19 +66,19 @@ export default function ContactForm() {
     toast({
       title: "Recibimos tu mensaje :)",
       description: "Te contactaremos a la brevedad.",
-      className: "bg-midnight text-pearl",
+      variant: "reformer",
     })
     form.reset()
   }
 
   return (
-    <section className="grid h-auto w-full grid-cols-1 items-start gap-10 bg-midnight pt-20 text-pearl lg:grid-cols-3">
-      <div className="col-span-1 flex items-center justify-start px-10 lg:justify-center lg:px-20">
+    <section className="grid h-auto w-full grid-cols-1 items-start gap-10 bg-midnight px-10 pt-20 text-pearl lg:grid-cols-3 lg:px-20">
+      <div className="col-span-1 flex items-center justify-start text-pretty lg:justify-center">
         <p className="text-3xl">
           SI QUERÉS FORMAR PARTE, DEJANOS TU MENSAJE :)
         </p>
       </div>
-      <div className="col-span-2 px-10 lg:px-0">
+      <div className="col-span-2">
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
@@ -88,8 +86,8 @@ export default function ContactForm() {
             autoComplete="off"
           >
             {/* Inputs */}
-            <div className="grid w-full grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-0">
-              <div className="flex w-full max-w-[90%] flex-col items-center justify-start gap-4 lg:col-span-1">
+            <div className="grid w-full grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-16">
+              <div className="flex w-full flex-col items-center justify-start gap-4 lg:col-span-1">
                 <FormField
                   control={form.control}
                   name="nombre"
@@ -99,7 +97,7 @@ export default function ContactForm() {
                       <FormControl>
                         <input
                           placeholder="Nombre"
-                          className="m-0 w-full border-b border-pearl bg-midnight pb-1 text-[16px] text-pearl placeholder:font-thin placeholder:text-pearl/80 focus:outline-none"
+                          className="m-0 w-full rounded-none border-b border-pearl bg-midnight pb-1 text-[16px] text-pearl placeholder:font-thin placeholder:text-pearl/80 focus:outline-none"
                           {...field}
                         />
                       </FormControl>
@@ -117,7 +115,7 @@ export default function ContactForm() {
                       <FormControl>
                         <input
                           placeholder="Apellido"
-                          className="m-0 w-full border-b border-pearl bg-midnight pb-1 text-[16px] text-pearl placeholder:font-thin placeholder:text-pearl/80 focus:outline-none"
+                          className="m-0 w-full rounded-none border-b border-pearl bg-midnight pb-1 text-[16px] text-pearl placeholder:font-thin placeholder:text-pearl/80 focus:outline-none"
                           {...field}
                         />
                       </FormControl>
@@ -135,7 +133,7 @@ export default function ContactForm() {
                       <FormControl>
                         <input
                           placeholder="Email"
-                          className="m-0 w-full border-b border-pearl bg-midnight pb-1 text-[16px] text-pearl placeholder:font-thin placeholder:text-pearl/80 focus:outline-none"
+                          className="m-0 w-full rounded-none border-b border-pearl bg-midnight pb-1 text-[16px] text-pearl placeholder:font-thin placeholder:text-pearl/80 focus:outline-none"
                           {...field}
                         />
                       </FormControl>
@@ -153,7 +151,7 @@ export default function ContactForm() {
                       <FormControl>
                         <input
                           placeholder="Teléfono"
-                          className="m-0 w-full border-b border-pearl bg-midnight pb-1 text-[16px] text-pearl placeholder:font-thin placeholder:text-pearl/80 focus:outline-none"
+                          className="m-0 w-full rounded-none border-b border-pearl bg-midnight pb-1 text-[16px] text-pearl placeholder:font-thin placeholder:text-pearl/80 focus:outline-none"
                           {...field}
                         />
                       </FormControl>
@@ -162,7 +160,7 @@ export default function ContactForm() {
                   )}
                 />
               </div>
-              <div className="flex max-w-[90%] flex-col justify-between gap-6 lg:col-span-1">
+              <div className="flex flex-col justify-between gap-6 lg:col-span-1">
                 <FormField
                   control={form.control}
                   name="mensaje"
@@ -172,7 +170,7 @@ export default function ContactForm() {
                       <FormControl>
                         <textarea
                           placeholder="Mensaje"
-                          className="scrollbar-hide m-0 h-full w-full resize-none border-b border-pearl bg-midnight pb-1 text-[16px] text-pearl placeholder:font-thin placeholder:text-pearl/80 focus:outline-none"
+                          className="scrollbar-hide m-0 h-full w-full resize-none rounded-none border-b border-pearl bg-midnight pb-1 text-[16px] text-pearl placeholder:font-thin placeholder:text-pearl/80 focus:outline-none"
                           {...field}
                         />
                       </FormControl>
