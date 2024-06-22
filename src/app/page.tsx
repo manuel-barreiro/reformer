@@ -9,6 +9,7 @@ import Lenis from "lenis"
 import Footer from "@/components/Footer"
 import ServiciosGrid from "@/components/Servicios/ServiciosGrid"
 import ContactForm from "@/components/ContactForm"
+import Pilates from "@/components/Pilates"
 
 export default function Home() {
   useEffect(() => {
@@ -28,6 +29,7 @@ export default function Home() {
       <QuienesSomos />
       <ComingSoon />
       <ServiciosGrid />
+      <Pilates />
       <ContactForm />
       <Footer />
     </main>

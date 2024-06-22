@@ -11,6 +11,7 @@ import footer_logo from "./icons/LOGO IZQ FOOTER.svg"
 import pilates from "./images/WEB_reformer_img-04.jpg"
 import yoga from "./images/WEB_reformer_img-05.jpg"
 import masajes from "./images/WEB_reformer_img-06.jpg"
+import seccionPilates from "./images/seccionPilates.jpg"
 
 export {
   logo,
@@ -26,4 +27,5 @@ export {
   yoga,
   pilates,
   masajes,
+  seccionPilates,
 }
