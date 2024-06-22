@@ -8,6 +8,7 @@ import { useEffect } from "react"
 import Lenis from "lenis"
 import Footer from "@/components/Footer"
 import ServiciosGrid from "@/components/Servicios/ServiciosGrid"
+import ContactForm from "@/components/ContactForm"
 
 export default function Home() {
   useEffect(() => {
@@ -27,6 +28,7 @@ export default function Home() {
       <QuienesSomos />
       <ComingSoon />
       <ServiciosGrid />
+      <ContactForm />
       <Footer />
     </main>
   )

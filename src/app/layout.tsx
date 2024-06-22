@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next"
 import { Marcellus, DM_Sans, DM_Mono } from "next/font/google"
 import "./globals.css"
+import { Toaster } from "@/components/ui/toaster"
 
 const marcellus = Marcellus({
   weight: "400",
@@ -66,6 +67,7 @@ export default function RootLayout({
         className={`${marcellus.variable} ${dm_sans.variable} ${dm_sans.className} ${dm_mono.variable} scrollbar-hide`}
       >
         {children}
+        <Toaster />
       </body>
     </html>
   )

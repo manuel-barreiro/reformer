@@ -1,12 +1,22 @@
 import type { Config } from "tailwindcss"
 
-const config: Config = {
+const config = {
+  darkMode: ["class"],
   content: [
-    "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
-    "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
-    "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
+    "./pages/**/*.{ts,tsx}",
+    "./components/**/*.{ts,tsx}",
+    "./app/**/*.{ts,tsx}",
+    "./src/**/*.{ts,tsx}",
   ],
+  prefix: "",
   theme: {
+    container: {
+      center: true,
+      padding: "2rem",
+      screens: {
+        "2xl": "1400px",
+      },
+    },
     extend: {
       fontFamily: {
         marcellus: "var(--font-marcellus)",
@@ -19,16 +29,26 @@ const config: Config = {
         midnight: "#231f20",
         rust: "#893f24",
       },
-      animation: {
-        "marquee-slow": "marquee 8s linear infinite",
-        "marquee-normal": "marquee 10s linear infinite",
-        "marquee-fast": "marquee 13s linear infinite",
-      },
       keyframes: {
         marquee: {
           "0%": { transform: "translateX(-100%)" },
           "100%": { transform: "translateX(100%)" },
         },
+        "accordion-down": {
+          from: { height: "0" },
+          to: { height: "var(--radix-accordion-content-height)" },
+        },
+        "accordion-up": {
+          from: { height: "var(--radix-accordion-content-height)" },
+          to: { height: "0" },
+        },
+      },
+      animation: {
+        "marquee-slow": "marquee 8s linear infinite",
+        "marquee-normal": "marquee 10s linear infinite",
+        "marquee-fast": "marquee 13s linear infinite",
+        "accordion-down": "accordion-down 0.2s ease-out",
+        "accordion-up": "accordion-up 0.2s ease-out",
       },
     },
   },
@@ -36,5 +56,6 @@ const config: Config = {
     animation: ["responsive"], // This enables responsive variants for the animation utility
   },
   plugins: [require("tailwindcss-animated")],
-}
+} satisfies Config
+
 export default config
