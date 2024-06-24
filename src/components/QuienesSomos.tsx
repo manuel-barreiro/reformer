@@ -19,7 +19,7 @@ export default function QuienesSomos() {
     animate: { y: 0, opacity: 1 },
   }
   return (
-    <section className="flex h-auto w-full flex-col lg:h-[100vh] lg:flex-row">
+    <section className="flex h-auto w-full flex-col lg:h-[100vh] lg:flex-row" id="quienesSomos">
       <div className="relative h-screen overflow-hidden lg:basis-[40%]">
         <motion.div className="absolute h-[110%] w-full" style={{ top: y }}>
           <Image

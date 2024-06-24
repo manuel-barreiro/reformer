@@ -72,7 +72,7 @@ export default function ContactForm() {
   }
 
   return (
-    <section className="grid h-auto w-full grid-cols-1 items-start gap-10 bg-midnight px-10 pt-20 text-pearl lg:grid-cols-3 lg:px-20">
+    <section className="grid h-auto w-full grid-cols-1 items-start gap-10 bg-midnight px-10 pt-20 text-pearl lg:grid-cols-3 lg:px-20" id="contacto">
       <div className="col-span-1 flex items-center justify-start text-pretty lg:justify-center">
         <p className="text-3xl">
           SI QUERÉS FORMAR PARTE, DEJANOS TU MENSAJE :)
