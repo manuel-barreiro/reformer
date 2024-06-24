@@ -59,7 +59,10 @@ const masajesInfo: ServicioInfo[] = [
 
 export default function Servicios() {
   return (
-    <section className="grid h-auto grid-cols-1 lg:grid-cols-3" id="servicios">
+    <section
+      className="grid h-auto scroll-mt-28 grid-cols-1 lg:grid-cols-3"
+      id="servicios"
+    >
       <Servicio service="pilates" img={pilates} info={pilatesInfo} />
       <Servicio service="yoga" img={yoga} info={yogaInfo} />
       <Servicio service="masajes" img={masajes} info={masajesInfo} />

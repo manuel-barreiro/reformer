@@ -61,7 +61,7 @@ export default function RootLayout({
   return (
     <html
       lang="es"
-      className="scrollbar-hide"
+      className="scrollbar-hide scroll-smooth"
       style={{ cursor: "url(icons/solPearl.svg),auto" }}
     >
       <body

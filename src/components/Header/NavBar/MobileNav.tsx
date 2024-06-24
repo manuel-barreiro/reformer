@@ -3,6 +3,7 @@
 import Image from "next/image"
 import { logo } from "../../../../public"
 import { useState } from "react"
+import ScrollLink from "@/components/ScrollLink"
 
 export default function MobileNav() {
   const [open, setOpen] = useState(false)
@@ -50,17 +51,31 @@ export default function MobileNav() {
       {open && (
         <div className="pointer-events-auto fixed inset-0 z-40 flex animate-fade flex-col justify-center overflow-auto bg-midnight px-10 transition duration-500 animate-duration-1000 animate-once animate-ease-in-out">
           <ul className="flex flex-col gap-6 text-3xl text-pearl sm:text-4xl">
-            <li className="pointer-events-auto cursor-pointer transition duration-500 hover:brightness-200 focus-visible:outline-0">
-              BRAND {">"}
+            <li
+              onClick={() => setOpen(false)}
+              className="pointer-events-auto cursor-pointer transition duration-500 hover:brightness-200 focus-visible:outline-0"
+            >
+              <ScrollLink id="brand">BRAND {">"}</ScrollLink>
             </li>
-            <li className="pointer-events-auto cursor-pointer transition duration-500 hover:brightness-200 focus-visible:outline-0">
-              QUIÉNES SOMOS {">"}
+            <li
+              onClick={() => setOpen(false)}
+              className="pointer-events-auto cursor-pointer transition duration-500 hover:brightness-200 focus-visible:outline-0"
+            >
+              <ScrollLink id="quienesSomosMobile">
+                QUIÉNES SOMOS {">"}
+              </ScrollLink>
             </li>
-            <li className="pointer-events-auto cursor-pointer transition duration-500 hover:brightness-200 focus-visible:outline-0">
-              SERVICIOS {">"}
+            <li
+              onClick={() => setOpen(false)}
+              className="pointer-events-auto cursor-pointer transition duration-500 hover:brightness-200 focus-visible:outline-0"
+            >
+              <ScrollLink id="servicios">SERVICIOS {">"}</ScrollLink>
             </li>
-            <li className="pointer-events-auto cursor-pointer transition duration-500 hover:brightness-200 focus-visible:outline-0">
-              CONTACTO {">"}
+            <li
+              onClick={() => setOpen(false)}
+              className="pointer-events-auto cursor-pointer transition duration-500 hover:brightness-200 focus-visible:outline-0"
+            >
+              <ScrollLink id="contacto">CONTACTO {">"}</ScrollLink>
             </li>
           </ul>
         </div>
