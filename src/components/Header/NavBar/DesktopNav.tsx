@@ -15,14 +15,14 @@ export default function DesktopNav() {
         </li>
       </ul>
 
-      <Link href={"/"}>
+      <ScrollLink id="home">
         <Image
           src={logo}
           width={200}
           alt="logo"
           className="animate-fade ease-in-out animate-normal animate-duration-[3000ms] animate-fill-both animate-once"
         />
-      </Link>
+      </ScrollLink>
 
       <ul className="mt-2 flex animate-fade-down gap-12 transition animate-normal animate-duration-[3000ms] animate-fill-both animate-once">
         <li className="underline-offset-8 transition-all duration-300 ease-in-out hover:scale-105 hover:text-white hover:underline hover:brightness-200">

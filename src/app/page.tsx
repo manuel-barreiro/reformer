@@ -23,6 +23,7 @@ export default function Home() {
   }, [])
   return (
     <main className="">
+      <div className="h-0 w-full scroll-mt-32" id="home" />
       <Hero />
       <Brand />
       <QuienesSomos />

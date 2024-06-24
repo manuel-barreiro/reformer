@@ -10,12 +10,14 @@ export default function MobileNav() {
 
   return (
     <nav className="flex items-center justify-between bg-midnight px-10 py-8 lg:hidden">
-      <Image
-        src={logo}
-        width={150}
-        alt="logo"
-        className="z-50 animate-fade ease-in-out animate-normal animate-duration-[3000ms] animate-fill-both animate-once"
-      />
+      <ScrollLink id="hero">
+        <Image
+          src={logo}
+          width={150}
+          alt="logo"
+          className="z-50 animate-fade ease-in-out animate-normal animate-duration-[3000ms] animate-fill-both animate-once"
+        />
+      </ScrollLink>
 
       {/* Botón para abrir o cerrar menú */}
       {!open ? (
