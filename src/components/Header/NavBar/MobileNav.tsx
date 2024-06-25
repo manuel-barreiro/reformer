@@ -3,21 +3,21 @@
 import Image from "next/image"
 import { logo } from "../../../../public"
 import { useState } from "react"
-import ScrollLink from "@/components/ScrollLink"
+import Link from "next/link"
 
 export default function MobileNav() {
   const [open, setOpen] = useState(false)
 
   return (
     <nav className="flex items-center justify-between bg-midnight px-10 py-8 lg:hidden">
-      <ScrollLink id="hero">
+      <Link href="#home" className="z-50" onClick={() => setOpen(false)}>
         <Image
           src={logo}
           width={150}
           alt="logo"
-          className="z-50 animate-fade ease-in-out animate-normal animate-duration-[3000ms] animate-fill-both animate-once"
+          className="animate-fade ease-in-out animate-normal animate-duration-[3000ms] animate-fill-both animate-once"
         />
-      </ScrollLink>
+      </Link>
 
       {/* Botón para abrir o cerrar menú */}
       {!open ? (
@@ -57,27 +57,25 @@ export default function MobileNav() {
               onClick={() => setOpen(false)}
               className="pointer-events-auto cursor-pointer transition duration-500 hover:brightness-200 focus-visible:outline-0"
             >
-              <ScrollLink id="brand">BRAND {">"}</ScrollLink>
+              <Link href="#brand">BRAND {">"}</Link>
             </li>
             <li
               onClick={() => setOpen(false)}
               className="pointer-events-auto cursor-pointer transition duration-500 hover:brightness-200 focus-visible:outline-0"
             >
-              <ScrollLink id="quienesSomosMobile">
-                QUIÉNES SOMOS {">"}
-              </ScrollLink>
+              <Link href="#quienesSomosMobile">QUIÉNES SOMOS {">"}</Link>
             </li>
             <li
               onClick={() => setOpen(false)}
               className="pointer-events-auto cursor-pointer transition duration-500 hover:brightness-200 focus-visible:outline-0"
             >
-              <ScrollLink id="servicios">SERVICIOS {">"}</ScrollLink>
+              <Link href="#servicios">SERVICIOS {">"}</Link>
             </li>
             <li
               onClick={() => setOpen(false)}
               className="pointer-events-auto cursor-pointer transition duration-500 hover:brightness-200 focus-visible:outline-0"
             >
-              <ScrollLink id="contacto">CONTACTO {">"}</ScrollLink>
+              <Link href="#contacto">CONTACTO {">"}</Link>
             </li>
           </ul>
         </div>

@@ -1,33 +1,32 @@
 import React from "react"
 import { footer_logo } from "../../public"
 import Image from "next/image"
-import ScrollLink from "@/components/ScrollLink"
-
+import Link from "next/link"
 export default function Footer() {
   return (
     <footer className="bg-midnight px-10 pb-10 pt-20 lg:px-20">
       <div className="relative mx-auto">
         <div className="mb-12 h-[1px] w-full bg-pearl" />
         <div className="flex flex-col items-start gap-12 sm:flex-row sm:justify-between">
-          <ScrollLink id="home">
+          <Link href="#home">
             <Image src={footer_logo} alt="footer logo" width={200} />
-          </ScrollLink>
+          </Link>
 
           <ul className="flex flex-col items-start gap-2">
             <li className="pointer-events-auto text-grey_pebble transition duration-500 hover:brightness-200 focus-visible:outline-0">
-              <ScrollLink id="brand">Brand</ScrollLink>
+              <Link href="#brand">Brand</Link>
             </li>
 
             <li className="pointer-events-auto text-grey_pebble transition duration-500 hover:brightness-200 focus-visible:outline-0">
-              <ScrollLink id="quienesSomosMobile">Quiénes somos</ScrollLink>
+              <Link href="#quienesSomosMobile">Quiénes somos</Link>
             </li>
 
             <li className="pointer-events-auto text-grey_pebble transition duration-500 hover:brightness-200 focus-visible:outline-0">
-              <ScrollLink id="servicios">Servicios</ScrollLink>
+              <Link href="#servicios">Servicios</Link>
             </li>
 
             <li className="pointer-events-auto text-grey_pebble transition duration-500 hover:brightness-200 focus-visible:outline-0">
-              <ScrollLink id="contacto">Contacto</ScrollLink>
+              <Link href="#contacto">Contacto</Link>
             </li>
           </ul>
         </div>

@@ -38,7 +38,5 @@ html.lenis body {
   pointer-events: none;
 }
 
-html {
-  scroll-behavior: smooth !important;
-}
+
 

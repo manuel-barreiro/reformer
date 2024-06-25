@@ -19,11 +19,6 @@ export default function Pilates() {
     animate: { y: 0, opacity: 1 },
   }
 
-  const listAnimationLeft = {
-    initial: { x: 15, opacity: 0 },
-    animate: { x: 0, opacity: 1 },
-  }
-
   const listAnimationRight = {
     initial: { x: -15, opacity: 0 },
     animate: { x: 0, opacity: 1 },
@@ -69,7 +64,7 @@ export default function Pilates() {
       <div className="flex w-full justify-center text-pearl">
         <ul className="ml-5 flex list-disc flex-col gap-4 text-justify text-base font-thin sm:max-w-[80%] lg:max-w-[90%] lg:text-lg">
           <motion.li
-            variants={listAnimationLeft}
+            variants={listAnimationRight}
             initial="initial"
             whileInView="animate"
             viewport={{ once: true }}
@@ -91,7 +86,7 @@ export default function Pilates() {
             solicitan esta parte del cuerpo.
           </motion.li>
           <motion.li
-            variants={listAnimationLeft}
+            variants={listAnimationRight}
             initial="initial"
             whileInView="animate"
             viewport={{ once: true }}
