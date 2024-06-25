@@ -32,7 +32,7 @@ export default function Hero() {
           alt="Reformer Wellness Club"
           title="Reformer Yoga, Pilates, Massages"
           priority={true}
-          className="inset-0 hidden h-full w-full object-cover object-left md:block"
+          className="inset-0 hidden h-full w-full object-cover object-center md:block"
           src={hero}
         />
       </motion.div>
