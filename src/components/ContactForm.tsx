@@ -89,8 +89,8 @@ export default function ContactForm() {
             autoComplete="off"
           >
             {/* Inputs */}
-            <div className="grid w-full grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-16">
-              <div className="flex w-full flex-col items-center justify-start gap-4 lg:col-span-1">
+            <div className="grid w-full grid-cols-1 gap-6 lg:grid-cols-2 lg:gap-16">
+              <div className="flex w-full flex-col items-center justify-start gap-6 lg:col-span-1">
                 <FormField
                   control={form.control}
                   name="nombre"
