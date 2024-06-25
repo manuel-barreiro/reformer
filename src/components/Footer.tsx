@@ -10,7 +10,7 @@ export default function Footer() {
         <div className="mb-12 h-[1px] w-full bg-pearl" />
         <div className="flex flex-col items-start gap-12 md:flex-row md:items-center md:justify-between">
           <Link href="#home">
-            <Image src={footer_logo} alt="footer logo" width={200} />
+            <Image src={footer_logo} alt="Reformer Logo" width={200} />
           </Link>
 
           <div className="flex flex-col gap-3 text-pearl">

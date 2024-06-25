@@ -26,9 +26,8 @@ export default function QuienesSomos() {
       <div className="relative h-screen overflow-hidden lg:basis-[40%]">
         <motion.div className="absolute h-[110%] w-full" style={{ top: y }}>
           <Image
-            alt="Reformer Wellness Club"
-            title="Reformer"
-            priority={true}
+            alt="Reformer Club"
+            title="Reformer Wellness Club"
             className="inset-0 h-full w-full object-cover object-bottom sm:object-center"
             src={quienes_somos}
           />

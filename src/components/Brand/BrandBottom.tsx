@@ -24,8 +24,7 @@ function BrandBottom() {
       <motion.div className="absolute h-[140%] w-full" style={{ top: y }}>
         <Image
           alt="Reformer Wellness Club"
-          title="Reformer"
-          priority={true}
+          title="Reformer Club"
           className="inset-0 h-full w-full object-cover object-left"
           src={brand}
         />

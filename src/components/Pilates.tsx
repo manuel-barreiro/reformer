@@ -30,9 +30,8 @@ export default function Pilates() {
     >
       <motion.div className="absolute -z-10 h-[110%] w-full" style={{ top: y }}>
         <Image
-          alt="Reformer Wellness Club"
-          title="Reformer"
-          priority={true}
+          alt="Pilates"
+          title="Reformer Club Pilates"
           className="inset-0 h-full w-full object-cover object-center"
           src={seccionPilates}
         />

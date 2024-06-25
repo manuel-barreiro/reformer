@@ -18,7 +18,8 @@ export default function DesktopNav() {
         <Image
           src={logo}
           width={200}
-          alt="logo"
+          alt="Reformer Logo"
+          priority={true}
           className="animate-fade ease-in-out animate-normal animate-duration-[3000ms] animate-fill-both animate-once"
         />
       </Link>

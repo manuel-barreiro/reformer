@@ -14,7 +14,8 @@ export default function MobileNav() {
         <Image
           src={logo}
           width={150}
-          alt="logo"
+          priority={true}
+          alt="Reformer Logo"
           className="animate-fade ease-in-out animate-normal animate-duration-[3000ms] animate-fill-both animate-once"
         />
       </Link>
