@@ -111,7 +111,7 @@ export default function Footer() {
 
         <div className="mt-10 flex flex-col items-center gap-5 md:flex-row md:justify-between">
           <TooltipProvider>
-            <div className="-ml-1 hidden gap-3 text-pearl md:flex">
+            <div className="-ml-1 hidden gap-3 uppercase text-pearl md:flex">
               <Tooltip>
                 <TooltipTrigger>
                   <a
