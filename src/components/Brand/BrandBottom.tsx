@@ -1,6 +1,6 @@
 "use client"
 import React, { useEffect } from "react"
-import { brand } from "../../../public"
+import brand from "/public/images/brand.webp"
 import Image from "next/image"
 import { useRef } from "react"
 import { motion, useInView, useScroll, useTransform } from "framer-motion"

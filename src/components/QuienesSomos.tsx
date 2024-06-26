@@ -1,5 +1,9 @@
 "use client"
-import { quienes_somos, cuerpo, bienestar, espiritu, mente } from "../../public"
+import cuerpo from "/public/icons/cuerpo.svg"
+import mente from "/public/icons/mente.svg"
+import bienestar from "/public/icons/bienestar.svg"
+import espiritu from "/public/icons/espiritu.svg"
+import quienesSomos from "/public/images/quienesSomos.webp"
 import Image from "next/image"
 import { useRef } from "react"
 import { motion, useScroll, useTransform } from "framer-motion"
@@ -29,7 +33,7 @@ export default function QuienesSomos() {
             alt="Reformer Club"
             title="Reformer Wellness Club"
             className="inset-0 h-full w-full object-cover object-bottom sm:object-center"
-            src={quienes_somos}
+            src={quienesSomos}
           />
         </motion.div>
       </div>

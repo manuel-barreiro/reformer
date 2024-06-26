@@ -1,5 +1,5 @@
 import Image from "next/image"
-import { logo } from "../../../../public"
+import logo from "/public/icons/logo.svg"
 import Link from "next/link"
 
 export default function DesktopNav() {

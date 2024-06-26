@@ -1,6 +1,7 @@
 "use client"
 import { useRef } from "react"
-import { seccionPilates } from "../../public"
+import seccionPilates from "/public/images/seccionPilates.webp"
+
 import Image from "next/image"
 import { motion, useScroll, useTransform } from "framer-motion"
 

@@ -1,5 +1,7 @@
 import Servicio from "./Servicio"
-import { yoga, pilates, masajes } from "../../../public"
+import yoga from "/public/images/yoga.webp"
+import pilates from "/public/images/pilates.webp"
+import masajes from "/public/images/masajes.webp"
 import { ServicioInfo } from "../../../types"
 
 const pilatesInfo: ServicioInfo[] = [
