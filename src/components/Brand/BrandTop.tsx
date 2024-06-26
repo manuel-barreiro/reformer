@@ -1,4 +1,4 @@
-import isotipo from "/public/icons/isotipo.svg"
+import isotipo from "../../../public/icons/isotipo.svg"
 import Image from "next/image"
 
 function BrandTop() {

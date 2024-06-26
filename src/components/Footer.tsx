@@ -1,10 +1,10 @@
-import logoIzqFooter from "/public/icons/logoIzqFooter.svg"
+import logoIzqFooter from "../../public/icons/logoIzqFooter.svg"
 import Image from "next/image"
 import Link from "next/link"
-import instagram from "/public/icons/instagram.svg"
-import location from "/public/icons/location.svg"
-import email from "/public/icons/email.svg"
-import whatsapp from "/public/icons/whatsapp.svg"
+import instagram from "../../public/icons/instagram.svg"
+import location from "../../public/icons/location.svg"
+import email from "../../public/icons/email.svg"
+import whatsapp from "../../public/icons/whatsapp.svg"
 import {
   Tooltip,
   TooltipContent,
