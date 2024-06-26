@@ -175,7 +175,7 @@ export default function Footer() {
             </div>
           </TooltipProvider>
           <p className="text-center text-sm text-grey_pebble lg:text-right">
-            Reformer Wellness Club &reg; 2024. Todos los derechos reservados.
+            Reformer Wellness Club &reg; 2024
           </p>
         </div>
       </div>
