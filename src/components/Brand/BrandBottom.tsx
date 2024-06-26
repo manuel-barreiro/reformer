@@ -40,20 +40,15 @@ function BrandBottom() {
           <span className="font-dm_mono text-sm font-extralight text-pearl">
             noun
           </span>
-          {/* <p
-            ref={ref}
-            className="-mt-4 max-w-sm text-wrap font-dm_mono text-sm font-extralight text-pearl"
-          >
-            1. Un espacio que integra la actividad física{" "}
-            <br className="hidden sm:block" /> con el bienestar mental y
-            emocional.
-          </p> */}
           <div
             ref={ref}
             className="-mt-4 h-[100px] w-[300px] text-wrap font-dm_mono text-sm font-extralight text-pearl sm:w-[350px]"
           >
             {isInView && (
               <Typewriter
+                options={{
+                  delay: 35,
+                }}
                 onInit={(typewriter) => {
                   typewriter
                     .typeString(
