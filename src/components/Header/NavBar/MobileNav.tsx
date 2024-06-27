@@ -58,25 +58,40 @@ export default function MobileNav() {
               onClick={() => setOpen(false)}
               className="pointer-events-auto cursor-pointer transition duration-500 hover:brightness-200 focus-visible:outline-0"
             >
-              <Link href="/#brand">BRAND {">"}</Link>
+              <Link href="/#brand" className="flex items-center gap-2">
+                <span>BRAND</span>
+                <span className="mb-1">{">"}</span>
+              </Link>
             </li>
             <li
               onClick={() => setOpen(false)}
               className="pointer-events-auto cursor-pointer transition duration-500 hover:brightness-200 focus-visible:outline-0"
             >
-              <Link href="/#quienesSomosMobile">QUIÉNES SOMOS {">"}</Link>
+              <Link
+                href="/#quienesSomosMobile"
+                className="flex items-center gap-2"
+              >
+                <span>QUIÉNES SOMOS</span>
+                <span className="mb-1">{">"}</span>
+              </Link>
             </li>
             <li
               onClick={() => setOpen(false)}
               className="pointer-events-auto cursor-pointer transition duration-500 hover:brightness-200 focus-visible:outline-0"
             >
-              <Link href="/#servicios">SERVICIOS {">"}</Link>
+              <Link href="/#servicios" className="flex items-center gap-2">
+                <span>SERVICIOS</span>
+                <span className="mb-1">{">"}</span>
+              </Link>
             </li>
             <li
               onClick={() => setOpen(false)}
               className="pointer-events-auto cursor-pointer transition duration-500 hover:brightness-200 focus-visible:outline-0"
             >
-              <Link href="/#contacto">CONTACTO {">"}</Link>
+              <Link href="/#contacto" className="flex items-center gap-2">
+                <span>CONTACTO</span>
+                <span className="mb-1">{">"}</span>
+              </Link>
             </li>
           </ul>
         </div>

@@ -83,7 +83,7 @@ export default function Footer() {
                 </TooltipTrigger>
                 <TooltipContent className="bg-grey_pebble text-pearl">
                   <span className="font-dm_mono text-xs font-medium">
-                    Avenida Benavídez 1897
+                    BUENOS AIRES
                   </span>
                 </TooltipContent>
               </Tooltip>
@@ -168,7 +168,7 @@ export default function Footer() {
                 </TooltipTrigger>
                 <TooltipContent className="bg-grey_pebble text-pearl">
                   <span className="font-dm_mono text-xs font-medium">
-                    Avenida Benavídez 1897
+                    BUENOS AIRES
                   </span>
                 </TooltipContent>
               </Tooltip>
