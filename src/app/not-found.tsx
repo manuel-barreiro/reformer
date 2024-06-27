@@ -1,7 +1,7 @@
 "use client"
 import Link from "next/link"
 import Image from "next/image"
-import notFoundBw from "../../public/images/notFoundBw.jpg"
+import notFoundBw from "../../public/images/notFoundBw.webp"
 
 export default function NotFound() {
   return (
