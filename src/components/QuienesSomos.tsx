@@ -21,7 +21,7 @@ export default function QuienesSomos() {
   }
   return (
     <section
-      className="flex h-auto w-full scroll-mt-28 flex-col lg:h-[100vh] lg:flex-row"
+      className="flex h-auto w-full scroll-mt-28 flex-col bg-pearl lg:h-[100vh] lg:flex-row"
       id="quienesSomos"
     >
       <div className="relative h-screen overflow-hidden lg:basis-[40%]">
@@ -36,7 +36,7 @@ export default function QuienesSomos() {
       </div>
 
       <div
-        className="flex h-auto scroll-mt-28 flex-col items-start justify-center bg-pearl px-14 py-20 md:items-center lg:basis-[60%] lg:items-start lg:py-28 lg:pl-36"
+        className="flex h-auto scroll-mt-28 flex-col items-start justify-center px-14 py-20 md:items-center lg:basis-[60%] lg:items-start lg:py-28 lg:pl-36"
         style={{ cursor: "url(icons/solGreyPebble.svg),auto" }}
         id="quienesSomosMobile"
       >
