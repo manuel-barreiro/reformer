@@ -11,6 +11,7 @@ import ContactForm from "@/components/ContactForm"
 import Pilates from "@/components/Pilates"
 
 export default function Home() {
+  //Lenis smooth scroll
   useEffect(() => {
     const lenis = new Lenis()
     function raf(time: any) {
@@ -20,6 +21,7 @@ export default function Home() {
 
     requestAnimationFrame(raf)
   }, [])
+
   return (
     <main className="">
       <div className="h-0 w-full scroll-mt-32" id="home" />

@@ -1,14 +1,14 @@
 "use client"
 import Link from "next/link"
 import Image from "next/image"
-import notFound from "../../public/images/notFound.webp"
+import notFoundBw from "../../public/images/notFoundBw.jpg"
 
 export default function NotFound() {
   return (
-    <div className="flex flex-col md:h-[85vh] md:flex-row">
-      <div className="flex h-[90vh] flex-col items-center justify-center gap-5 bg-grey_pebble px-10 py-8 text-center font-marcellus text-pearl md:h-auto md:basis-1/2 lg:px-20">
-        <span className="mb-3 font-dm_mono text-2xl font-bold tracking-tight sm:text-4xl">
-          :(
+    <div>
+      <div className="flex h-auto flex-col items-center justify-center gap-5 bg-grey_pebble px-10 py-12 text-center font-marcellus text-pearl lg:px-20">
+        <span className="mb-3 text-4xl font-bold tracking-tight">
+          Oops {":("}
         </span>
 
         <h1 className="text-2xl font-bold tracking-tight lg:text-4xl">
@@ -29,9 +29,9 @@ export default function NotFound() {
         </Link>
       </div>
       <Image
-        src={notFound}
+        src={notFoundBw}
         alt="404"
-        className="hidden basis-1/2 object-cover object-center md:block"
+        className="object-cover object-bottom"
       />
     </div>
   )

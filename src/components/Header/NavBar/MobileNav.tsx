@@ -10,7 +10,7 @@ export default function MobileNav() {
 
   return (
     <nav className="flex items-center justify-between bg-midnight px-10 py-8 lg:hidden">
-      <Link href="#home" className="z-50" onClick={() => setOpen(false)}>
+      <Link href="/#home" className="z-50" onClick={() => setOpen(false)}>
         <Image
           src={logo}
           width={150}
@@ -58,25 +58,25 @@ export default function MobileNav() {
               onClick={() => setOpen(false)}
               className="pointer-events-auto cursor-pointer transition duration-500 hover:brightness-200 focus-visible:outline-0"
             >
-              <Link href="#brand">BRAND {">"}</Link>
+              <Link href="/#brand">BRAND {">"}</Link>
             </li>
             <li
               onClick={() => setOpen(false)}
               className="pointer-events-auto cursor-pointer transition duration-500 hover:brightness-200 focus-visible:outline-0"
             >
-              <Link href="#quienesSomosMobile">QUIÉNES SOMOS {">"}</Link>
+              <Link href="/#quienesSomosMobile">QUIÉNES SOMOS {">"}</Link>
             </li>
             <li
               onClick={() => setOpen(false)}
               className="pointer-events-auto cursor-pointer transition duration-500 hover:brightness-200 focus-visible:outline-0"
             >
-              <Link href="#servicios">SERVICIOS {">"}</Link>
+              <Link href="/#servicios">SERVICIOS {">"}</Link>
             </li>
             <li
               onClick={() => setOpen(false)}
               className="pointer-events-auto cursor-pointer transition duration-500 hover:brightness-200 focus-visible:outline-0"
             >
-              <Link href="#contacto">CONTACTO {">"}</Link>
+              <Link href="/#contacto">CONTACTO {">"}</Link>
             </li>
           </ul>
         </div>
