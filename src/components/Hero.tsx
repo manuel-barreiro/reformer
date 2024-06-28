@@ -2,7 +2,6 @@
 
 import hero from "/public/images/hero.webp"
 import heroMobile from "../../public/images/heroMobile.webp"
-
 import Image from "next/image"
 import { useRef } from "react"
 import { motion, useScroll, useTransform } from "framer-motion"

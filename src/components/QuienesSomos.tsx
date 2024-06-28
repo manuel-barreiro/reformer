@@ -43,19 +43,17 @@ export default function QuienesSomos() {
         <div className="flex max-w-lg flex-col items-start gap-10 text-justify font-dm_sans">
           <p className="font-dm_mono text-midnight">QUIÉNES SOMOS</p>
           <p>
-            Hacemos de tu bienestar nuestra prioridad. Reformer Wellness Club
-            ofrece una experiencia única para desarrollar y perfeccionar tu
-            yo-físico con practicas como Pilates y Yoga, y a su vez, enfocarnos
-            y elevar consciencia.{" "}
+            Somos un estudio de power y HIIT pilates. Somos un estudio de yoga.
+            Somos un lugar para regenerarte y recuperarte con stretching,
+            masajes y técnicas de respiración.{" "}
             <span className="font-bold">
-              Fluimos con intención, con fuerza, con flexibilidad y con nuestro
-              fuego interno.
+              Somos el espacio en donde empieza tu transformación.
             </span>
           </p>
           <p>
-            ¿Nuestro objetivo? Energizarte, desafiarte y centrarte con nuestras
-            clases con el propósito de que logres una transformación tanto
-            externa como interna. Buscamos que logres esa plenitud integral.
+            Somos un club que ofrece una experiencia única para maximizar tu
+            potencial y mantenerte rindiendo al 100%. Nosotros hacemos que tu
+            bienestar y metas de realizamiento físico, sean nuestra prioridad.
           </p>
           <div className="grid h-auto w-full grid-cols-2 gap-8 sm:flex sm:items-center sm:justify-between">
             <motion.div
@@ -112,10 +110,11 @@ export default function QuienesSomos() {
             </motion.div>
           </div>
           <p>
-            El verdadero cambio proviene de tomar consciencia sobre nuestra
-            realidad, y aceptarla para luego reformarla y en última instancia
-            TRANSFORMARLA. Nosotros buscamos darte las herramientas básicas para
-            que puedas poner mente cuerpo y alma a la obra.
+            Te damos el know how y el entrenamiento necesario para{" "}
+            <span className="font-bold">
+              poner cuerpo, mente y alma a la obra.{" "}
+            </span>
+            Sumáte para convertirte en tu mejor version, empezá hoy.
           </p>
         </div>
       </div>
