@@ -1,14 +1,15 @@
 "use client"
-import Brand from "@/components/Brand/Brand"
-import ComingSoon from "@/components/ComingSoon"
-import Hero from "@/components/Hero"
-import QuienesSomos from "@/components/QuienesSomos"
+import Brand from "@/components/routes/root/Brand/Brand"
+import ComingSoon from "@/components/routes/root/ComingSoon"
+import Hero from "@/components/routes/root/Hero/Hero"
+import QuienesSomos from "@/components/routes/root/QuienesSomos"
 import { useEffect } from "react"
 import Lenis from "lenis"
-import Footer from "@/components/Footer"
-import ServiciosGrid from "@/components/Servicios/ServiciosGrid"
-import ContactForm from "@/components/ContactForm"
-import Pilates from "@/components/Pilates"
+import Footer from "@/components/routes/root/Footer/Footer"
+import ServiciosGrid from "@/components/routes/root/Servicios/ServiciosGrid"
+import ContactForm from "@/components/routes/root/Footer/ContactForm"
+import Pilates from "@/components/routes/root/Pilates"
+import Paquetes from "@/components/routes/root/Paquetes"
 
 export default function Home() {
   //Lenis smooth scroll
@@ -31,6 +32,7 @@ export default function Home() {
       <ComingSoon />
       <ServiciosGrid />
       <Pilates />
+      <Paquetes />
       <ContactForm />
       <Footer />
     </main>

@@ -2,7 +2,8 @@ import type { Metadata, Viewport } from "next"
 import { Marcellus, DM_Sans, DM_Mono } from "next/font/google"
 import "./globals.css"
 import { Toaster } from "@/components/ui/toaster"
-import Header from "@/components/Header/Header"
+import Header from "@/components/routes/root/Header/Header"
+import { SolPearl } from "@/assets/icons"
 
 const marcellus = Marcellus({
   weight: "400",
@@ -28,7 +29,7 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       { url: "/icons/favicon-light.png" },
-      new URL("/icons/favicon-light.png", "https://reformerclub.vercel.app"),
+      new URL("/icons/favicon-light.png", "https://reformer.com.ar"),
       { url: "/icons/favicon-dark.png", media: "(prefers-color-scheme: dark)" },
     ],
     shortcut: ["/icons/favicon-light.png"],
