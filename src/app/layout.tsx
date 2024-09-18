@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next"
 import { Marcellus, DM_Sans, DM_Mono } from "next/font/google"
 import "./globals.css"
 import { Toaster } from "@/components/ui/toaster"
-import Header from "@/components/Header/Header"
+import Header from "@/components/routes/root/Header/Header"
 
 const marcellus = Marcellus({
   weight: "400",
