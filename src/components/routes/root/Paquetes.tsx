@@ -40,7 +40,7 @@ export default function Paquetes() {
 
       <h2 className="text-lg uppercase">Nuestros paquetes</h2>
 
-      <div className="grid h-auto w-auto max-w-[900px] grid-cols-1 gap-6 bg-midnight/60 md:grid-cols-3 md:gap-0">
+      <div className="grid h-auto w-auto max-w-[900px] grid-cols-1 gap-6 md:grid-cols-3 md:gap-0">
         <Paquete clases="4" duracion="1" precio="48.000" />
         <Paquete clases="8" duracion="1" precio="80.000" />
         <Paquete clases="12" duracion="1" precio="108.000" />
@@ -59,7 +59,7 @@ function Paquete({
   precio: string
 }) {
   return (
-    <div className="flex h-full flex-col items-center justify-evenly">
+    <div className="flex h-full flex-col items-center justify-evenly bg-midnight/60">
       <div className="w-full flex-1 border-[2px] border-b-0 border-grey_pebble p-6 text-center">
         <span className="w-full text-lg font-thin">X{clases} CLASES</span>
       </div>
