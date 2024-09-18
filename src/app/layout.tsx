@@ -3,6 +3,7 @@ import { Marcellus, DM_Sans, DM_Mono } from "next/font/google"
 import "./globals.css"
 import { Toaster } from "@/components/ui/toaster"
 import Header from "@/components/routes/root/Header/Header"
+import { SolPearl } from "@/assets/icons"
 
 const marcellus = Marcellus({
   weight: "400",
@@ -61,11 +62,11 @@ export default function RootLayout({
   return (
     <html
       lang="es"
-      className="scrollbar-hide overflow-hidden scroll-smooth"
+      className="scrollbar-hide scroll-smooth"
       style={{ cursor: "url(icons/solPearl.svg),auto" }}
     >
       <body
-        className={`${marcellus.variable} ${dm_sans.variable} ${dm_sans.className} ${dm_mono.variable} scrollbar-hide overflow-hidden`}
+        className={`${marcellus.variable} ${dm_sans.variable} ${dm_sans.className} ${dm_mono.variable} scrollbar-hide`}
       >
         <Header />
         {children}
