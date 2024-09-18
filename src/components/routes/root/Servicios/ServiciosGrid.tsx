@@ -10,24 +10,9 @@ const pilatesInfo: ServicioInfo[] = [
     zone: "Musculatura del tren superior",
   },
   {
-    name: "POWER STRENGTH YIN",
+    name: "LOWER BODY BURN",
     intensity: 4,
     zone: "Inferior (glúteos y piernas)",
-  },
-  {
-    name: "FLEXIBILIDAD",
-    intensity: 3,
-    zone: "Elongación musculatura integral",
-  },
-  {
-    name: "RECOVERY",
-    intensity: 2,
-    zone: "Recovery para lesiones o imbalances",
-  },
-  {
-    name: "INDIVIDUALES",
-    intensity: "Personalizada",
-    zone: "Foco en puntos a elección",
   },
 ]
 const yogaInfo: ServicioInfo[] = [
@@ -40,9 +25,6 @@ const yogaInfo: ServicioInfo[] = [
     name: "VINYASA",
     description:
       "Se caracteriza por el dinamismo en la práctica del asana que están vinculadas con un flow más enérgico. La energía se centra en el fluir al ritmo de la respiración de una postura a otra. La inhalación nos llena de Prana al subir y se exhala al bajar (apana), limpiando el cuerpo internamente.",
-  },
-  {
-    name: "EMBARAZADAS",
   },
 ]
 
