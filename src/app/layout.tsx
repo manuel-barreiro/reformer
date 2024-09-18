@@ -61,11 +61,11 @@ export default function RootLayout({
   return (
     <html
       lang="es"
-      className="scrollbar-hide scroll-smooth"
+      className="scrollbar-hide overflow-hidden scroll-smooth"
       style={{ cursor: "url(icons/solPearl.svg),auto" }}
     >
       <body
-        className={`${marcellus.variable} ${dm_sans.variable} ${dm_sans.className} ${dm_mono.variable} scrollbar-hide`}
+        className={`${marcellus.variable} ${dm_sans.variable} ${dm_sans.className} ${dm_mono.variable} scrollbar-hide overflow-hidden`}
       >
         <Header />
         {children}
