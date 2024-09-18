@@ -44,7 +44,7 @@ export default function Hero() {
           <h1 className="animate-fade-up font-marcellus text-3xl font-medium text-pearl animate-delay-[1000ms] animate-normal animate-duration-[3000ms] animate-once animate-ease-in-out sm:text-4xl md:text-5xl lg:text-right lg:animate-delay-[1500ms] xl:text-6xl">
             MOVILIDAD.
           </h1>
-          <button className="mt-8 rounded-full border-[1px] border-grey_pebble bg-midnight/50 px-14 py-3 text-xl font-light text-pearl duration-300 ease-in-out hover:border-pearl hover:bg-midnight/80">
+          <button className="mt-8 animate-fade-up rounded-full border-[1px] border-grey_pebble bg-midnight/50 px-14 py-3 text-xl font-light text-pearl duration-300 ease-in-out animate-delay-[1000ms] animate-normal animate-duration-[3000ms] animate-once animate-ease-in-out hover:border-pearl hover:bg-midnight/80 lg:animate-delay-[1500ms]">
             RESERVÁ
           </button>
         </div>
