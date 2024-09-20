@@ -11,6 +11,9 @@ export default function DesktopNav() {
         <li className="underline-offset-8 transition-all duration-300 ease-in-out hover:scale-105 hover:text-white hover:underline hover:brightness-200">
           <Link href="/#quienesSomos">QUIÉNES SOMOS</Link>
         </li>
+        <li className="underline-offset-8 transition-all duration-300 ease-in-out hover:scale-105 hover:text-white hover:underline hover:brightness-200">
+          <Link href="/#servicios">SERVICIOS</Link>
+        </li>
       </ul>
 
       <Link href="/#home">
@@ -19,10 +22,13 @@ export default function DesktopNav() {
 
       <ul className="mt-2 flex animate-fade-down gap-12 transition animate-normal animate-duration-[3000ms] animate-fill-both animate-once">
         <li className="underline-offset-8 transition-all duration-300 ease-in-out hover:scale-105 hover:text-white hover:underline hover:brightness-200">
-          <Link href="/#servicios">SERVICIOS</Link>
+          <Link href="/#contacto">RESERVÁ</Link>
         </li>
         <li className="underline-offset-8 transition-all duration-300 ease-in-out hover:scale-105 hover:text-white hover:underline hover:brightness-200">
           <Link href="/#contacto">CONTACTO</Link>
+        </li>
+        <li className="underline-offset-8 transition-all duration-300 ease-in-out hover:scale-105 hover:text-white hover:underline hover:brightness-200">
+          <Link href="/sign-in">MI CUENTA</Link>
         </li>
       </ul>
     </nav>

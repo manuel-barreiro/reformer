@@ -1,6 +1,6 @@
 import { StaticImageData } from "next/image"
 import Image from "next/image"
-import { ServicioInfo } from "@/lib/types"
+import { ServicioInfo } from "@/types/types"
 
 type ServicioProps = {
   img: StaticImageData

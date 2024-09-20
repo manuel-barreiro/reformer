@@ -1,4 +1,5 @@
 "use client"
+import Header from "@/components/routes/root/Header/Header"
 import Brand from "@/components/routes/root/Brand/Brand"
 import ComingSoon from "@/components/routes/root/ComingSoon"
 import Hero from "@/components/routes/root/Hero/Hero"
@@ -24,17 +25,21 @@ export default function Home() {
   }, [])
 
   return (
-    <main className="">
-      <div className="h-0 w-full scroll-mt-32" id="home" />
-      <Hero />
-      <Brand />
-      <QuienesSomos />
-      <ComingSoon />
-      <ServiciosGrid />
-      <Pilates />
-      <Paquetes />
-      <ContactForm />
-      <Footer />
-    </main>
+    <>
+      <Header />
+
+      <main className="">
+        <div className="h-0 w-full scroll-mt-32" id="home" />
+        <Hero />
+        <Brand />
+        <QuienesSomos />
+        <ComingSoon />
+        <ServiciosGrid />
+        <Pilates />
+        <Paquetes />
+        <ContactForm />
+        <Footer />
+      </main>
+    </>
   )
 }
