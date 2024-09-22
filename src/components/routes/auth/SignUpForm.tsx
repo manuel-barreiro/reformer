@@ -53,7 +53,7 @@ export default function SignUpForm() {
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onRegister)}
-          className="w-auto min-w-96 space-y-6 rounded-lg"
+          className="w-auto min-w-96 space-y-6 rounded-lg px-10"
         >
           <div className="flex gap-4">
             <FormField
@@ -64,7 +64,7 @@ export default function SignUpForm() {
                   <FormLabel className="sr-only">Nombre</FormLabel>
                   <FormControl>
                     <Input
-                      className="bg-inputBg border-rust py-6 font-dm_mono text-midnight ring-rust ring-offset-rust placeholder:text-midnight"
+                      className="border-rust bg-inputBg py-6 font-dm_mono text-midnight ring-rust ring-offset-rust placeholder:text-midnight"
                       type="text"
                       placeholder="NOMBRE"
                       {...field}
@@ -83,7 +83,7 @@ export default function SignUpForm() {
                   <FormLabel className="sr-only">Surname</FormLabel>
                   <FormControl>
                     <Input
-                      className="bg-inputBg border-rust py-6 font-dm_mono text-midnight ring-rust ring-offset-rust placeholder:text-midnight"
+                      className="border-rust bg-inputBg py-6 font-dm_mono text-midnight ring-rust ring-offset-rust placeholder:text-midnight"
                       type="text"
                       placeholder="APELLIDO"
                       {...field}
@@ -103,7 +103,7 @@ export default function SignUpForm() {
                 <FormLabel className="sr-only">Email</FormLabel>
                 <FormControl>
                   <Input
-                    className="bg-inputBg border-rust py-6 font-dm_mono text-midnight ring-rust ring-offset-rust placeholder:text-midnight"
+                    className="border-rust bg-inputBg py-6 font-dm_mono text-midnight ring-rust ring-offset-rust placeholder:text-midnight"
                     type="email"
                     placeholder="EMAIL"
                     {...field}
@@ -122,7 +122,7 @@ export default function SignUpForm() {
                 <FormLabel className="sr-only">Celular</FormLabel>
                 <FormControl>
                   <Input
-                    className="bg-inputBg border-rust py-6 font-dm_mono text-midnight ring-rust ring-offset-rust placeholder:text-midnight"
+                    className="border-rust bg-inputBg py-6 font-dm_mono text-midnight ring-rust ring-offset-rust placeholder:text-midnight"
                     type="phone"
                     placeholder="CELULAR"
                     {...field}
@@ -141,7 +141,7 @@ export default function SignUpForm() {
                 <FormLabel className="sr-only">Contraseña</FormLabel>
                 <FormControl>
                   <Input
-                    className="bg-inputBg border-rust py-6 font-dm_mono text-midnight ring-rust ring-offset-rust placeholder:text-midnight"
+                    className="border-rust bg-inputBg py-6 font-dm_mono text-midnight ring-rust ring-offset-rust placeholder:text-midnight"
                     type="password"
                     placeholder="CONTRASEÑA"
                     {...field}
@@ -162,12 +162,12 @@ export default function SignUpForm() {
           <div className="flex w-full items-center justify-around">
             <Separator
               orientation="horizontal"
-              className="h-[0.5px] w-32 bg-rust"
+              className="h-[0.5px] w-24 bg-rust md:w-32"
             />
             <p className="w-auto font-dm_mono text-xs">O TAMBIÉN</p>
             <Separator
               orientation="horizontal"
-              className="h-[0.5px] w-32 bg-rust"
+              className="h-[0.5px] w-24 bg-rust md:w-32"
             />
           </div>
           <GoogleLoginButton />

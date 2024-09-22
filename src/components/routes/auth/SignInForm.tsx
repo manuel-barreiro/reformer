@@ -56,7 +56,7 @@ export default function SignInForm({
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onLogin)}
-          className="w-auto min-w-96 space-y-6 rounded-lg"
+          className="w-auto min-w-96 space-y-6 rounded-lg px-10"
         >
           {isVerified && (
             <p className="text-green-500">
@@ -77,7 +77,7 @@ export default function SignInForm({
                 <FormControl>
                   <Input
                     placeholder="EMAIL"
-                    className="bg-inputBg border-rust py-6 font-dm_mono text-midnight ring-rust ring-offset-rust placeholder:text-midnight"
+                    className="border-rust bg-inputBg py-6 font-dm_mono text-midnight ring-rust ring-offset-rust placeholder:text-midnight"
                     {...field}
                   />
                 </FormControl>
@@ -95,7 +95,7 @@ export default function SignInForm({
                   <Input
                     type="password"
                     placeholder="PASSWORD"
-                    className="bg-inputBg border-rust py-6 font-dm_mono text-midnight ring-rust ring-offset-rust placeholder:text-midnight"
+                    className="border-rust bg-inputBg py-6 font-dm_mono text-midnight ring-rust ring-offset-rust placeholder:text-midnight"
                     {...field}
                   />
                 </FormControl>
@@ -114,12 +114,12 @@ export default function SignInForm({
           <div className="flex w-full items-center justify-around">
             <Separator
               orientation="horizontal"
-              className="h-[0.5px] w-32 bg-rust"
+              className="h-[0.5px] w-24 bg-rust"
             />
             <p className="w-auto font-dm_mono text-xs">O TAMBIÉN</p>
             <Separator
               orientation="horizontal"
-              className="h-[0.5px] w-32 bg-rust"
+              className="h-[0.5px] w-24 bg-rust"
             />
           </div>
 
