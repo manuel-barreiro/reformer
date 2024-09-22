@@ -11,7 +11,7 @@ export const sendEmailVerification = async (email: string, token: string) => {
       subject: "Verifica tu correo electrónico",
       html: `
         <p>Clickea el siguiente enlace para verificar tu cuenta</p>
-        <a href="https://www.reformer.com.ar/api/auth/verify-email?token=${token}">Verify email</a>
+        <a href="${process.env.NEXTAUTH_URL}/api/auth/verify-email?token=${token}">Verify email</a>
       `,
     })
     // ${process.env.NEXTAUTH_URL}
