@@ -86,6 +86,15 @@ export default function MobileNav() {
                 <span className="mb-1">{">"}</span>
               </Link>
             </li>
+            <li
+              onClick={() => setOpen(false)}
+              className="pointer-events-auto cursor-pointer transition duration-500 hover:brightness-200 focus-visible:outline-0"
+            >
+              <Link href="/sign-in" className="flex items-center gap-2">
+                <span>MI CUENTA</span>
+                <span className="mb-1">{">"}</span>
+              </Link>
+            </li>
           </ul>
         </div>
       )}
