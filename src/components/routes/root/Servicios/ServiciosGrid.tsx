@@ -1,7 +1,7 @@
 import Servicio from "./Servicio"
 import yoga from "/public/images/yoga.webp"
 import pilates from "/public/images/pilates.webp"
-import { ServicioInfo } from "@/lib/types"
+import { ServicioInfo } from "@/types/types"
 
 const pilatesInfo: ServicioInfo[] = [
   {
