@@ -43,7 +43,7 @@ export default function SignUpForm() {
       if (register.error) {
         setError(register.error)
       } else {
-        router.push("/dashboard")
+        router.push("/paquetes")
       }
     })
   }

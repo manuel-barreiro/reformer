@@ -1,7 +1,7 @@
 import Image from "next/image"
 import Link from "next/link"
 import { Isotipo } from "@/assets/icons"
-import RegisterForm from "@/components/routes/auth/SignUpForm"
+import RegisterForm from "@/components/modules/auth/SignUpForm"
 
 export default function SignUp() {
   return (

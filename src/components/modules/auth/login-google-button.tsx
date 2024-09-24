@@ -7,7 +7,7 @@ export default function GoogleLoginButton() {
   return (
     <Button
       type="button"
-      onClick={() => signIn("google", { redirectTo: "/dashboard" })}
+      onClick={() => signIn("google", { redirectTo: "/paquetes" })}
       variant="outline"
       className="w-full py-6 font-dm_sans text-midnight duration-300 ease-in-out hover:border hover:border-midnight"
     >

@@ -46,7 +46,7 @@ export default function SignInForm({
       if (login.error) {
         setError(login.error)
       } else {
-        router.push("/dashboard")
+        router.push("/paquetes")
       }
     })
   }

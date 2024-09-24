@@ -29,6 +29,7 @@ const config = {
         midnight: "#231f20",
         rust: "#893f24",
         inputBg: "#D9D9D9",
+        pearlVariant: "#E9E7D9",
       },
       keyframes: {
         marquee: {

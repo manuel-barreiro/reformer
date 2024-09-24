@@ -1,6 +1,6 @@
 import Image from "next/image"
 import Link from "next/link"
-import LoginForm from "@/components/routes/auth/SignInForm"
+import LoginForm from "@/components/modules/auth/SignInForm"
 import { Isotipo } from "@/assets/icons"
 
 export default function SignIn({

@@ -433,3 +433,29 @@ export const GoogleSignInIcon = ({ ...props }) => (
     ></path>
   </svg>
 )
+
+export const ProfileImageMockup = ({ color = "currentColor", ...props }) => (
+  <svg
+    width="712"
+    height="712"
+    viewBox="0 0 712 712"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    {...props}
+  >
+    <circle cx="356" cy="356" r="356" fill={color} />
+  </svg>
+)
+
+export const ButtonCaretRight = ({ color = "currentColor", ...props }) => (
+  <svg
+    width="97"
+    height="136"
+    viewBox="0 0 97 136"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    {...props}
+  >
+    <path d="M4 4L88 67.6967L4 132" stroke={color} strokeWidth="10" />
+  </svg>
+)

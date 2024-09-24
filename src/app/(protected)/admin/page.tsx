@@ -1,5 +1,5 @@
 import { auth } from "@/auth"
-import LogoutButton from "@/components/routes/auth/logout-button"
+import LogoutButton from "@/components/modules/auth/logout-button"
 
 export default async function page() {
   const session = await auth()

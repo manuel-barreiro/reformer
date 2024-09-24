@@ -26,9 +26,9 @@ export default auth((req) => {
     return NextResponse.next()
   }
 
-  // Redirigir a /dashboard si el usuario está logueado y trata de acceder a rutas de autenticación
+  // Redirigir a /paquetes si el usuario está logueado y trata de acceder a rutas de autenticación
   if (isLoggedIn && authRoutes.includes(nextUrl.pathname)) {
-    return NextResponse.redirect(new URL("/dashboard", nextUrl))
+    return NextResponse.redirect(new URL("/paquetes", nextUrl))
   }
 
   // Redirigir a /sign-in si el usuario no está logueado y trata de acceder a una ruta protegida
@@ -40,9 +40,9 @@ export default auth((req) => {
     return NextResponse.redirect(new URL("/sign-in", nextUrl))
   }
 
-  // Redirigir a /dashboard si el rol del usuario es user e intenta acceder a /admin
+  // Redirigir a /paquetes si el rol del usuario es user e intenta acceder a /admin
   if (!userRole && nextUrl.pathname.startsWith("/admin")) {
-    return NextResponse.redirect(new URL("/dashboard", nextUrl))
+    return NextResponse.redirect(new URL("/paquetes", nextUrl))
   }
 
   return NextResponse.next()
