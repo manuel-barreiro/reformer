@@ -6,7 +6,7 @@ import {
 
 export default function PackageCard({ pack }: { pack: Package }) {
   return (
-    <div className="bg-pearlVariant flex h-auto min-w-[50%] flex-col items-start gap-3 rounded-xl p-6">
+    <div className="flex h-auto min-w-[50%] flex-col items-start gap-3 rounded-xl bg-pearlVariant p-6">
       <h1 className="font-dm_mono text-lg uppercase">{`x${pack.classQuantity} CLASES / ${pack.activity}`}</h1>
       {pack.activity === "YOGA" ? (
         <p className="text-sm">
