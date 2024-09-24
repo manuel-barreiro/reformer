@@ -1,6 +1,12 @@
-import HeaderToggle from "@/components/modules/user/common/HeaderToggle"
 import PackagesPage from "@/components/modules/user/paquetes/PackagesPage"
+import { mockPackages } from "@/components/modules/user/paquetes/utils/mockPackages"
 
-export default function MisPaquetes() {
-  return <PackagesPage />
+async function getInitialPackages() {
+  return mockPackages
+}
+
+export default async function MisPaquetes() {
+  const initialPackages = await getInitialPackages()
+
+  return <PackagesPage initialPackages={initialPackages} />
 }

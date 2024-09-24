@@ -30,6 +30,7 @@ const config = {
         rust: "#893f24",
         inputBg: "#D9D9D9",
         pearlVariant: "#E9E7D9",
+        pearlVariant2: "#F0EEE3",
       },
       keyframes: {
         marquee: {

@@ -1,7 +1,10 @@
-import HeaderToggle from "@/components/modules/user/common/HeaderToggle"
+import ReservasPage from "@/components/modules/user/reservas/ReservasPage"
+import { mockReservations } from "@/components/modules/user/reservas/utils/mockReservations"
+
+async function getInitialReservations() {
+  return mockReservations
+}
 
 export default function MisReservas() {
-  return (
-    <HeaderToggle title="Mis Reservas" filterOptions={["YOGA", "PILATES"]} />
-  )
+  return <ReservasPage initialReservations={mockReservations} />
 }

@@ -1,24 +1,32 @@
-export type Package = {
+export interface Package {
   id: number
-  activity: string
   classQuantity: number
-  purchaseDate: string
+  activity: string
   amount: number
+  isActive: boolean
 }
 
-export const mockPackages = [
+export const mockPackages: Package[] = [
   {
     id: 1,
-    activity: "PILATES",
     classQuantity: 4,
-    purchaseDate: "2021-09-01",
-    amount: 48000,
+    activity: "YOGA",
+    amount: 10000,
+    isActive: true,
   },
   {
     id: 2,
-    activity: "YOGA",
-    classQuantity: 4,
-    purchaseDate: "2021-09-01",
-    amount: 48000,
+    classQuantity: 8,
+    activity: "PILATES",
+    amount: 18000,
+    isActive: true,
   },
+  {
+    id: 3,
+    classQuantity: 12,
+    activity: "YOGA",
+    amount: 25000,
+    isActive: false,
+  },
+  // Add more mock packages as needed
 ]

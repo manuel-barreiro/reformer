@@ -1,12 +1,15 @@
 import React from "react"
-import {
-  Package,
-  mockPackages,
-} from "@/components/modules/user/paquetes/utils/mockPackages"
+import { Package } from "@/components/modules/user/paquetes/utils/mockPackages"
+import { cn } from "@/lib/utils"
 
 export default function PackageCard({ pack }: { pack: Package }) {
   return (
-    <div className="flex h-auto min-w-[50%] flex-col items-start gap-3 rounded-xl bg-pearlVariant p-6">
+    <div
+      className={cn(
+        "flex h-auto min-w-[50%] flex-col items-start gap-3 rounded-xl bg-pearlVariant p-6",
+        !pack.isActive && "text-grey_pebble/40"
+      )}
+    >
       <h1 className="font-dm_mono text-lg uppercase">{`x${pack.classQuantity} CLASES / ${pack.activity}`}</h1>
       {pack.activity === "YOGA" ? (
         <p className="text-sm">
