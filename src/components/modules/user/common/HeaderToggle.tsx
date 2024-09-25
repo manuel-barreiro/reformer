@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils"
 interface HeaderToggleProps {
   title: string
   filterOptions?: string[]
-  currentFilter: string
+  currentFilter?: string
   onFilterChange?: (filter: string) => void
 }
 
