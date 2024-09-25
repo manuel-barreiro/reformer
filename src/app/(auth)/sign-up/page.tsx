@@ -8,7 +8,7 @@ export default function SignUp() {
     <div className="min-h-[100dvh] w-full text-pearl lg:grid lg:grid-cols-2">
       <div className="relative hidden lg:block">
         <Image
-          src="/images/signup.webp"
+          src="/images/signUp.jpg"
           alt="Image"
           width="1920"
           height="1080"
