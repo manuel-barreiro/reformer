@@ -12,9 +12,9 @@ export default function SideMenuButton({
 }) {
   return (
     <Link key={title} href={href} className="w-full">
-      <Button className="bg-pearlVariant flex w-full items-center justify-between rounded-xl px-6 py-8 text-xl text-grey_pebble duration-300 ease-in-out hover:bg-grey_pebble hover:text-pearl">
+      <Button className="w-full rounded-lg bg-pearlVariant py-0 text-xs text-grey_pebble duration-300 ease-in-out hover:bg-grey_pebble hover:text-pearl sm:text-sm md:justify-between md:px-6 md:py-8 md:text-xl">
         <span>{title}</span>
-        <ButtonCaretRight className="h-5 w-5" />
+        <ButtonCaretRight className="hidden h-5 w-5 md:block" />
       </Button>
     </Link>
   )

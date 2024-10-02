@@ -24,30 +24,30 @@ export default async function SideMenu() {
   const session = await auth()
 
   return (
-    <div className="flex w-full flex-col items-center justify-evenly gap-3">
-      {session?.user?.image ? (
-        <Image
-          src={session?.user?.image}
-          height={96}
-          width={96}
-          alt="profile pic"
-          className="rounded-full"
-        />
-      ) : (
-        <ProfileImageMockup className="h-24 w-24 text-grey_pebble" />
-      )}
-      <div className="text-center">
-        <p className="font-dm_sans text-lg font-medium text-grey_pebble">
-          {session?.user?.name}
-        </p>
-        <p className="text-md font-medium text-grey_pebble/50">
-          {session?.user?.email && session.user.email.length > 30
-            ? `${session.user.email.slice(0, 27)}...`
-            : session?.user?.email}
-        </p>
+    <div className="flex w-full flex-col items-start justify-evenly gap-3 text-sm md:items-center">
+      <div className="flex items-center gap-3 md:flex-col">
+        {session?.user?.image ? (
+          <Image
+            src={session?.user?.image}
+            alt="profile pic"
+            className="h-[30px] w-[30px] rounded-full md:h-[96px] md:w-[96px]"
+          />
+        ) : (
+          <ProfileImageMockup className="h-[30px] w-[30px] rounded-full text-grey_pebble md:h-[96px] md:w-[96px]" />
+        )}
+        <div className="md:text-center">
+          <p className="font-dm_sans text-sm font-medium text-grey_pebble md:text-lg">
+            {session?.user?.name}
+          </p>
+          <p className="text-xs font-medium text-grey_pebble/50 md:text-base">
+            {session?.user?.email && session.user.email.length > 30
+              ? `${session.user.email.slice(0, 27)}...`
+              : session?.user?.email}
+          </p>
+        </div>
       </div>
 
-      <div className="flex w-[80%] flex-col gap-2">
+      <div className="flex w-full gap-2 md:w-[80%] md:flex-col">
         {menuItems.map((item) => (
           <SideMenuButton key={item.href} title={item.title} href={item.href} />
         ))}

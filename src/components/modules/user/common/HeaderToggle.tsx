@@ -15,8 +15,8 @@ export default function HeaderToggle({
   onFilterChange,
 }: HeaderToggleProps) {
   return (
-    <div className="flex w-full items-center justify-around border-b border-grey_pebble pb-6 font-dm_sans font-medium uppercase">
-      <h1 className="py-2 text-xl">{title}</h1>
+    <div className="flex w-full items-center justify-between border-grey_pebble pb-6 font-dm_sans text-xs font-medium uppercase sm:text-sm md:justify-around md:border-b md:text-base">
+      <h1 className="py-2">{title}</h1>
 
       {filterOptions && onFilterChange && (
         <div className="flex items-center rounded-full bg-pearlVariant">
@@ -25,7 +25,7 @@ export default function HeaderToggle({
               key={option}
               onClick={() => onFilterChange(option)}
               className={cn(
-                "rounded-full px-12 py-2 text-grey_pebble",
+                "rounded-full px-6 py-2 text-grey_pebble md:px-12",
                 currentFilter === option && "bg-grey_pebble text-pearl"
               )}
             >
