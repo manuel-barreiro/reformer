@@ -43,7 +43,7 @@ export default async function SideMenu() {
             <p className="font-dm_sans text-sm font-medium text-grey_pebble sm:text-base md:text-lg">
               {session?.user?.name}
             </p>
-            <p className="text-xs font-medium text-grey_pebble/50 sm:text-sm md:text-base">
+            <p className="cursor-default text-xs font-medium text-grey_pebble/50 sm:text-sm md:text-base">
               {session?.user?.email && session.user.email.length > 30
                 ? `${session.user.email.slice(0, 27)}...`
                 : session?.user?.email}
