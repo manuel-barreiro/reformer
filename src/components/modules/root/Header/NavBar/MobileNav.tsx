@@ -1,5 +1,4 @@
 "use client"
-
 import { Logo } from "@/assets/icons"
 import { useState } from "react"
 import Link from "next/link"
@@ -86,6 +85,7 @@ export default function MobileNav() {
                 <span className="mb-1">{">"}</span>
               </Link>
             </li>
+
             <li
               onClick={() => setOpen(false)}
               className="pointer-events-auto cursor-pointer transition duration-500 hover:brightness-200 focus-visible:outline-0"

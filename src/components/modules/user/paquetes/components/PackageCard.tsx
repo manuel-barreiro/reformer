@@ -25,7 +25,8 @@ export default function PackageCard({ pack }: { pack: Package }) {
       <div>
         <p className="mb-2 text-sm">Duración: 1 mes</p>
         <p className="mt-auto w-full border-t border-dashed border-grey_pebble pt-3 text-right font-dm_mono text-sm sm:text-base md:text-lg">
-          {`total $${pack.amount.toLocaleString("es-AR")}`}
+          <span className="font-semibold">total</span>
+          {` $${pack.amount.toLocaleString("es-AR")}`}
         </p>
       </div>
     </div>

@@ -3,7 +3,7 @@ import ActionDialog from "@/components/modules/user/common/ActionDialog"
 
 export default function ReservasCard({ reserva }: { reserva: Reservation }) {
   return (
-    <div className="flex h-full w-full flex-col items-start justify-evenly rounded-lg bg-rust font-dm_mono font-medium text-pearl">
+    <div className="flex h-full w-full flex-col items-start justify-evenly rounded-md bg-rust font-dm_mono font-medium text-pearl">
       <div className="flex h-full w-full flex-col items-start justify-evenly p-5">
         <p>{reserva.date}</p>
         <span className="my-1 w-full border border-dashed border-pearl" />
@@ -14,7 +14,7 @@ export default function ReservasCard({ reserva }: { reserva: Reservation }) {
 
       <ActionDialog
         trigger={
-          <button className="bg-pearlVariant2/80 w-full p-2 font-dm_sans font-semibold text-grey_pebble">
+          <button className="w-full bg-pearlVariant2/80 p-2 font-dm_sans font-semibold text-grey_pebble">
             CANCELAR
           </button>
         }

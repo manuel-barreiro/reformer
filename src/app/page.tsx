@@ -1,5 +1,4 @@
 "use client"
-import Header from "@/components/modules/root/Header/Header"
 import Brand from "@/components/modules/root/Brand/Brand"
 import ComingSoon from "@/components/modules/root/ComingSoon"
 import Hero from "@/components/modules/root/Hero/Hero"
@@ -11,6 +10,7 @@ import ServiciosGrid from "@/components/modules/root/Servicios/ServiciosGrid"
 import ContactForm from "@/components/modules/root/Footer/ContactForm"
 import Pilates from "@/components/modules/root/Pilates"
 import Paquetes from "@/components/modules/root/Paquetes"
+import Header from "@/components/modules/root/Header/Header"
 
 export default function Home() {
   //Lenis smooth scroll
@@ -27,7 +27,6 @@ export default function Home() {
   return (
     <>
       <Header />
-
       <main className="">
         <div className="h-0 w-full scroll-mt-32" id="home" />
         <Hero />

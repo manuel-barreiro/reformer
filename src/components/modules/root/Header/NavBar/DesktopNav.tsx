@@ -27,6 +27,7 @@ export default function DesktopNav() {
         <li className="underline-offset-8 transition-all duration-300 ease-in-out hover:scale-105 hover:text-white hover:underline hover:brightness-200">
           <Link href="/#contacto">CONTACTO</Link>
         </li>
+
         <li className="underline-offset-8 transition-all duration-300 ease-in-out hover:scale-105 hover:text-white hover:underline hover:brightness-200">
           <Link href="/sign-in">MI CUENTA</Link>
         </li>
