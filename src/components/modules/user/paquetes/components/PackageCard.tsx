@@ -14,17 +14,16 @@ export default function PackageCard({ pack }: { pack: Package }) {
         <h1 className="mb-2 font-dm_mono text-[10px] font-semibold uppercase sm:text-sm lg:text-base">
           {`x${pack.classQuantity} CLASES / ${pack.activity}`}
         </h1>
-        <div className="flex flex-col gap-10">
-          <p className="text-[9px] sm:text-sm md:text-base">
-            {pack.activity === "YOGA"
-              ? `${pack.classQuantity} clases de yoga HATCHA y/o VINYASA a elección`
-              : `${pack.classQuantity} clases de pilates POWER STRENTGH CORE y/o LOWER BODY BURN`}
-          </p>
-        </div>
+
+        <p className="text-[9px] sm:text-sm md:text-base">
+          {pack.activity === "YOGA"
+            ? `${pack.classQuantity} clases de yoga HATCHA y/o VINYASA a elección`
+            : `${pack.classQuantity} clases de pilates POWER STRENTGH CORE y/o LOWER BODY BURN`}
+        </p>
       </div>
 
       <div>
-        <p className="mt-0 text-[9px] sm:text-sm md:text-base">
+        <p className="mb-2 text-[9px] sm:text-sm md:text-base">
           Duración: 1 mes
         </p>
         <p className="mt-auto w-full border-t border-dashed border-grey_pebble pt-3 text-right font-dm_mono text-sm sm:text-base md:text-lg">
