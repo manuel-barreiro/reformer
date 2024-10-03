@@ -4,6 +4,7 @@ import React, { useState, useMemo } from "react"
 import HeaderToggle from "@/components/modules/user/common/HeaderToggle"
 import ReservasList from "@/components/modules/user/reservas/components/ReservasList"
 import { Reservation } from "@/components/modules/user/reservas/utils/mockReservations"
+import { ScrollArea } from "@/components/ui/scroll-area"
 
 interface ReservationsPageProps {
   initialReservations: Reservation[]
@@ -28,8 +29,9 @@ export default function ReservasPage({
         currentFilter={filter}
         onFilterChange={setFilter}
       />
-
-      <ReservasList reservas={filteredReservations} />
+      <ScrollArea className="h-[500px] w-full md:h-72">
+        <ReservasList reservas={filteredReservations} />
+      </ScrollArea>
     </>
   )
 }

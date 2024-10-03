@@ -6,7 +6,7 @@ export default function PackageCard({ pack }: { pack: Package }) {
   return (
     <div
       className={cn(
-        "flex h-[180px] w-full flex-col rounded-xl bg-pearlVariant p-4 md:h-[250px] md:w-[50%] md:p-6",
+        "flex h-[180px] w-full flex-col rounded-xl bg-pearlVariant p-4 md:h-[250px] md:p-6",
         !pack.isActive && "text-grey_pebble/40"
       )}
     >

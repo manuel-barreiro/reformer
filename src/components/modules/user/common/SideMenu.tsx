@@ -31,13 +31,13 @@ export default async function SideMenu() {
           {session?.user?.image ? (
             <Image
               src={session?.user?.image}
-              width={96}
-              height={96}
+              width={76}
+              height={76}
               alt="profile pic"
-              className="h-[40px] w-[40px] rounded-full sm:h-[55px] sm:w-[55px] md:h-[96px] md:w-[96px]"
+              className="h-[40px] w-[40px] rounded-full sm:h-[55px] sm:w-[55px] md:h-[76px] md:w-[76px]"
             />
           ) : (
-            <ProfileImageMockup className="h-[40px] w-[40px] rounded-full text-grey_pebble sm:h-[55px] sm:w-[55px] md:h-[96px] md:w-[96px]" />
+            <ProfileImageMockup className="h-[40px] w-[40px] rounded-full text-grey_pebble sm:h-[55px] sm:w-[55px] md:h-[76px] md:w-[76px]" />
           )}
           <div className="md:text-center">
             <p className="font-dm_sans text-sm font-medium text-grey_pebble sm:text-base md:text-lg">
@@ -53,7 +53,7 @@ export default async function SideMenu() {
         <LogoutButtonMobile />
       </div>
 
-      <div className="flex w-full gap-2 md:w-[80%] md:flex-col">
+      <div className="flex w-full gap-2 md:w-[75%] md:flex-col">
         {menuItems.map((item) => (
           <SideMenuButton key={item.href} title={item.title} href={item.href} />
         ))}

@@ -4,6 +4,7 @@ import React, { useState, useMemo } from "react"
 import HeaderToggle from "@/components/modules/user/common/HeaderToggle"
 import { Package } from "@/components/modules/user/paquetes/utils/mockPackages"
 import PackageList from "./components/PackageList"
+import { ScrollArea } from "@/components/ui/scroll-area"
 
 interface PackagesPageProps {
   initialPackages: Package[]
@@ -26,8 +27,9 @@ export default function PackagesPage({ initialPackages }: PackagesPageProps) {
         currentFilter={filter}
         onFilterChange={setFilter}
       />
-
-      <PackageList packages={filteredPackages} />
+      <ScrollArea className="h-[500px] w-full md:h-72">
+        <PackageList packages={filteredPackages} />
+      </ScrollArea>
     </>
   )
 }

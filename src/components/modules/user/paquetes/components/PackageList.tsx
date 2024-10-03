@@ -4,7 +4,7 @@ import PackageCard from "@/components/modules/user/paquetes/components/PackageCa
 
 export default function PackageList({ packages }: { packages: Package[] }) {
   return (
-    <div className="flex h-full w-full flex-col items-center justify-start gap-3 p-0 md:flex-row md:p-10">
+    <div className="grid grid-cols-1 gap-3 md:max-w-[600px] md:grid-cols-2 md:p-10 lg:max-w-[800px]">
       {packages.map((pack) => (
         <PackageCard key={pack.id} pack={pack} />
       ))}
