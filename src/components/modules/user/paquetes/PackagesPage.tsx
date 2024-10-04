@@ -20,7 +20,7 @@ export default function PackagesPage({ initialPackages }: PackagesPageProps) {
   }, [initialPackages, filter])
 
   return (
-    <>
+    <section className="md:h-96">
       <HeaderToggle
         title="Mis Paquetes"
         filterOptions={["ACTIVOS", "INACTIVOS"]}
@@ -30,6 +30,6 @@ export default function PackagesPage({ initialPackages }: PackagesPageProps) {
       <ScrollArea className="w-full overflow-y-auto md:h-72">
         <PackageList packages={filteredPackages} />
       </ScrollArea>
-    </>
+    </section>
   )
 }

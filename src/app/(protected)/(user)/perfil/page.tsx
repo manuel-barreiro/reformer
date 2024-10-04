@@ -1,5 +1,12 @@
-import HeaderToggle from "@/components/modules/user/common/HeaderToggle"
+import ProfilePage from "@/components/modules/user/perfil/ProfilePage"
+import { mockUserInfo } from "@/components/modules/user/perfil/utils/mockUserInfo"
 
-export default function MiPerfil() {
-  return <HeaderToggle title="Mi Perfil" />
+async function getUserInfo() {
+  return mockUserInfo
+}
+
+export default async function MiPerfil() {
+  const userInfo = await getUserInfo()
+
+  return <ProfilePage userInfo={userInfo} />
 }
