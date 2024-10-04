@@ -22,7 +22,8 @@ export default function ReservasPage({
   }, [initialReservations, filter])
 
   return (
-    <>
+    // le pongo altura a la section porque sino no scrollea con la wheel
+    <section className="md:h-96">
       <HeaderToggle
         title="Mis Reservas"
         filterOptions={["YOGA", "PILATES"]}
@@ -32,6 +33,6 @@ export default function ReservasPage({
       <ScrollArea className="w-full overflow-y-auto md:h-72">
         <ReservasList reservas={filteredReservations} />
       </ScrollArea>
-    </>
+    </section>
   )
 }
