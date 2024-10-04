@@ -11,7 +11,7 @@ export default function UserLayout({
         <div className="w-full flex-grow md:w-[30%]">
           <SideMenu />
         </div>
-        <div className="h-full w-full flex-grow border-midnight md:w-[70%] md:border-l md:pr-12">
+        <div className="h-full w-full flex-grow border-midnight md:w-[70%] md:border-l md:pr-9 lg:pr-12">
           {children}
         </div>
       </section>
