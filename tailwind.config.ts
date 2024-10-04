@@ -59,6 +59,7 @@ const config = {
     animation: ["responsive"], // This enables responsive variants for the animation utility
   },
   plugins: [require("tailwindcss-animated")],
+  safelist: ["overflow-y-auto"],
 } satisfies Config
 
 export default config
