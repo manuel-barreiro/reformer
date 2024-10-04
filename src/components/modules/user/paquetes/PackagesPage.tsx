@@ -27,7 +27,7 @@ export default function PackagesPage({ initialPackages }: PackagesPageProps) {
         currentFilter={filter}
         onFilterChange={setFilter}
       />
-      <ScrollArea className="w-full md:h-72">
+      <ScrollArea className="max-h-[550px] w-full overflow-y-auto pb-10 md:h-72 md:pb-0">
         <PackageList packages={filteredPackages} />
       </ScrollArea>
     </>

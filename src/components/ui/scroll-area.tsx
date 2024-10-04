@@ -40,14 +40,14 @@ const ScrollBar = React.forwardRef<
     className={cn(
       "my-auto flex rounded-full bg-grey_pebble/20",
       orientation === "vertical" &&
-        "h-[50%] w-2.5 border-l border-l-transparent p-[1px]",
+        "hidden h-[50%] w-2.5 border-l border-l-transparent p-[1px] md:block",
       orientation === "horizontal" &&
         "h-2.5 flex-col border-t border-t-transparent p-[1px]",
       className
     )}
     {...props}
   >
-    <ScrollAreaPrimitive.ScrollAreaThumb className="relative flex-1 rounded-full bg-grey_pebble" />
+    <ScrollAreaPrimitive.ScrollAreaThumb className="relative hidden flex-1 rounded-full bg-grey_pebble md:block" />
   </ScrollAreaPrimitive.ScrollAreaScrollbar>
 ))
 ScrollBar.displayName = ScrollAreaPrimitive.ScrollAreaScrollbar.displayName

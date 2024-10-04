@@ -29,7 +29,7 @@ export default function ReservasPage({
         currentFilter={filter}
         onFilterChange={setFilter}
       />
-      <ScrollArea className="w-full overflow-y-auto md:h-72">
+      <ScrollArea className="max-h-[550px] w-full overflow-y-auto pb-10 md:h-72 md:pb-0">
         <ReservasList reservas={filteredReservations} />
       </ScrollArea>
     </>
