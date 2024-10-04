@@ -8,9 +8,9 @@ export default function LogoutButtonMobile() {
     <Button
       variant="outline"
       onClick={async () => await signOut({ callbackUrl: "/sing-in" })}
-      className="bg-transparent hover:bg-grey_pebble/10"
+      className="bg-transparent hover:bg-grey_pebble/10 md:hidden"
     >
-      <LogoutIcon className="h-5 w-5 text-midnight sm:h-5 sm:w-5 md:hidden" />
+      <LogoutIcon className="h-5 w-5 text-midnight sm:h-5 sm:w-5" />
     </Button>
   )
 }
