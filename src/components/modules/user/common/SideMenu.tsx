@@ -34,16 +34,16 @@ export default async function SideMenu() {
               width={76}
               height={76}
               alt="profile pic"
-              className="h-[40px] w-[40px] rounded-full sm:h-[55px] sm:w-[55px] md:h-[76px] md:w-[76px]"
+              className="h-[50px] w-[50px] rounded-full sm:h-[55px] sm:w-[55px] md:h-[76px] md:w-[76px]"
             />
           ) : (
-            <ProfileImageMockup className="h-[40px] w-[40px] rounded-full text-grey_pebble sm:h-[55px] sm:w-[55px] md:h-[76px] md:w-[76px]" />
+            <ProfileImageMockup className="h-[50px] w-[50px] rounded-full text-grey_pebble sm:h-[55px] sm:w-[55px] md:h-[76px] md:w-[76px]" />
           )}
           <div className="md:text-center">
-            <p className="font-dm_sans text-sm font-medium text-grey_pebble sm:text-base md:text-lg">
+            <p className="sm font-dm_sans text-base font-medium text-grey_pebble md:text-lg">
               {session?.user?.name}
             </p>
-            <p className="cursor-default text-xs font-medium text-grey_pebble/50 sm:text-sm md:text-base">
+            <p className="sm:text-md cursor-default text-sm font-medium text-grey_pebble/50 md:text-base">
               {session?.user?.email && session.user.email.length > 30
                 ? `${session.user.email.slice(0, 27)}...`
                 : session?.user?.email}

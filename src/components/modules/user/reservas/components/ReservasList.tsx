@@ -8,7 +8,7 @@ export default function ReservasList({
   reservas: Reservation[]
 }) {
   return (
-    <div className="grid h-full grid-cols-2 gap-3 md:max-w-[600px] md:grid-cols-3 md:p-10 lg:max-w-[800px] lg:grid-cols-4">
+    <div className="grid h-full grid-cols-2 gap-3 py-10 md:max-w-[600px] md:grid-cols-3 md:p-10 lg:max-w-[800px]">
       {reservas.map((reserva) => (
         <ReservasCard key={reserva.id} reserva={reserva} />
       ))}

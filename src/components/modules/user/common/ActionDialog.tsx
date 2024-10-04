@@ -8,14 +8,12 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 
 export default function ActionDialog({ trigger }: { trigger: JSX.Element }) {
   return (
     <Dialog>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
-      <DialogContent className="bg-pearl text-midnight sm:max-w-[425px]">
+      <DialogContent className="max-w-xs rounded-xl bg-pearl text-midnight sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle className="font-dm_sans">¿Estás seguro?</DialogTitle>
           <DialogDescription>
