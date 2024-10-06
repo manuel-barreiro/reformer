@@ -7,7 +7,7 @@ export default function MobileNav() {
   const [open, setOpen] = useState(false)
 
   return (
-    <nav className="flex items-center justify-between bg-midnight px-10 py-8 lg:hidden">
+    <nav className="flex items-center justify-between bg-midnight px-10 py-8 xl:hidden">
       <Link href="/#home" className="z-50" onClick={() => setOpen(false)}>
         <Logo className="w-[150px] animate-fade text-pearl ease-in-out animate-normal animate-duration-[3000ms] animate-fill-both animate-once" />
       </Link>
@@ -73,6 +73,15 @@ export default function MobileNav() {
             >
               <Link href="/#servicios" className="flex items-center gap-2">
                 <span>SERVICIOS</span>
+                <span className="mb-1">{">"}</span>
+              </Link>
+            </li>
+            <li
+              onClick={() => setOpen(false)}
+              className="pointer-events-auto cursor-pointer transition duration-500 hover:brightness-200 focus-visible:outline-0"
+            >
+              <Link href="/#paquetes" className="flex items-center gap-2">
+                <span>PAQUETES</span>
                 <span className="mb-1">{">"}</span>
               </Link>
             </li>
