@@ -4,14 +4,32 @@ import Link from "next/link"
 import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import marmolBg from "/public/images/marmolBg.png"
-import React, { useRef } from "react"
+import React, { useRef, useState } from "react"
 import Image from "next/image"
 import { Separator } from "@radix-ui/react-separator"
 import { Input } from "@/components/ui/input"
 import { ChevronRight } from "lucide-react"
 import { CreditCardIcon, CashIcon, BankTransferIcon } from "@/assets/icons"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+
+// Define the package options
+const packageOptions = [
+  { name: "PAQUETE X4 CLASES", price: 56000 },
+  { name: "PAQUETE X8 CLASES", price: 96000 },
+  { name: "PAQUETE X12 CLASES", price: 120000 },
+  { name: "CLASE INDIVIDUAL", price: 15000 },
+]
 
 export default function CheckoutPage() {
+  const [selectedPackage, setSelectedPackage] = useState(packageOptions[0])
+  const [selectedClass, setSelectedClass] = useState("pilates")
+
   //Parallax
   const sectionRef = useRef(null)
   const { scrollYProgress } = useScroll({
@@ -19,17 +37,6 @@ export default function CheckoutPage() {
     offset: ["start end", "end start"],
   })
   const y = useTransform(scrollYProgress, [0, 1], ["-10%", "10%"])
-
-  //Framer motion animation
-  const pilatesAnimationVariants = {
-    initial: { y: 15, opacity: 0 },
-    animate: { y: 0, opacity: 1 },
-  }
-
-  const listAnimationRight = {
-    initial: { x: -15, opacity: 0 },
-    animate: { x: 0, opacity: 1 },
-  }
 
   return (
     <section
@@ -47,21 +54,58 @@ export default function CheckoutPage() {
 
       <div className="grid h-auto w-auto max-w-[900px] grid-cols-1 gap-6 md:grid-cols-2 md:gap-2">
         <div className="flex flex-col gap-2">
-          <OrderSummary />
+          <OrderSummary
+            selectedPackage={selectedPackage}
+            setSelectedPackage={setSelectedPackage}
+            selectedClass={selectedClass}
+            setSelectedClass={setSelectedClass}
+          />
           <DiscountCoupon />
         </div>
-        <FinalCheckout />
+        <FinalCheckout
+          selectedPackage={selectedPackage}
+          selectedClass={selectedClass}
+        />
       </div>
     </section>
   )
 }
 
-function OrderSummary({}: {}) {
+function OrderSummary({
+  selectedPackage,
+  setSelectedPackage,
+  selectedClass,
+  setSelectedClass,
+}: {
+  selectedPackage: { name: string; price: number }
+  setSelectedPackage: (pkg: { name: string; price: number }) => void
+  selectedClass: string
+  setSelectedClass: (cls: string) => void
+}) {
   return (
     <div className="flex h-auto w-full max-w-[450px] flex-col items-start justify-evenly gap-3 border-[2px] border-grey_pebble bg-midnight/60 px-5 py-6 md:px-10 md:py-12">
-      <h3 className="font-dm_mono text-xl">PAQUETE X4 CLASES</h3>
+      <Select
+        onValueChange={(value) =>
+          setSelectedPackage(
+            packageOptions.find((pkg) => pkg.name === value) ||
+              packageOptions[0]
+          )
+        }
+      >
+        <SelectTrigger className="w-full bg-transparent">
+          <SelectValue placeholder={selectedPackage.name} />
+        </SelectTrigger>
+        <SelectContent className="bg-pearlVariant2">
+          {packageOptions.map((option) => (
+            <SelectItem key={option.name} value={option.name}>
+              {option.name}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
       <RadioGroup
-        defaultValue="yoga"
+        value={selectedClass}
+        onValueChange={setSelectedClass}
         className="flex items-center gap-4 text-pearl"
       >
         <div className="flex items-center space-x-2">
@@ -79,14 +123,16 @@ function OrderSummary({}: {}) {
       </RadioGroup>
       <div className="mt-5 flex w-full items-center justify-between px-1">
         <span className="font-extralight">Total</span>
-        <span className="font-bold">$ 48.000</span>
+        <span className="font-bold">
+          $ {selectedPackage.price.toLocaleString()}
+        </span>
       </div>
       <Separator className="h-[1px] w-full rounded-full bg-pearl/70" />
 
       <div className="mt-5 flex flex-col gap-3 px-1 font-light">
         <p>
-          Este paquete incluye 4 clases de pilates para utilizar en el período
-          de un mes.
+          Este paquete incluye {selectedPackage.name.split(" ")[1]} de{" "}
+          {selectedClass} para utilizar en el período de un mes.
         </p>
         <p className="italic">
           Al finalizar el pedido podrás reservar las fechas para tus clases
@@ -111,14 +157,20 @@ function DiscountCoupon() {
   )
 }
 
-function FinalCheckout() {
+function FinalCheckout({
+  selectedPackage,
+  selectedClass,
+}: {
+  selectedPackage: { name: string; price: number }
+  selectedClass: string
+}) {
   return (
     <div className="flex h-auto w-full max-w-[450px] flex-col justify-between border-[2px] border-grey_pebble bg-midnight/60">
       <div className="flex flex-col items-start gap-3 px-5 py-6 md:px-10 md:py-12">
         <p className="font-dm_mono text-xl">Resumen de compra</p>
         <div className="w-full border-[1px] border-pearl/30 bg-midnight/70 p-3">
           <p className="text-center text-base md:text-xl">
-            PACK X12 CLASES - PILATES
+            {selectedPackage.name} - {selectedClass.toUpperCase()}
           </p>
         </div>
         <div className="mt-5 flex w-full flex-col gap-3">
@@ -135,7 +187,7 @@ function FinalCheckout() {
           </div>
           <Separator className="h-[1px] w-full rounded-full bg-pearl/70" />
           <div className="flex items-center gap-2">
-            <CreditCardIcon className="h-6 w-6" />
+            <BankTransferIcon className="h-6 w-6" />
             <span>Transferencia Bancaria</span>
           </div>
           <Separator className="h-[1px] w-full rounded-full bg-pearl/70" />
