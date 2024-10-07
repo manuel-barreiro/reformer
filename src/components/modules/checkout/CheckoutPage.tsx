@@ -4,7 +4,7 @@ import Link from "next/link"
 import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import marmolBg from "/public/images/marmolBg.png"
-import React, { useRef, useState } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import Image from "next/image"
 import { Separator } from "@radix-ui/react-separator"
 import { Input } from "@/components/ui/input"
@@ -38,6 +38,9 @@ export default function CheckoutPage() {
   const [selectedPackage, setSelectedPackage] = useState(packageOptions[0])
   const [selectedClass, setSelectedClass] = useState("pilates")
 
+  useEffect(() => {
+    window.scroll(0, 0)
+  }, [])
   //Parallax
   const sectionRef = useRef(null)
   const { scrollYProgress } = useScroll({
