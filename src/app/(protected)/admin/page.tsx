@@ -1,5 +1,5 @@
 import { auth } from "@/auth"
-import LogoutButton from "@/components/routes/auth/logout-button"
+import LogoutButtonDesktop from "@/components/modules/auth/logout-button-desktop"
 
 export default async function page() {
   const session = await auth()
@@ -14,7 +14,7 @@ export default async function page() {
           <code>{JSON.stringify(session, null, 2)}</code>
         </pre>
       )}
-      <LogoutButton />
+      <LogoutButtonDesktop />
     </main>
   )
 }

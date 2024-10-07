@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next"
 import { Marcellus, DM_Sans, DM_Mono } from "next/font/google"
 import "./globals.css"
 import { Toaster } from "@/components/ui/toaster"
+import { auth } from "@/auth"
 
 const marcellus = Marcellus({
   weight: "400",
@@ -55,11 +56,12 @@ export const viewport: Viewport = {
   width: "device-width",
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  const session = await auth()
   return (
     <html
       lang="es"

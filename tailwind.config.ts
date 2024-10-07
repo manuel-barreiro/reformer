@@ -29,6 +29,8 @@ const config = {
         midnight: "#231f20",
         rust: "#893f24",
         inputBg: "#D9D9D9",
+        pearlVariant: "#E9E7D9",
+        pearlVariant2: "#F0EEE3",
       },
       keyframes: {
         marquee: {
@@ -57,6 +59,7 @@ const config = {
     animation: ["responsive"], // This enables responsive variants for the animation utility
   },
   plugins: [require("tailwindcss-animated")],
+  safelist: ["overflow-y-auto"],
 } satisfies Config
 
 export default config
