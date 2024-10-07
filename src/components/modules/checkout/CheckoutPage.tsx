@@ -20,11 +20,19 @@ import {
 
 // Define the package options
 const packageOptions = [
-  { name: "PAQUETE X4 CLASES", price: 56000 },
-  { name: "PAQUETE X8 CLASES", price: 96000 },
-  { name: "PAQUETE X12 CLASES", price: 120000 },
-  { name: "CLASE INDIVIDUAL", price: 15000 },
+  { name: "PAQUETE X4 CLASES", classQuantity: 4, price: 56000 },
+  { name: "PAQUETE X8 CLASES", classQuantity: 8, price: 96000 },
+  { name: "PAQUETE X12 CLASES", classQuantity: 12, price: 120000 },
+  { name: "CLASE INDIVIDUAL", classQuantity: 1, price: 15000 },
 ]
+
+// Create a number formatter
+const numberFormatter = new Intl.NumberFormat("es-AR", {
+  style: "currency",
+  currency: "ARS",
+  minimumFractionDigits: 0,
+  maximumFractionDigits: 0,
+})
 
 export default function CheckoutPage() {
   const [selectedPackage, setSelectedPackage] = useState(packageOptions[0])
@@ -77,8 +85,12 @@ function OrderSummary({
   selectedClass,
   setSelectedClass,
 }: {
-  selectedPackage: { name: string; price: number }
-  setSelectedPackage: (pkg: { name: string; price: number }) => void
+  selectedPackage: { name: string; classQuantity: number; price: number }
+  setSelectedPackage: (pkg: {
+    name: string
+    classQuantity: number
+    price: number
+  }) => void
   selectedClass: string
   setSelectedClass: (cls: string) => void
 }) {
@@ -97,7 +109,11 @@ function OrderSummary({
         </SelectTrigger>
         <SelectContent className="bg-pearlVariant2">
           {packageOptions.map((option) => (
-            <SelectItem key={option.name} value={option.name}>
+            <SelectItem
+              key={option.name}
+              value={option.name}
+              className="border-b-[1px] border-midnight"
+            >
               {option.name}
             </SelectItem>
           ))}
@@ -124,18 +140,25 @@ function OrderSummary({
       <div className="mt-5 flex w-full items-center justify-between px-1">
         <span className="font-extralight">Total</span>
         <span className="font-bold">
-          $ {selectedPackage.price.toLocaleString()}
+          {numberFormatter.format(selectedPackage.price)}
         </span>
       </div>
       <Separator className="h-[1px] w-full rounded-full bg-pearl/70" />
 
       <div className="mt-5 flex flex-col gap-3 px-1 font-light">
         <p>
-          Este paquete incluye {selectedPackage.name.split(" ")[1]} de{" "}
-          {selectedClass} para utilizar en el período de un mes.
+          Este paquete incluye{" "}
+          <span className="font-semibold">
+            {selectedPackage.classQuantity}{" "}
+            {selectedPackage.classQuantity > 1 ? "clases" : "clase"} de{" "}
+            {selectedClass}
+          </span>{" "}
+          para utilizar en el período de{" "}
+          <span className="font-semibold">un mes</span>.
         </p>
         <p className="italic">
-          Al finalizar el pedido podrás reservar las fechas para tus clases
+          Luego de que tu compra sea aprobada, podrás reservar tus clases en
+          nuestro sistema.
         </p>
       </div>
     </div>

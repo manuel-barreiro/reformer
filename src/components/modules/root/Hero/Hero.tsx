@@ -5,6 +5,7 @@ import heroMobile from "/public/images/heroMobile.webp"
 import Image from "next/image"
 import { useRef } from "react"
 import { motion, useScroll, useTransform } from "framer-motion"
+import Link from "next/link"
 
 export default function Hero() {
   const sectionRef = useRef(null)
@@ -45,7 +46,7 @@ export default function Hero() {
             MOVILIDAD.
           </h1>
           <button className="mt-8 animate-fade-up rounded-full border-[1px] border-grey_pebble bg-midnight/50 px-14 py-3 text-xl font-light text-pearl duration-300 ease-in-out animate-delay-[1000ms] animate-normal animate-duration-[3000ms] animate-once animate-ease-in-out hover:border-pearl hover:bg-midnight/80 lg:animate-delay-[1500ms]">
-            RESERVÁ
+            <Link href="/#paquetes">PAQUETES</Link>
           </button>
         </div>
       </div>

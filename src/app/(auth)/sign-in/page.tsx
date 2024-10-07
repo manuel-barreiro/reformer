@@ -2,6 +2,8 @@ import Image from "next/image"
 import Link from "next/link"
 import LoginForm from "@/components/modules/auth/SignInForm"
 import { Isotipo } from "@/assets/icons"
+import { Button } from "@/components/ui/button"
+import { ArrowLeft } from "lucide-react"
 
 export default function SignIn({
   searchParams,
@@ -22,11 +24,19 @@ export default function SignIn({
           className="absolute inset-0 -z-10 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
         />
       </div>
+      <Button
+        variant="ghost"
+        className="absolute left-4 top-5 p-2 text-midnight lg:text-pearl"
+      >
+        <Link href="/">
+          <ArrowLeft className="h-8 w-8" />
+        </Link>
+      </Button>
       <div
         style={{ cursor: "url(icons/solGreyPebble.svg),auto" }}
         className="flex min-h-[100dvh] items-center justify-center bg-pearl py-12"
       >
-        <div className="flex flex-col items-center gap-4 text-midnight">
+        <div className="relative flex flex-col items-center gap-4 text-midnight">
           <Link href={"/"}>
             <Isotipo className="h-8 w-8" />
           </Link>
