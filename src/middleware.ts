@@ -4,34 +4,46 @@ import authConfig from "./auth.config"
 
 const { auth } = NextAuth(authConfig)
 
-const publicRoutes = ["/", "/checkout"]
+const publicRoutes = ["/"]
 const authRoutes = ["/sign-in", "/sign-up"]
 const apiAuthPrefix = "/api/auth"
+const apiRoutes = ["/api/create_preference"] // Add other API routes as needed
 
 export default auth((req) => {
   const { nextUrl } = req
   const userRole = req.auth?.user.role
-  console.log({ userRole })
   const isLoggedIn = !!req.auth
 
   console.log({ isLoggedIn, path: nextUrl.pathname })
 
-  // Permitir todas las rutas de API de autenticación
+  // Allow all authentication API routes
   if (nextUrl.pathname.startsWith(apiAuthPrefix)) {
     return NextResponse.next()
   }
 
-  // Permitir acceso a rutas públicas sin importar el estado de autenticación
+  // Allow API calls from /checkout only if user is logged in
+  if (
+    nextUrl.pathname === "/checkout" ||
+    apiRoutes.some((route) => nextUrl.pathname.startsWith(route))
+  ) {
+    if (isLoggedIn) {
+      return NextResponse.next()
+    } else {
+      return NextResponse.redirect(new URL("/sign-in", nextUrl))
+    }
+  }
+
+  // Allow access to public routes regardless of authentication status
   if (publicRoutes.includes(nextUrl.pathname)) {
     return NextResponse.next()
   }
 
-  // Redirigir a /paquetes si el usuario está logueado y trata de acceder a rutas de autenticación
+  // Redirect to /paquetes if the user is logged in and tries to access auth routes
   if (isLoggedIn && authRoutes.includes(nextUrl.pathname)) {
     return NextResponse.redirect(new URL("/paquetes", nextUrl))
   }
 
-  // Redirigir a /sign-in si el usuario no está logueado y trata de acceder a una ruta protegida
+  // Redirect to /sign-in if the user is not logged in and tries to access a protected route
   if (
     !isLoggedIn &&
     !authRoutes.includes(nextUrl.pathname) &&
@@ -40,7 +52,7 @@ export default auth((req) => {
     return NextResponse.redirect(new URL("/sign-in", nextUrl))
   }
 
-  // Redirigir a /paquetes si el rol del usuario es user e intenta acceder a /admin
+  // Redirect to /paquetes if the user role is user and tries to access /admin
   if (!userRole && nextUrl.pathname.startsWith("/admin")) {
     return NextResponse.redirect(new URL("/paquetes", nextUrl))
   }

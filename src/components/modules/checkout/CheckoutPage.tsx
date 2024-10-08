@@ -17,13 +17,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { useRouter } from "next/navigation"
 
 // Define the package options
 const packageOptions = [
-  { name: "PAQUETE X4 CLASES", classQuantity: 4, price: 56000 },
-  { name: "PAQUETE X8 CLASES", classQuantity: 8, price: 96000 },
-  { name: "PAQUETE X12 CLASES", classQuantity: 12, price: 120000 },
-  { name: "CLASE INDIVIDUAL", classQuantity: 1, price: 15000 },
+  { id: "pkg_4", name: "PAQUETE X4 CLASES", classQuantity: 4, price: 56000 },
+  { id: "pkg_8", name: "PAQUETE X8 CLASES", classQuantity: 8, price: 96000 },
+  {
+    id: "pkg_12",
+    name: "PAQUETE X12 CLASES",
+    classQuantity: 12,
+    price: 120000,
+  },
+  { id: "pkg_1", name: "CLASE INDIVIDUAL", classQuantity: 1, price: 15000 },
 ]
 
 // Create a number formatter
@@ -37,10 +43,12 @@ const numberFormatter = new Intl.NumberFormat("es-AR", {
 export default function CheckoutPage() {
   const [selectedPackage, setSelectedPackage] = useState(packageOptions[0])
   const [selectedClass, setSelectedClass] = useState("pilates")
+  const router = useRouter()
 
   useEffect(() => {
     window.scroll(0, 0)
   }, [])
+
   //Parallax
   const sectionRef = useRef(null)
   const { scrollYProgress } = useScroll({
@@ -48,6 +56,41 @@ export default function CheckoutPage() {
     offset: ["start end", "end start"],
   })
   const y = useTransform(scrollYProgress, [0, 1], ["-10%", "10%"])
+
+  const handleCheckout = async () => {
+    try {
+      const response = await fetch(
+        `http://localhost:3000/api/create-preference`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            id: selectedPackage.id,
+            title: `${selectedPackage.name} - ${selectedClass.toUpperCase()}`,
+            description: `Paquete de ${selectedPackage.classQuantity} ${selectedPackage.classQuantity > 1 ? "clases" : "clase"} de ${selectedClass}`,
+            price: selectedPackage.price,
+          }),
+        }
+      )
+
+      if (!response.ok) {
+        throw new Error("Network response was not ok")
+      }
+
+      const data = await response.json()
+
+      if (data.redirectUrl) {
+        router.push(data.redirectUrl)
+      } else {
+        console.error("No redirect URL received from the server")
+      }
+    } catch (error) {
+      console.error("Error during checkout:", error)
+      // Handle the error (e.g., show an error message to the user)
+    }
+  }
 
   return (
     <section
@@ -60,6 +103,7 @@ export default function CheckoutPage() {
           title="Fondo de marmol"
           className="inset-0 h-full w-full object-cover object-center"
           src={marmolBg}
+          priority
         />
       </motion.div>
 
@@ -76,6 +120,7 @@ export default function CheckoutPage() {
         <FinalCheckout
           selectedPackage={selectedPackage}
           selectedClass={selectedClass}
+          onCheckout={handleCheckout}
         />
       </div>
     </section>
@@ -88,8 +133,14 @@ function OrderSummary({
   selectedClass,
   setSelectedClass,
 }: {
-  selectedPackage: { name: string; classQuantity: number; price: number }
+  selectedPackage: {
+    id: string
+    name: string
+    classQuantity: number
+    price: number
+  }
   setSelectedPackage: (pkg: {
+    id: string
     name: string
     classQuantity: number
     price: number
@@ -186,9 +237,11 @@ function DiscountCoupon() {
 function FinalCheckout({
   selectedPackage,
   selectedClass,
+  onCheckout,
 }: {
   selectedPackage: { name: string; price: number }
   selectedClass: string
+  onCheckout: () => void
 }) {
   return (
     <div className="flex h-auto w-full max-w-[450px] flex-col justify-between border-[2px] border-grey_pebble bg-midnight/60">
@@ -220,10 +273,11 @@ function FinalCheckout({
         </div>
       </div>
 
-      <button className="w-full flex-1 border-t-[2px] border-grey_pebble p-6 font-dm_sans text-lg font-bold duration-300 ease-in-out hover:bg-pearlVariant2 hover:text-midnight">
-        <Link href="/checkout" className="h-full w-full">
-          REALIZAR PAGO
-        </Link>
+      <button
+        onClick={onCheckout}
+        className="w-full flex-1 border-t-[2px] border-grey_pebble p-6 font-dm_sans text-lg font-bold duration-300 ease-in-out hover:bg-pearlVariant2 hover:text-midnight"
+      >
+        REALIZAR PAGO
       </button>
     </div>
   )
