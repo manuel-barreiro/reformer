@@ -4,7 +4,7 @@ import authConfig from "./auth.config"
 
 const { auth } = NextAuth(authConfig)
 
-const publicRoutes = ["/"]
+const publicRoutes = ["/", "/api/notify"]
 const authRoutes = ["/sign-in", "/sign-up"]
 const apiAuthPrefix = "/api/auth"
 const apiRoutes = ["/api/create_preference"] // Add other API routes as needed

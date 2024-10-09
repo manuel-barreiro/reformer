@@ -1,96 +1,29 @@
 "use client"
-import { motion, useScroll, useTransform } from "framer-motion"
-import Link from "next/link"
-import { Label } from "@/components/ui/label"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { motion } from "framer-motion"
 import marmolBg from "/public/images/marmolBg.png"
-import React, { useEffect, useRef, useState } from "react"
+import React, { useEffect } from "react"
 import Image from "next/image"
-import { Separator } from "@radix-ui/react-separator"
-import { Input } from "@/components/ui/input"
-import { ChevronRight } from "lucide-react"
-import { CreditCardIcon, CashIcon, BankTransferIcon } from "@/assets/icons"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-import { useRouter } from "next/navigation"
-
-// Define the package options
-const packageOptions = [
-  { id: "pkg_4", name: "PAQUETE X4 CLASES", classQuantity: 4, price: 56000 },
-  { id: "pkg_8", name: "PAQUETE X8 CLASES", classQuantity: 8, price: 96000 },
-  {
-    id: "pkg_12",
-    name: "PAQUETE X12 CLASES",
-    classQuantity: 12,
-    price: 120000,
-  },
-  { id: "pkg_1", name: "CLASE INDIVIDUAL", classQuantity: 1, price: 15000 },
-]
-
-// Create a number formatter
-const numberFormatter = new Intl.NumberFormat("es-AR", {
-  style: "currency",
-  currency: "ARS",
-  minimumFractionDigits: 0,
-  maximumFractionDigits: 0,
-})
+import DiscountCoupon from "./components/DiscountCoupon"
+import FinalCheckout from "./components/FinalCheckout"
+import OrderSummary from "./components/OrderSummary"
+import { useCheckout } from "./hooks/useCheckout"
+import { useParallax } from "@/lib/useParallax"
 
 export default function CheckoutPage() {
-  const [selectedPackage, setSelectedPackage] = useState(packageOptions[0])
-  const [selectedClass, setSelectedClass] = useState("pilates")
-  const router = useRouter()
+  const {
+    selectedPackage,
+    setSelectedPackage,
+    selectedClass,
+    setSelectedClass,
+    handleCheckout,
+    packageOptions,
+  } = useCheckout()
+
+  const { sectionRef, y } = useParallax()
 
   useEffect(() => {
     window.scroll(0, 0)
   }, [])
-
-  //Parallax
-  const sectionRef = useRef(null)
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ["start end", "end start"],
-  })
-  const y = useTransform(scrollYProgress, [0, 1], ["-10%", "10%"])
-
-  const handleCheckout = async () => {
-    try {
-      const response = await fetch(
-        `http://localhost:3000/api/create-preference`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            id: selectedPackage.id,
-            title: `${selectedPackage.name} - ${selectedClass.toUpperCase()}`,
-            description: `Paquete de ${selectedPackage.classQuantity} ${selectedPackage.classQuantity > 1 ? "clases" : "clase"} de ${selectedClass}`,
-            price: selectedPackage.price,
-          }),
-        }
-      )
-
-      if (!response.ok) {
-        throw new Error("Network response was not ok")
-      }
-
-      const data = await response.json()
-
-      if (data.redirectUrl) {
-        router.push(data.redirectUrl)
-      } else {
-        console.error("No redirect URL received from the server")
-      }
-    } catch (error) {
-      console.error("Error during checkout:", error)
-      // Handle the error (e.g., show an error message to the user)
-    }
-  }
 
   return (
     <section
@@ -114,6 +47,7 @@ export default function CheckoutPage() {
             setSelectedPackage={setSelectedPackage}
             selectedClass={selectedClass}
             setSelectedClass={setSelectedClass}
+            packageOptions={packageOptions}
           />
           <DiscountCoupon />
         </div>
@@ -124,161 +58,5 @@ export default function CheckoutPage() {
         />
       </div>
     </section>
-  )
-}
-
-function OrderSummary({
-  selectedPackage,
-  setSelectedPackage,
-  selectedClass,
-  setSelectedClass,
-}: {
-  selectedPackage: {
-    id: string
-    name: string
-    classQuantity: number
-    price: number
-  }
-  setSelectedPackage: (pkg: {
-    id: string
-    name: string
-    classQuantity: number
-    price: number
-  }) => void
-  selectedClass: string
-  setSelectedClass: (cls: string) => void
-}) {
-  return (
-    <div className="flex h-auto w-full max-w-[450px] flex-col items-start justify-evenly gap-3 border-[2px] border-grey_pebble bg-midnight/60 px-5 py-6 md:px-10 md:py-12">
-      <Select
-        onValueChange={(value) =>
-          setSelectedPackage(
-            packageOptions.find((pkg) => pkg.name === value) ||
-              packageOptions[0]
-          )
-        }
-      >
-        <SelectTrigger className="w-full bg-transparent">
-          <SelectValue placeholder={selectedPackage.name} />
-        </SelectTrigger>
-        <SelectContent className="bg-pearlVariant2">
-          {packageOptions.map((option) => (
-            <SelectItem
-              key={option.name}
-              value={option.name}
-              className="border-b-[1px] border-midnight"
-            >
-              {option.name}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-      <RadioGroup
-        value={selectedClass}
-        onValueChange={setSelectedClass}
-        className="flex items-center gap-4 text-pearl"
-      >
-        <div className="flex items-center space-x-2">
-          <RadioGroupItem value="pilates" id="r1" />
-          <Label className="text-base font-extralight" htmlFor="r1">
-            Pilates
-          </Label>
-        </div>
-        <div className="flex items-center space-x-2">
-          <RadioGroupItem value="yoga" id="r2" />
-          <Label className="text-base font-extralight" htmlFor="r2">
-            Yoga
-          </Label>
-        </div>
-      </RadioGroup>
-      <div className="mt-5 flex w-full items-center justify-between px-1">
-        <span className="font-extralight">Total</span>
-        <span className="font-bold">
-          {numberFormatter.format(selectedPackage.price)}
-        </span>
-      </div>
-      <Separator className="h-[1px] w-full rounded-full bg-pearl/70" />
-
-      <div className="mt-5 flex flex-col gap-3 px-1 font-light">
-        <p>
-          Este paquete incluye{" "}
-          <span className="font-semibold">
-            {selectedPackage.classQuantity}{" "}
-            {selectedPackage.classQuantity > 1 ? "clases" : "clase"} de{" "}
-            {selectedClass}
-          </span>{" "}
-          para utilizar en el período de{" "}
-          <span className="font-semibold">un mes</span>.
-        </p>
-        <p className="italic">
-          Luego de que tu compra sea aprobada, podrás reservar tus clases en
-          nuestro sistema.
-        </p>
-      </div>
-    </div>
-  )
-}
-
-function DiscountCoupon() {
-  return (
-    <div className="flex h-auto w-full max-w-[450px] flex-col items-start justify-evenly gap-3 border-[2px] border-grey_pebble bg-midnight/60 px-5 py-6 md:px-10">
-      <p className="font-dm_mono">¿Tenés un cupón de descuento?</p>
-      <div className="relative h-auto w-full">
-        <Input
-          type="text"
-          className="focus:shadow-outline h-full w-full rounded-none border-0 border-b-[2px] border-pearl/70 bg-transparent ring-0 focus:border-midnight/60 focus:ring-0 focus:ring-midnight/60 focus:ring-offset-0"
-        />
-        <ChevronRight className="absolute right-0 top-1 h-7 w-7 text-pearl/70" />
-      </div>
-    </div>
-  )
-}
-
-function FinalCheckout({
-  selectedPackage,
-  selectedClass,
-  onCheckout,
-}: {
-  selectedPackage: { name: string; price: number }
-  selectedClass: string
-  onCheckout: () => void
-}) {
-  return (
-    <div className="flex h-auto w-full max-w-[450px] flex-col justify-between border-[2px] border-grey_pebble bg-midnight/60">
-      <div className="flex flex-col items-start gap-3 px-5 py-6 md:px-10 md:py-12">
-        <p className="font-dm_mono text-xl">Resumen de compra</p>
-        <div className="w-full border-[1px] border-pearl/30 bg-midnight/70 p-3">
-          <p className="text-center text-base md:text-xl">
-            {selectedPackage.name} - {selectedClass.toUpperCase()}
-          </p>
-        </div>
-        <div className="mt-5 flex w-full flex-col gap-3">
-          <p className="font-semibold">MEDIOS DE PAGO</p>
-          <Separator className="h-[1px] w-full rounded-full bg-pearl/70" />
-          <div className="flex items-center gap-2">
-            <CreditCardIcon className="h-6 w-6" />
-            <span>Tarjeta de crédito</span>
-          </div>
-          <Separator className="h-[1px] w-full rounded-full bg-pearl/70" />
-          <div className="flex items-center gap-2">
-            <CashIcon className="h-6 w-6" />
-            <span>Efectivo</span>
-          </div>
-          <Separator className="h-[1px] w-full rounded-full bg-pearl/70" />
-          <div className="flex items-center gap-2">
-            <BankTransferIcon className="h-6 w-6" />
-            <span>Transferencia Bancaria</span>
-          </div>
-          <Separator className="h-[1px] w-full rounded-full bg-pearl/70" />
-        </div>
-      </div>
-
-      <button
-        onClick={onCheckout}
-        className="w-full flex-1 border-t-[2px] border-grey_pebble p-6 font-dm_sans text-lg font-bold duration-300 ease-in-out hover:bg-pearlVariant2 hover:text-midnight"
-      >
-        REALIZAR PAGO
-      </button>
-    </div>
   )
 }

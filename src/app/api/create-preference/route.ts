@@ -1,7 +1,10 @@
 import { NextResponse } from "next/server"
 import { MercadoPagoConfig, Preference } from "mercadopago"
+import { auth } from "@/auth"
 
-// Initialize MercadoPago client
+// Este endpoint es llamado desde el front cuando el usuario quiere comprar un paquete. Recibe los datos del paquete y crea una preferencia de pago en MercadoPago, devolviendo la URL de pago (init_point) para que el usuario sea redirigido al CheckoutPro de MP.
+
+// Inicializo cliente MercadoPago con el access token
 if (!process.env.MERCADOPAGO_ACCESS_TOKEN) {
   throw new Error("MERCADOPAGO_ACCESS_TOKEN is not defined")
 }
@@ -11,9 +14,17 @@ const client = new MercadoPagoConfig({
 })
 
 export async function POST(request: Request) {
+  //Chequeo si el usuario está loggeado cuando intenta comprar el paquete, si no lo está, le muestro un mensaje de error
+  const session = await auth()
+  console.log("session", session)
+  if (!session) {
+    return NextResponse.json(
+      { error: "Tenés que estar loggeado para poder comprar el paquete" },
+      { status: 401 }
+    )
+  }
   try {
     const { id, title, description, price } = await request.json()
-    console.log({ id, title, description, price })
     const body = {
       items: [
         {
@@ -26,28 +37,26 @@ export async function POST(request: Request) {
           currency_id: "ARS",
         },
       ],
-      payer: {
-        name: "John",
-        surname: "Doe",
-        email: "john.doe@gmail.com",
-        date_created: new Date().toISOString(),
+      payment_methods: {
+        excluded_payment_methods: [{ id: "pagofacil" }, { id: "rapipago" }],
       },
       back_urls: {
-        success: `http://${process.env.NEXTAUTH_URL}/success`,
+        success: `http://${process.env.NEXTAUTH_URL}/paquetes`,
         pending: `http://${process.env.NEXTAUTH_URL}/pending`,
         failure: `http://${process.env.NEXTAUTH_URL}/failure`,
       },
-      // notification_url: "http://notificationurl.com",
+      auto_return: "approved",
+      notification_url:
+        "https://realized-aids-ya-expansys.trycloudflare.com/api/notify",
+      metadata: {
+        user_id: session.user.id,
+      },
+      external_reference: id,
     }
 
     const preference = await new Preference(client).create({ body })
 
     return NextResponse.json({ redirectUrl: preference.init_point })
-    // console.log("Preference created:", body)
-    // return NextResponse.json({
-    //   redirectUrl:
-    //     "https://www.reddit.com/r/devsarg/comments/1dyo0sz/comment/lf1cgdj/",
-    // })
   } catch (error) {
     console.error("Error creating preference:", error)
     return NextResponse.json(
