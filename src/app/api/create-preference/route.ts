@@ -25,6 +25,7 @@ export async function POST(request: Request) {
   }
   try {
     const { id, title, description, price } = await request.json()
+    console.log("PACK id", id)
     const body = {
       items: [
         {
@@ -47,7 +48,7 @@ export async function POST(request: Request) {
       },
       auto_return: "approved",
       notification_url:
-        "https://realized-aids-ya-expansys.trycloudflare.com/api/notify",
+        "https://movement-position-earning-referral.trycloudflare.com/api/notify",
       metadata: {
         user_id: session.user.id,
       },

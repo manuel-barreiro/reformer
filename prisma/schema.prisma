@@ -20,6 +20,7 @@ model User {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   accounts      Account[]
+  payments      Payment[]
 }
 
 model Account {
@@ -49,7 +50,36 @@ model VerificationToken {
   @@id([identifier])
 }
 
+model Payment {
+  id                 String   @id @default(cuid())
+  paymentId          String   @unique
+  packageType        PackageType
+  dateCreated        DateTime
+  dateLastUpdated    DateTime
+  moneyReleaseDate   DateTime?
+  description        String?
+  total              Float
+  status             String
+  statusDetail       String?
+  paymentTypeId      String
+  userId             String
+  user               User     @relation(fields: [userId], references: [id])
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+}
+
 enum Role {
   user
   admin
+}
+
+enum PackageType {
+  pkg_1_yoga
+  pkg_4_yoga
+  pkg_8_yoga
+  pkg_12_yoga
+  pkg_1_pilates
+  pkg_4_pilates
+  pkg_8_pilates
+  pkg_12_pilates
 }

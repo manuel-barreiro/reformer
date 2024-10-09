@@ -1,14 +1,27 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { packageOptions } from "@/lib/packageOptions"
+import {
+  packageOptions,
+  Package,
+  ClassType,
+  getPackageType,
+  PackageType,
+} from "@/lib/packageOptions"
 
 export const useCheckout = () => {
-  const [selectedPackage, setSelectedPackage] = useState(packageOptions[0])
-  const [selectedClass, setSelectedClass] = useState("pilates")
+  const [selectedPackage, setSelectedPackage] = useState<Package>(
+    packageOptions[0]
+  )
+  const [selectedClass, setSelectedClass] = useState<ClassType>("pilates")
   const router = useRouter()
 
   const handleCheckout = async () => {
     try {
+      const packageType: PackageType = getPackageType(
+        selectedPackage.id,
+        selectedClass
+      )
+
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_URL}/api/create-preference`,
         {
@@ -17,7 +30,7 @@ export const useCheckout = () => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            id: selectedPackage.id,
+            id: packageType,
             title: `${selectedPackage.name} - ${selectedClass.toUpperCase()}`,
             description: `Paquete de ${selectedPackage.classQuantity} ${
               selectedPackage.classQuantity > 1 ? "clases" : "clase"

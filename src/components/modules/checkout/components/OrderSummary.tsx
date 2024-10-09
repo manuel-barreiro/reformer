@@ -10,35 +10,21 @@ import {
 import { Separator } from "@/components/ui/separator"
 import React from "react"
 import { numberFormatter } from "@/lib/numberFormatter"
+import { Package, ClassType, packageOptions } from "@/lib/packageOptions"
+
+interface OrderSummaryProps {
+  selectedPackage: Package
+  setSelectedPackage: (pkg: Package) => void
+  selectedClass: ClassType
+  setSelectedClass: (cls: ClassType) => void
+}
 
 export default function OrderSummary({
   selectedPackage,
   setSelectedPackage,
   selectedClass,
   setSelectedClass,
-  packageOptions,
-}: {
-  selectedPackage: {
-    id: string
-    name: string
-    classQuantity: number
-    price: number
-  }
-  setSelectedPackage: (pkg: {
-    id: string
-    name: string
-    classQuantity: number
-    price: number
-  }) => void
-  selectedClass: string
-  setSelectedClass: (cls: string) => void
-  packageOptions: {
-    id: string
-    name: string
-    classQuantity: number
-    price: number
-  }[]
-}) {
+}: OrderSummaryProps) {
   return (
     <div className="flex h-auto w-full max-w-[450px] flex-col items-start justify-evenly gap-3 border-[2px] border-grey_pebble bg-midnight/60 px-5 py-6 md:px-10 md:py-12">
       <Select
@@ -66,7 +52,7 @@ export default function OrderSummary({
       </Select>
       <RadioGroup
         value={selectedClass}
-        onValueChange={setSelectedClass}
+        onValueChange={(value: ClassType) => setSelectedClass(value)}
         className="flex items-center gap-4 text-pearl"
       >
         <div className="flex items-center space-x-2">

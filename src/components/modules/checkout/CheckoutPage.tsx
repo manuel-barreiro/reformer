@@ -47,7 +47,6 @@ export default function CheckoutPage() {
             setSelectedPackage={setSelectedPackage}
             selectedClass={selectedClass}
             setSelectedClass={setSelectedClass}
-            packageOptions={packageOptions}
           />
           <DiscountCoupon />
         </div>
