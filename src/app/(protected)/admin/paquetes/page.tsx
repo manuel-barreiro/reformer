@@ -1,12 +1,13 @@
 import { auth } from "@/auth"
-import LogoutButtonDesktop from "@/components/modules/auth/logout-button-desktop"
 
 export default async function page() {
   const session = await auth()
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center gap-5">
-      <p className="text-5xl font-bold text-blue-500">Admin page ("/admin")</p>
+    <main className="flex min-h-[86dvh] flex-col items-center justify-center gap-5">
+      <p className="text-5xl font-bold text-grey_pebble">
+        Paquetes ("/admin/paquetes")
+      </p>
       {session?.user?.role !== "admin" ? (
         <p className="text-5xl font-bold text-red-500">You are not an admin!</p>
       ) : (
@@ -14,7 +15,6 @@ export default async function page() {
           <code>{JSON.stringify(session, null, 2)}</code>
         </pre>
       )}
-      <LogoutButtonDesktop />
     </main>
   )
 }

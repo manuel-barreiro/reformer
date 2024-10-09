@@ -5,11 +5,9 @@ import React, { useState } from "react"
 
 export default function FinalCheckout({
   selectedPackage,
-  selectedClass,
   onCheckout,
 }: {
   selectedPackage: { name: string; price: number }
-  selectedClass: string
   onCheckout: () => Promise<void>
 }) {
   const [isLoading, setIsLoading] = useState(false)
@@ -29,7 +27,7 @@ export default function FinalCheckout({
         <p className="font-dm_mono text-xl">Resumen de compra</p>
         <div className="w-full border-[1px] border-pearl/30 bg-midnight/70 p-3">
           <p className="text-center text-base md:text-xl">
-            {selectedPackage.name} - {selectedClass.toUpperCase()}
+            {selectedPackage.name}
           </p>
         </div>
         <div className="mt-5 flex w-full flex-col gap-3">

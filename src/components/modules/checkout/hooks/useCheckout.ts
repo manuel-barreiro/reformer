@@ -12,15 +12,11 @@ export const useCheckout = () => {
   const [selectedPackage, setSelectedPackage] = useState<Package>(
     packageOptions[0]
   )
-  const [selectedClass, setSelectedClass] = useState<ClassType>("pilates")
   const router = useRouter()
 
   const handleCheckout = async () => {
     try {
-      const packageType: PackageType = getPackageType(
-        selectedPackage.id,
-        selectedClass
-      )
+      const packageType: PackageType = selectedPackage.id
 
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_URL}/api/create-preference`,
@@ -30,12 +26,12 @@ export const useCheckout = () => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            id: packageType,
-            title: `${selectedPackage.name} - ${selectedClass.toUpperCase()}`,
-            description: `Paquete de ${selectedPackage.classQuantity} ${
+            packageType: packageType,
+            packageName: selectedPackage.name,
+            packageDescription: `Paquete de ${selectedPackage.classQuantity} ${
               selectedPackage.classQuantity > 1 ? "clases" : "clase"
-            } de ${selectedClass}`,
-            price: selectedPackage.price,
+            }`,
+            packagePrice: selectedPackage.price,
           }),
         }
       )
@@ -60,8 +56,6 @@ export const useCheckout = () => {
   return {
     selectedPackage,
     setSelectedPackage,
-    selectedClass,
-    setSelectedClass,
     handleCheckout,
     packageOptions,
   }

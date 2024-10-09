@@ -15,15 +15,11 @@ import { Package, ClassType, packageOptions } from "@/lib/packageOptions"
 interface OrderSummaryProps {
   selectedPackage: Package
   setSelectedPackage: (pkg: Package) => void
-  selectedClass: ClassType
-  setSelectedClass: (cls: ClassType) => void
 }
 
 export default function OrderSummary({
   selectedPackage,
   setSelectedPackage,
-  selectedClass,
-  setSelectedClass,
 }: OrderSummaryProps) {
   return (
     <div className="flex h-auto w-full max-w-[450px] flex-col items-start justify-evenly gap-3 border-[2px] border-grey_pebble bg-midnight/60 px-5 py-6 md:px-10 md:py-12">
@@ -43,32 +39,15 @@ export default function OrderSummary({
             <SelectItem
               key={option.name}
               value={option.name}
-              className="border-b-[1px] border-midnight"
+              className="border-b-[1px] border-midnight focus:bg-grey_pebble focus:text-pearl"
             >
               {option.name}
             </SelectItem>
           ))}
         </SelectContent>
       </Select>
-      <RadioGroup
-        value={selectedClass}
-        onValueChange={(value: ClassType) => setSelectedClass(value)}
-        className="flex items-center gap-4 text-pearl"
-      >
-        <div className="flex items-center space-x-2">
-          <RadioGroupItem value="pilates" id="r1" />
-          <Label className="text-base font-extralight" htmlFor="r1">
-            Pilates
-          </Label>
-        </div>
-        <div className="flex items-center space-x-2">
-          <RadioGroupItem value="yoga" id="r2" />
-          <Label className="text-base font-extralight" htmlFor="r2">
-            Yoga
-          </Label>
-        </div>
-      </RadioGroup>
-      <div className="mt-5 flex w-full items-center justify-between px-1">
+
+      <div className="mt-5 flex w-full items-center justify-between px-1 text-lg">
         <span className="font-extralight">Total</span>
         <span className="font-bold">
           {numberFormatter.format(selectedPackage.price)}
@@ -77,15 +56,18 @@ export default function OrderSummary({
       <Separator className="h-[1px] w-full rounded-full bg-pearl/70" />
 
       <div className="mt-5 flex flex-col gap-3 px-1 font-light">
-        <p>
+        <p className="text-justify">
           Este paquete incluye{" "}
           <span className="font-semibold">
             {selectedPackage.classQuantity}{" "}
-            {selectedPackage.classQuantity > 1 ? "clases" : "clase"} de{" "}
-            {selectedClass}
+            {selectedPackage.classQuantity > 1 ? "clases" : "clase"}
           </span>{" "}
-          para utilizar en el período de{" "}
-          <span className="font-semibold">un mes</span>.
+          {selectedPackage.classQuantity > 1 ? "combinables" : ""} de pilates
+          {selectedPackage.classQuantity > 1 ? " y/o" : " o"} yoga{" "}
+          {selectedPackage.classQuantity > 1
+            ? "para que las puedas utilizar"
+            : "para que la puedas utilizar"}{" "}
+          en el período de <span className="font-semibold">un mes</span>.
         </p>
         <p className="italic">
           Luego de que tu compra sea aprobada, podrás reservar tus clases en

@@ -10,14 +10,7 @@ import { useCheckout } from "./hooks/useCheckout"
 import { useParallax } from "@/lib/useParallax"
 
 export default function CheckoutPage() {
-  const {
-    selectedPackage,
-    setSelectedPackage,
-    selectedClass,
-    setSelectedClass,
-    handleCheckout,
-    packageOptions,
-  } = useCheckout()
+  const { selectedPackage, setSelectedPackage, handleCheckout } = useCheckout()
 
   const { sectionRef, y } = useParallax()
 
@@ -40,19 +33,16 @@ export default function CheckoutPage() {
         />
       </motion.div>
 
-      <div className="grid h-auto w-auto max-w-[900px] grid-cols-1 gap-6 md:grid-cols-2 md:gap-2">
-        <div className="flex flex-col gap-2">
+      <div className="grid h-auto w-auto max-w-[900px] grid-cols-1 justify-items-stretch gap-6 md:grid-cols-2 md:gap-2">
+        <div className="flex flex-grow flex-col gap-2">
           <OrderSummary
             selectedPackage={selectedPackage}
             setSelectedPackage={setSelectedPackage}
-            selectedClass={selectedClass}
-            setSelectedClass={setSelectedClass}
           />
           <DiscountCoupon />
         </div>
         <FinalCheckout
           selectedPackage={selectedPackage}
-          selectedClass={selectedClass}
           onCheckout={handleCheckout}
         />
       </div>

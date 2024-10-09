@@ -24,17 +24,18 @@ export async function POST(request: Request) {
     )
   }
   try {
-    const { id, title, description, price } = await request.json()
-    console.log("PACK id", id)
+    const { packageType, packageName, packageDescription, packagePrice } =
+      await request.json()
+    console.log("packageType", packageType)
     const body = {
       items: [
         {
-          id: id,
-          title: title,
-          description: description,
+          id: packageType,
+          title: packageName,
+          description: packageDescription,
           picture_url: "http://www.reformer.com.ar/icons/opengraph-image.png",
           quantity: 1,
-          unit_price: price,
+          unit_price: packagePrice,
           currency_id: "ARS",
         },
       ],
@@ -48,11 +49,11 @@ export async function POST(request: Request) {
       },
       auto_return: "approved",
       notification_url:
-        "https://movement-position-earning-referral.trycloudflare.com/api/notify",
+        "https://includes-lg-ski-clinics.trycloudflare.com/api/notify",
       metadata: {
         user_id: session.user.id,
       },
-      external_reference: id,
+      external_reference: packageType,
     }
 
     const preference = await new Preference(client).create({ body })

@@ -1,8 +1,9 @@
 import NextAuth from "next-auth"
 import { NextResponse } from "next/server"
 import authConfig from "./auth.config"
+import { auth } from "./auth"
 
-const { auth } = NextAuth(authConfig)
+// const { auth } = NextAuth(authConfig)
 
 const publicRoutes = ["/", "/api/notify"]
 const authRoutes = ["/sign-in", "/sign-up"]
@@ -14,7 +15,7 @@ export default auth((req) => {
   const userRole = req.auth?.user.role
   const isLoggedIn = !!req.auth
 
-  console.log({ isLoggedIn, path: nextUrl.pathname })
+  console.log("MIDDLEWARE", req.auth?.user)
 
   // Allow all authentication API routes
   if (nextUrl.pathname.startsWith(apiAuthPrefix)) {
@@ -53,9 +54,13 @@ export default auth((req) => {
   }
 
   // Redirect to /paquetes if the user role is user and tries to access /admin
-  if (!userRole && nextUrl.pathname.startsWith("/admin")) {
-    return NextResponse.redirect(new URL("/paquetes", nextUrl))
-  }
+  // if (userRole !== "admin" && nextUrl.pathname.startsWith("/admin")) {
+  //   return NextResponse.redirect(new URL("/paquetes", nextUrl))
+  // }
+
+  // if (userRole !== "user" && !nextUrl.pathname.startsWith("/admin")) {
+  //   return NextResponse.redirect(new URL("/admin", nextUrl))
+  // }
 
   return NextResponse.next()
 })
