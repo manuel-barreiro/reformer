@@ -5,7 +5,7 @@ import notFoundBw from "/public/images/notFoundBw.webp"
 
 export default function NotFound() {
   return (
-    <div className="flex h-[85vh] flex-col md:flex-row">
+    <div className="flex h-[86vh] flex-col md:flex-row">
       <div className="flex h-full flex-col items-center justify-center gap-5 bg-grey_pebble px-10 py-12 text-center font-marcellus text-pearl lg:px-20">
         <span className="mb-3 text-4xl font-bold tracking-tight">
           Oops {":("}

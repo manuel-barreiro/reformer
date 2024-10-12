@@ -14,7 +14,7 @@ export default function SignIn({
   const OAuthAccountNotLinked = searchParams.error === "OAuthAccountNotLinked"
 
   return (
-    <div className="min-h-[100dvh] w-full text-pearl lg:grid lg:grid-cols-2">
+    <div className="h-auto w-full text-pearl lg:grid lg:grid-cols-2">
       <div className="relative hidden lg:block">
         <Image
           src="/images/signin.jpg"
@@ -34,7 +34,7 @@ export default function SignIn({
       </Button>
       <div
         style={{ cursor: "url(icons/solGreyPebble.svg),auto" }}
-        className="flex min-h-[100dvh] items-center justify-center bg-pearl py-12"
+        className="flex min-h-[86dvh] items-center justify-center bg-pearl py-12"
       >
         <div className="relative flex flex-col items-center gap-4 text-midnight">
           <Link href={"/"}>

@@ -13,7 +13,7 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { loginAction } from "@/actions/auth-actions"
 import { useState, useTransition } from "react"
 import GoogleLoginButton from "./login-google-button"
@@ -30,6 +30,8 @@ export default function SignInForm({
   const [error, setError] = useState<string | null>("")
   const [isPending, startTransition] = useTransition()
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const callbackUrl = searchParams.get("callbackUrl") || "/paquetes"
 
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
@@ -46,7 +48,7 @@ export default function SignInForm({
       if (login.error) {
         setError(login.error)
       } else {
-        router.push("/paquetes")
+        router.push(callbackUrl)
       }
     })
   }
