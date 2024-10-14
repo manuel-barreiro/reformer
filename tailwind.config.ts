@@ -31,6 +31,8 @@ const config = {
         inputBg: "#D9D9D9",
         pearlVariant: "#E9E7D9",
         pearlVariant2: "#F0EEE3",
+        pearlVariant3: "#D6D4C6",
+        tableContent: "#878686",
       },
       keyframes: {
         marquee: {

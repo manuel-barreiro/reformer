@@ -1,23 +1,15 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import {
-  packageOptions,
-  Package,
-  ClassType,
-  getPackageType,
-  PackageType,
-} from "@/lib/packageOptions"
+import { ClassPackage } from "@prisma/client"
 
-export const useCheckout = () => {
-  const [selectedPackage, setSelectedPackage] = useState<Package>(
-    packageOptions[0]
+export const useCheckout = (classPackages: ClassPackage[]) => {
+  const [selectedPackage, setSelectedPackage] = useState<ClassPackage>(
+    classPackages[0]
   )
   const router = useRouter()
 
   const handleCheckout = async () => {
     try {
-      const packageType: PackageType = selectedPackage.id
-
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_URL}/api/create-preference`,
         {
@@ -26,12 +18,7 @@ export const useCheckout = () => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            packageType: packageType,
-            packageName: selectedPackage.name,
-            packageDescription: `Paquete de ${selectedPackage.classQuantity} ${
-              selectedPackage.classQuantity > 1 ? "clases" : "clase"
-            }`,
-            packagePrice: selectedPackage.price,
+            classPackageId: selectedPackage.id,
           }),
         }
       )
@@ -57,6 +44,5 @@ export const useCheckout = () => {
     selectedPackage,
     setSelectedPackage,
     handleCheckout,
-    packageOptions,
   }
 }

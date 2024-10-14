@@ -6,7 +6,7 @@ import { auth } from "./auth"
 const publicRoutes = ["/", "/api/notify"]
 const authRoutes = ["/sign-in", "/sign-up"]
 const apiAuthPrefix = "/api/auth"
-const apiRoutes = ["/api/create_preference"] // Add other API routes as needed
+const apiRoutes = ["/api/create_preference", "/api/packages"] // Add other API routes as needed
 
 const adminRoutes = ["/admin/pagos", "/admin/paquetes", "/admin/calendario"]
 const userRoutes = ["/paquetes", "/reservas", "/calendario", "/perfil"]
@@ -16,7 +16,7 @@ export default auth((req) => {
   const userRole = req.auth?.user.role
   const isLoggedIn = !!req.auth
 
-  console.log("MIDDLEWARE", req.auth?.user)
+  // console.log("MIDDLEWARE", req.auth?.user)
 
   // Allow all authentication API routes
   if (nextUrl.pathname.startsWith(apiAuthPrefix)) {

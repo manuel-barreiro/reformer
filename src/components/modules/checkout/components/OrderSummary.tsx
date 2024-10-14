@@ -1,5 +1,3 @@
-import { Label } from "@/components/ui/label"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import {
   Select,
   SelectContent,
@@ -10,14 +8,16 @@ import {
 import { Separator } from "@/components/ui/separator"
 import React from "react"
 import { numberFormatter } from "@/lib/numberFormatter"
-import { Package, ClassType, packageOptions } from "@/lib/packageOptions"
+import { ClassPackage } from "@prisma/client"
 
 interface OrderSummaryProps {
-  selectedPackage: Package
-  setSelectedPackage: (pkg: Package) => void
+  classPackages: ClassPackage[]
+  selectedPackage: ClassPackage
+  setSelectedPackage: (pkg: ClassPackage) => void
 }
 
 export default function OrderSummary({
+  classPackages,
   selectedPackage,
   setSelectedPackage,
 }: OrderSummaryProps) {
@@ -26,22 +26,21 @@ export default function OrderSummary({
       <Select
         onValueChange={(value) =>
           setSelectedPackage(
-            packageOptions.find((pkg) => pkg.name === value) ||
-              packageOptions[0]
+            classPackages.find((pkg) => pkg.name === value) || classPackages[0]
           )
         }
       >
         <SelectTrigger className="w-full bg-transparent">
-          <SelectValue placeholder={selectedPackage.name} />
+          <SelectValue placeholder={`PAQUETE ${selectedPackage.name}`} />
         </SelectTrigger>
         <SelectContent className="bg-pearlVariant2">
-          {packageOptions.map((option) => (
+          {classPackages.map((option) => (
             <SelectItem
               key={option.name}
               value={option.name}
               className="border-b-[1px] border-midnight focus:bg-grey_pebble focus:text-pearl"
             >
-              {option.name}
+              {`PAQUETE ${option.name}`}
             </SelectItem>
           ))}
         </SelectContent>
@@ -59,12 +58,12 @@ export default function OrderSummary({
         <p className="text-justify">
           Este paquete incluye{" "}
           <span className="font-semibold">
-            {selectedPackage.classQuantity}{" "}
-            {selectedPackage.classQuantity > 1 ? "clases" : "clase"}
+            {selectedPackage.classCount}{" "}
+            {selectedPackage.classCount > 1 ? "clases" : "clase"}
           </span>{" "}
-          {selectedPackage.classQuantity > 1 ? "combinables" : ""} de pilates
-          {selectedPackage.classQuantity > 1 ? " y/o" : " o"} yoga{" "}
-          {selectedPackage.classQuantity > 1
+          {selectedPackage.classCount > 1 ? "combinables" : ""} de pilates
+          {selectedPackage.classCount > 1 ? " y/o" : " o"} yoga{" "}
+          {selectedPackage.classCount > 1
             ? "para que las puedas utilizar"
             : "para que la puedas utilizar"}{" "}
           en el período de <span className="font-semibold">un mes</span>.

@@ -100,3 +100,62 @@ export const mockPackages: Package[] = [
   // },
   // Add more mock packages as needed
 ]
+
+// export interface ClassPackage {
+//   id: string
+//   name: string
+//   description: string
+//   classCount: number
+//   price: number
+//   duration: number
+//   isActive: boolean
+//   createdAt: Date
+//   updatedAt: Date
+// }
+
+// export const mockClassPackages: ClassPackage[] = [
+//   {
+//     id: "ckv1q9z0a0000z0a0z0a0z0a1",
+//     name: "X1 CLASE",
+//     description: "X1 clase de yoga y/o pilates.",
+//     classCount: 1,
+//     price: 18000,
+//     duration: 1,
+//     isActive: true,
+//     createdAt: new Date(),
+//     updatedAt: new Date(),
+//   },
+//   {
+//     id: "ckv1q9z0a0000z0a0z0a0z0a0",
+//     name: "X4 CLASES",
+//     description: "X4 clases combinables de yoga y/o pilates.",
+//     classCount: 4,
+//     price: 60000,
+//     duration: 1,
+//     isActive: true,
+//     createdAt: new Date(),
+//     updatedAt: new Date(),
+//   },
+//   {
+//     id: "ckv1q9z0a0001z0a0z0a0z0a0",
+//     name: "X8 CLASES",
+//     description: "X8 clases combinables de yoga y/o pilates.",
+//     classCount: 8,
+//     price: 112000,
+//     duration: 1,
+//     isActive: true,
+//     createdAt: new Date(),
+//     updatedAt: new Date(),
+//   },
+//   {
+//     id: "ckv1q9z0a0002z0a0z0a0z0a0",
+//     name: "X12 CLASES",
+//     description: "X12 clases combinables de yoga y/o pilates.",
+//     classCount: 12,
+//     price: 144000,
+//     duration: 1,
+//     isActive: true,
+//     createdAt: new Date(),
+//     updatedAt: new Date(),
+//   },
+// ]

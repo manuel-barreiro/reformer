@@ -9,7 +9,7 @@ import Footer from "@/components/modules/landingPage/Footer/Footer"
 import ServiciosGrid from "@/components/modules/landingPage/Servicios/ServiciosGrid"
 import ContactForm from "@/components/modules/landingPage/Footer/ContactForm"
 import Pilates from "@/components/modules/landingPage/Pilates"
-import Paquetes from "@/components/modules/landingPage/Paquetes"
+import Paquetes from "@/components/modules/landingPage/Paquetes/Paquetes"
 
 export default function Home() {
   //Lenis smooth scroll

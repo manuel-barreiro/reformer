@@ -1,8 +1,11 @@
 import { NextResponse } from "next/server"
 import { MercadoPagoConfig, Preference } from "mercadopago"
 import { auth } from "@/auth"
+import { PrismaClient } from "@prisma/client"
 
 // Este endpoint es llamado desde el front cuando el usuario quiere comprar un paquete. Recibe los datos del paquete y crea una preferencia de pago en MercadoPago, devolviendo la URL de pago (init_point) para que el usuario sea redirigido al CheckoutPro de MP.
+
+const prisma = new PrismaClient()
 
 // Inicializo cliente MercadoPago con el access token
 if (!process.env.MERCADOPAGO_ACCESS_TOKEN) {
@@ -16,26 +19,39 @@ const client = new MercadoPagoConfig({
 export async function POST(request: Request) {
   //Chequeo si el usuario está loggeado cuando intenta comprar el paquete, si no lo está, le muestro un mensaje de error
   const session = await auth()
-  console.log("session", session)
   if (!session) {
     return NextResponse.json(
       { error: "Tenés que estar loggeado para poder comprar el paquete" },
       { status: 401 }
     )
   }
+
   try {
-    const { packageType, packageName, packageDescription, packagePrice } =
-      await request.json()
-    console.log("packageType", packageType)
+    const { classPackageId } = await request.json()
+
+    // Busco el paquete en la base de datos para obtener los datos necesarios para crear la preferencia
+    const classPackage = await prisma.classPackage.findUnique({
+      where: { id: classPackageId },
+    })
+
+    if (!classPackage) {
+      return NextResponse.json(
+        { error: "ClassPackage not found" },
+        { status: 404 }
+      )
+    }
+
+    console.log("Creating preference for class package:", classPackage)
+
     const body = {
       items: [
         {
-          id: packageType,
-          title: packageName,
-          description: packageDescription,
+          id: classPackage.id.toString(),
+          title: classPackage.name.toString(),
+          description: classPackage.description?.toString(),
           picture_url: "http://www.reformer.com.ar/icons/opengraph-image.png",
           quantity: 1,
-          unit_price: packagePrice,
+          unit_price: classPackage.price,
           currency_id: "ARS",
         },
       ],
@@ -49,11 +65,11 @@ export async function POST(request: Request) {
       },
       auto_return: "approved",
       notification_url:
-        "https://includes-lg-ski-clinics.trycloudflare.com/api/notify",
+        "https://describe-sunshine-film-charged.trycloudflare.com/api/notify",
       metadata: {
         user_id: session.user.id,
+        class_package_id: classPackage.id,
       },
-      external_reference: packageType,
     }
 
     const preference = await new Preference(client).create({ body })

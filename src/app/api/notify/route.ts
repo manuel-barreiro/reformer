@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 import { MercadoPagoConfig, Payment } from "mercadopago"
-import { Prisma, PrismaClient, PackageType } from "@prisma/client"
+import { Prisma, PrismaClient, PackageStatus } from "@prisma/client"
 
 const prisma = new PrismaClient()
 
@@ -29,7 +29,6 @@ export async function POST(request: Request) {
 
         const paymentData: Prisma.PaymentCreateInput = {
           paymentId: pago.id?.toString() || "",
-          packageType: pago.external_reference as PackageType,
           dateCreated: pago.date_created
             ? new Date(pago.date_created)
             : new Date(),
@@ -67,16 +66,45 @@ export async function POST(request: Request) {
               moneyReleaseDate: paymentData.moneyReleaseDate,
               status: paymentData.status,
               statusDetail: paymentData.statusDetail,
-              // Add any other fields that might change
             },
           })
           console.log("Payment updated in database:", savedPayment)
         } else {
-          // Payment doesn't exist, create a new entry
-          savedPayment = await prisma.payment.create({
-            data: paymentData,
+          // Payment doesn't exist, create a new entry and a PurchasedPackage
+          const classPackage = await prisma.classPackage.findUnique({
+            where: { id: pago.metadata.class_package_id },
           })
-          console.log("New payment saved to database:", savedPayment)
+
+          if (!classPackage) {
+            throw new Error("ClassPackage not found")
+          }
+
+          const expirationDate = new Date()
+          expirationDate.setMonth(
+            expirationDate.getMonth() + classPackage.durationMonths
+          )
+
+          savedPayment = await prisma.payment.create({
+            data: {
+              ...paymentData,
+              purchasedPackage: {
+                create: {
+                  userId: pago.metadata.user_id,
+                  classPackageId: classPackage.id,
+                  remainingClasses: classPackage.classCount,
+                  expirationDate: expirationDate,
+                  status: PackageStatus.active,
+                },
+              },
+            },
+            include: {
+              purchasedPackage: true,
+            },
+          })
+          console.log(
+            "New payment and PurchasedPackage saved to database:",
+            savedPayment
+          )
         }
 
         return NextResponse.json(

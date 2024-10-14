@@ -8,9 +8,15 @@ import FinalCheckout from "./components/FinalCheckout"
 import OrderSummary from "./components/OrderSummary"
 import { useCheckout } from "./hooks/useCheckout"
 import { useParallax } from "@/lib/useParallax"
+import { ClassPackage } from "@prisma/client"
 
-export default function CheckoutPage() {
-  const { selectedPackage, setSelectedPackage, handleCheckout } = useCheckout()
+export default function CheckoutPage({
+  classPackages,
+}: {
+  classPackages: ClassPackage[]
+}) {
+  const { selectedPackage, setSelectedPackage, handleCheckout } =
+    useCheckout(classPackages)
 
   const { sectionRef, y } = useParallax()
 
@@ -36,6 +42,7 @@ export default function CheckoutPage() {
       <div className="grid h-auto w-auto max-w-[900px] grid-cols-1 justify-items-stretch gap-6 md:grid-cols-2 md:gap-2">
         <div className="flex flex-grow flex-col gap-2">
           <OrderSummary
+            classPackages={classPackages}
             selectedPackage={selectedPackage}
             setSelectedPackage={setSelectedPackage}
           />

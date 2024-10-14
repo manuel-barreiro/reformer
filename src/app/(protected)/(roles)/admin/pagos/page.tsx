@@ -1,11 +1,12 @@
 import { Suspense } from "react"
 import { PaymentsTable } from "@/components/modules/roles/admin/pagos/PaymentsTable"
 import { getPayments } from "@/actions/fetch-payments"
+import { Payment } from "@/components/modules/roles/admin/pagos/types"
 
 export default async function PaymentsPage() {
   // const initialPayments = await getPayments()
 
-  const initialPayments = [
+  const rawPayments = [
     {
       id: "cm22f108f00047dxsx6wfedt4",
       paymentId: "89797005067",
@@ -43,7 +44,7 @@ export default async function PaymentsPage() {
     {
       id: "cm22g123h0005t6xdqlaaakds",
       paymentId: "89797123456",
-      packageType: "pkg_5",
+      packageType: "pkg_12",
       dateCreated: new Date("2024-10-10T10:15:30.000Z"),
       dateLastUpdated: new Date("2024-10-10T10:15:30.000Z"),
       moneyReleaseDate: new Date("2024-11-05T10:15:30.000Z"),
@@ -51,7 +52,7 @@ export default async function PaymentsPage() {
       total: 80000,
       status: "approved",
       statusDetail: "accredited",
-      paymentTypeId: "paypal",
+      paymentTypeId: "cash",
       userId: "cm22xyzvh00042dxs9abc1234",
       createdAt: "2024-10-10T10:15:32.336Z",
       updatedAt: "2024-10-10T10:15:32.336Z",
@@ -60,7 +61,7 @@ export default async function PaymentsPage() {
     {
       id: "cm22g123h0005t6xdqlaaakds",
       paymentId: "89797123456",
-      packageType: "pkg_5",
+      packageType: "pkg_12",
       dateCreated: new Date("2024-10-10T10:15:30.000Z"),
       dateLastUpdated: new Date("2024-10-10T10:15:30.000Z"),
       moneyReleaseDate: new Date("2024-11-05T10:15:30.000Z"),
@@ -68,7 +69,7 @@ export default async function PaymentsPage() {
       total: 80000,
       status: "approved",
       statusDetail: "accredited",
-      paymentTypeId: "paypal",
+      paymentTypeId: "cash",
       userId: "cm22xyzvh00042dxs9abc1234",
       createdAt: "2024-10-10T10:15:32.336Z",
       updatedAt: "2024-10-10T10:15:32.336Z",
@@ -77,7 +78,7 @@ export default async function PaymentsPage() {
     {
       id: "cm22g123h0005t6xdqlaaakds",
       paymentId: "89797123456",
-      packageType: "pkg_5",
+      packageType: "pkg_8",
       dateCreated: new Date("2024-10-10T10:15:30.000Z"),
       dateLastUpdated: new Date("2024-10-10T10:15:30.000Z"),
       moneyReleaseDate: new Date("2024-11-05T10:15:30.000Z"),
@@ -85,7 +86,7 @@ export default async function PaymentsPage() {
       total: 80000,
       status: "approved",
       statusDetail: "accredited",
-      paymentTypeId: "paypal",
+      paymentTypeId: "cash",
       userId: "cm22xyzvh00042dxs9abc1234",
       createdAt: "2024-10-10T10:15:32.336Z",
       updatedAt: "2024-10-10T10:15:32.336Z",
@@ -94,7 +95,7 @@ export default async function PaymentsPage() {
     {
       id: "cm22g123h0005t6xdqlaaakds",
       paymentId: "89797123456",
-      packageType: "pkg_5",
+      packageType: "pkg_8",
       dateCreated: new Date("2024-10-10T10:15:30.000Z"),
       dateLastUpdated: new Date("2024-10-10T10:15:30.000Z"),
       moneyReleaseDate: new Date("2024-11-05T10:15:30.000Z"),
@@ -102,7 +103,7 @@ export default async function PaymentsPage() {
       total: 80000,
       status: "approved",
       statusDetail: "accredited",
-      paymentTypeId: "paypal",
+      paymentTypeId: "cash",
       userId: "cm22xyzvh00042dxs9abc1234",
       createdAt: "2024-10-10T10:15:32.336Z",
       updatedAt: "2024-10-10T10:15:32.336Z",
@@ -111,7 +112,7 @@ export default async function PaymentsPage() {
     {
       id: "cm22g123h0005t6xdqlaaakds",
       paymentId: "89797123456",
-      packageType: "pkg_5",
+      packageType: "pkg_8",
       dateCreated: new Date("2024-10-10T10:15:30.000Z"),
       dateLastUpdated: new Date("2024-10-10T10:15:30.000Z"),
       moneyReleaseDate: new Date("2024-11-05T10:15:30.000Z"),
@@ -119,7 +120,7 @@ export default async function PaymentsPage() {
       total: 80000,
       status: "approved",
       statusDetail: "accredited",
-      paymentTypeId: "paypal",
+      paymentTypeId: "cash",
       userId: "cm22xyzvh00042dxs9abc1234",
       createdAt: "2024-10-10T10:15:32.336Z",
       updatedAt: "2024-10-10T10:15:32.336Z",
@@ -128,7 +129,7 @@ export default async function PaymentsPage() {
     {
       id: "cm22g123h0005t6xdqlaaakds",
       paymentId: "89797123456",
-      packageType: "pkg_5",
+      packageType: "pkg_8",
       dateCreated: new Date("2024-10-10T10:15:30.000Z"),
       dateLastUpdated: new Date("2024-10-10T10:15:30.000Z"),
       moneyReleaseDate: new Date("2024-11-05T10:15:30.000Z"),
@@ -136,7 +137,7 @@ export default async function PaymentsPage() {
       total: 80000,
       status: "approved",
       statusDetail: "accredited",
-      paymentTypeId: "paypal",
+      paymentTypeId: "cash",
       userId: "cm22xyzvh00042dxs9abc1234",
       createdAt: "2024-10-10T10:15:32.336Z",
       updatedAt: "2024-10-10T10:15:32.336Z",
@@ -145,7 +146,7 @@ export default async function PaymentsPage() {
     {
       id: "cm22g123h0005t6xdqlaaakds",
       paymentId: "89797123456",
-      packageType: "pkg_5",
+      packageType: "pkg_8",
       dateCreated: new Date("2024-10-10T10:15:30.000Z"),
       dateLastUpdated: new Date("2024-10-10T10:15:30.000Z"),
       moneyReleaseDate: new Date("2024-11-05T10:15:30.000Z"),
@@ -153,7 +154,7 @@ export default async function PaymentsPage() {
       total: 80000,
       status: "approved",
       statusDetail: "accredited",
-      paymentTypeId: "paypal",
+      paymentTypeId: "cash",
       userId: "cm22xyzvh00042dxs9abc1234",
       createdAt: "2024-10-10T10:15:32.336Z",
       updatedAt: "2024-10-10T10:15:32.336Z",
@@ -162,7 +163,7 @@ export default async function PaymentsPage() {
     {
       id: "cm22g456h0008r8sdfhjjkloq",
       paymentId: "89797234567",
-      packageType: "pkg_10",
+      packageType: "pkg_12",
       dateCreated: new Date("2024-10-11T11:22:44.000Z"),
       dateLastUpdated: new Date("2024-10-11T11:22:44.000Z"),
       moneyReleaseDate: new Date("2024-11-05T11:22:44.000Z"),
@@ -179,7 +180,7 @@ export default async function PaymentsPage() {
     {
       id: "cm22g789h0011f5rtgbmnoqer",
       paymentId: "89797345678",
-      packageType: "pkg_3",
+      packageType: "pkg_1",
       dateCreated: new Date("2024-10-12T08:30:00.000Z"),
       dateLastUpdated: new Date("2024-10-12T08:30:00.000Z"),
       moneyReleaseDate: new Date("2024-10-30T08:30:00.000Z"),
@@ -194,6 +195,17 @@ export default async function PaymentsPage() {
       user: { name: "Lucia Ramos" },
     },
   ]
+
+  const initialPayments: Payment[] = rawPayments.map((payment) => ({
+    ...payment,
+    dateCreated: new Date(payment.dateCreated),
+    dateLastUpdated: new Date(payment.dateLastUpdated),
+    moneyReleaseDate: payment.moneyReleaseDate
+      ? new Date(payment.moneyReleaseDate)
+      : undefined,
+    createdAt: new Date(payment.createdAt),
+    updatedAt: new Date(payment.updatedAt),
+  }))
 
   return (
     <section className="flex min-h-[86dvh] items-center justify-center">

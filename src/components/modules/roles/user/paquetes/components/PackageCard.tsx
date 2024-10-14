@@ -1,5 +1,5 @@
 import React from "react"
-import { Package } from "@/components/modules/user/paquetes/utils/mockPackages"
+import { Package } from "@/components/modules/roles/user/paquetes/utils/mockPackages"
 import { cn } from "@/lib/utils"
 
 export default function PackageCard({ pack }: { pack: Package }) {
