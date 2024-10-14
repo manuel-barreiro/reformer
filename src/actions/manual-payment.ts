@@ -1,56 +1,70 @@
-import { PrismaClient, User, Payment, PackageType } from "@prisma/client"
+"use server"
 
-const prisma = new PrismaClient()
+import { prisma } from "@/lib/prisma"
+import { Payment, PurchasedPackage, User } from "@prisma/client"
 
-export async function searchUsers(term: string): Promise<User[]> {
+export async function createManualPayment(
+  userId: string,
+  classPackageId: string,
+  total: number,
+  paymentTypeId: string
+): Promise<Payment> {
+  return prisma.$transaction(async (tx) => {
+    const classPackage = await tx.classPackage.findUnique({
+      where: { id: classPackageId },
+    })
+
+    if (!classPackage) {
+      throw new Error("Class package not found")
+    }
+
+    const payment = await tx.payment.create({
+      data: {
+        paymentId: `MANUAL_${Date.now()}`,
+        dateCreated: new Date(),
+        dateLastUpdated: new Date(),
+        description: `Manual payment for ${classPackage.name}`,
+        total,
+        status: "approved",
+        statusDetail: "Manual payment",
+        paymentTypeId,
+        userId,
+      },
+    })
+
+    const purchasedPackage = await tx.purchasedPackage.create({
+      data: {
+        userId,
+        classPackageId,
+        remainingClasses: classPackage.classCount,
+        expirationDate: new Date(
+          Date.now() + classPackage.durationMonths * 30 * 24 * 60 * 60 * 1000
+        ),
+        paymentId: payment.id,
+        status: "active",
+      },
+    })
+
+    return payment
+  })
+}
+
+export async function searchUsers(searchTerm: string): Promise<User[]> {
   try {
     const users = await prisma.user.findMany({
       where: {
         OR: [
-          { name: { contains: term, mode: "insensitive" } },
-          { surname: { contains: term, mode: "insensitive" } },
-          { email: { contains: term, mode: "insensitive" } },
+          { name: { contains: searchTerm, mode: "insensitive" } },
+          { surname: { contains: searchTerm, mode: "insensitive" } },
+          { email: { contains: searchTerm, mode: "insensitive" } },
         ],
       },
-      take: 10,
+      take: 5,
     })
-    console.log(users)
+    console.log(searchTerm, users)
     return users
   } catch (error) {
-    console.error("Error searching users:", error)
-    throw new Error("Failed to search users")
-  } finally {
-    await prisma.$disconnect()
-  }
-}
-
-export async function createManualPayment(
-  userId: string,
-  packageType: PackageType,
-  amount: number,
-  paymentMethod: string
-): Promise<Payment> {
-  try {
-    const payment = await prisma.payment.create({
-      data: {
-        userId,
-        packageType,
-        total: amount,
-        status: "approved",
-        paymentTypeId: paymentMethod,
-        dateCreated: new Date(),
-        dateLastUpdated: new Date(),
-        paymentId: `MANUAL-${Date.now()}`,
-      },
-    })
-
-    // Here you would also call the generatePackage function
-
-    return payment
-  } catch (error) {
-    console.error("Error creating manual payment:", error)
-    throw new Error("Failed to create manual payment")
-  } finally {
-    await prisma.$disconnect()
+    console.error("Error in searchUsers:", error)
+    return [] // Return an empty array instead of undefinedA
   }
 }

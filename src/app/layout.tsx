@@ -67,7 +67,7 @@ export default async function RootLayout({
     <html
       lang="es"
       className="scrollbar-hide scroll-smooth"
-      style={{ cursor: "url(icons/solPearl.svg),auto" }}
+      style={{ cursor: "url(/icons/solPearl.svg),auto" }}
     >
       <body
         className={`${marcellus.variable} ${dm_sans.variable} ${dm_sans.className} ${dm_mono.variable} scrollbar-hide`}

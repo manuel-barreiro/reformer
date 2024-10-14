@@ -1,27 +1,20 @@
-import { PrismaClient } from "@prisma/client"
+"use server"
 
-const prisma = new PrismaClient()
+import { prisma } from "@/lib/prisma"
+import { Payment, User } from "@prisma/client"
 
-export async function getPayments() {
-  try {
-    const payments = await prisma.payment.findMany({
-      include: {
-        user: {
-          select: {
-            name: true,
-          },
+export async function getPayments(): Promise<(Payment & { user: User })[]> {
+  return await prisma.payment.findMany({
+    include: {
+      user: true,
+      purchasedPackage: {
+        include: {
+          classPackage: true,
         },
       },
-      orderBy: {
-        dateCreated: "desc",
-      },
-    })
-    console.log(payments)
-    return payments
-  } catch (error) {
-    console.error("Error fetching payments:", error)
-    throw new Error("Failed to fetch payments")
-  } finally {
-    await prisma.$disconnect()
-  }
+    },
+    orderBy: {
+      dateCreated: "desc",
+    },
+  })
 }

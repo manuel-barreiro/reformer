@@ -1,9 +1,12 @@
-import React from "react"
+"use client"
+
+import React, { useState, useEffect } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
-import { PackageType, User } from "@prisma/client"
+import { User, ClassPackage, Payment } from "@prisma/client"
 import { useTransition } from "react"
+import { numberFormatter } from "@/lib/numberFormatter"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -22,54 +25,89 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { Input } from "@/components/ui/input"
 import { UserSearch } from "@/components/modules/roles/common/UserSearch"
 import { createManualPayment } from "@/actions/manual-payment"
+import { fetchClassPackages } from "@/actions/fetch-class-packages"
 
 const formSchema = z.object({
-  user: z.object({
-    id: z.string(),
-    name: z.string(),
-    email: z.string().email(),
-  }),
-  packageType: z.nativeEnum(PackageType),
-  amount: z.number().positive(),
-  paymentMethod: z.enum(["efectivo", "transferencia"]),
+  user: z
+    .object({
+      id: z.string(),
+      name: z.string(),
+      surname: z.string().nullable(),
+      email: z.string().email(),
+      phone: z.string().nullable(),
+      password: z.string().nullable(),
+      emailVerified: z.date().nullable(),
+      image: z.string().nullable(),
+      role: z.enum(["user", "admin"]), // Assuming these are the roles
+      createdAt: z.date(),
+      updatedAt: z.date(),
+    })
+    .nullable(),
+  classPackageId: z.string(),
+  paymentTypeId: z.enum(["cash", "bank_transfer"]),
 })
 
-export function ManualPaymentForm() {
+interface ManualPaymentFormProps {
+  onAddPayment: (payment: Payment & { user: User }) => void
+  onClose: () => void
+}
+
+export function ManualPaymentForm({
+  onAddPayment,
+  onClose,
+}: ManualPaymentFormProps) {
   const [isPending, startTransition] = useTransition()
+  const [classPackages, setClassPackages] = useState<ClassPackage[]>([])
+  const [error, setError] = useState<string | null>(null)
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      packageType: PackageType.pkg_1,
-      amount: 0,
-      paymentMethod: "efectivo",
+      user: null,
+      classPackageId: "",
+      paymentTypeId: "cash",
     },
   })
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  useEffect(() => {
+    fetchClassPackages().then(setClassPackages)
+  }, [])
+
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    setError(null)
     startTransition(async () => {
       try {
-        await createManualPayment(
-          values.user.id,
-          values.packageType,
-          values.amount,
-          values.paymentMethod
+        if (!values.user) {
+          throw new Error("Please select a user")
+        }
+        const selectedPackage = classPackages.find(
+          (pkg) => pkg.id === values.classPackageId
         )
+        if (!selectedPackage) {
+          throw new Error("Selected package not found")
+        }
+        const payment = await createManualPayment(
+          values.user.id,
+          values.classPackageId,
+          selectedPackage.price,
+          values.paymentTypeId
+        )
+        onAddPayment({ ...payment, user: values.user })
         alert("Pago registrado exitosamente")
         form.reset()
+        onClose()
       } catch (error) {
         console.error("Error al registrar el pago:", error)
-        alert("Error al registrar el pago")
+        setError("Error al registrar el pago. Por favor, intente nuevamente.")
       }
     })
   }
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <FormField
           control={form.control}
           name="user"
@@ -78,7 +116,8 @@ export function ManualPaymentForm() {
               <FormLabel>Usuario</FormLabel>
               <FormControl>
                 <UserSearch
-                  onSelectUser={(user: User) => field.onChange(user)}
+                  onSelectUser={(user: User | null) => field.onChange(user)}
+                  selectedUser={field.value}
                 />
               </FormControl>
               <FormDescription>Busca y selecciona un usuario.</FormDescription>
@@ -88,21 +127,29 @@ export function ManualPaymentForm() {
         />
         <FormField
           control={form.control}
-          name="packageType"
+          name="classPackageId"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Tipo de Paquete</FormLabel>
+              <FormLabel>Paquete</FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecciona un paquete" />
+                  <SelectTrigger className="border-rust/50 bg-pearlVariant font-semibold text-grey_pebble/60">
+                    <SelectValue
+                      placeholder="Selecciona un paquete"
+                      className="uppercase placeholder:uppercase"
+                    />
                   </SelectTrigger>
                 </FormControl>
-                <SelectContent>
-                  <SelectItem value={PackageType.pkg_1}>1 Clase</SelectItem>
-                  <SelectItem value={PackageType.pkg_4}>4 Clases</SelectItem>
-                  <SelectItem value={PackageType.pkg_8}>8 Clases</SelectItem>
-                  <SelectItem value={PackageType.pkg_12}>12 Clases</SelectItem>
+                <SelectContent className="bg-grey_pebble text-pearl">
+                  {classPackages.map((pkg) => (
+                    <SelectItem
+                      key={pkg.id}
+                      value={pkg.id}
+                      className="border-b border-pearl/50 uppercase hover:!bg-pearlVariant3"
+                    >
+                      {pkg.name} - {numberFormatter.format(pkg.price)}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
               <FormMessage />
@@ -111,36 +158,30 @@ export function ManualPaymentForm() {
         />
         <FormField
           control={form.control}
-          name="amount"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Monto</FormLabel>
-              <FormControl>
-                <Input
-                  type="number"
-                  {...field}
-                  onChange={(e) => field.onChange(parseFloat(e.target.value))}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="paymentMethod"
+          name="paymentTypeId"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Método de Pago</FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecciona un método de pago" />
+                  <SelectTrigger className="border-rust/50 bg-pearlVariant font-semibold text-grey_pebble/60">
+                    <SelectValue
+                      placeholder="Selecciona un método de pago"
+                      className="uppercase placeholder:uppercase"
+                    />
                   </SelectTrigger>
                 </FormControl>
-                <SelectContent>
-                  <SelectItem value="efectivo">Efectivo</SelectItem>
-                  <SelectItem value="transferencia">
+                <SelectContent className="bg-grey_pebble text-pearl">
+                  <SelectItem
+                    value="cash"
+                    className="border-b border-pearl/50 uppercase hover:!bg-pearlVariant2"
+                  >
+                    Efectivo
+                  </SelectItem>
+                  <SelectItem
+                    value="bank_transfer"
+                    className="border-b border-pearl/50 uppercase hover:!bg-pearlVariant2"
+                  >
                     Transferencia bancaria
                   </SelectItem>
                 </SelectContent>
@@ -149,8 +190,13 @@ export function ManualPaymentForm() {
             </FormItem>
           )}
         />
-        <Button type="submit" disabled={isPending}>
-          {isPending ? "Registrando..." : "Registrar Pago"}
+        {error && <div className="text-red-500">{error}</div>}
+        <Button
+          type="submit"
+          disabled={isPending}
+          className="w-full bg-rust py-6 font-dm_mono text-pearl duration-300 ease-in-out hover:bg-rust/90"
+        >
+          {isPending ? "Registrando..." : "Cargar Pago | Asignar Paquete"}
         </Button>
       </form>
     </Form>

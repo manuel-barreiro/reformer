@@ -5,7 +5,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import { Payment } from "./types"
+import { Payment } from "@prisma/client"
 
 interface PaymentDetailModalProps {
   isOpen: boolean
@@ -32,7 +32,7 @@ export function PaymentDetailModal({
           <div className="grid grid-cols-4 items-center gap-4">
             <label className="text-right font-medium">Fecha de Creación:</label>
             <div className="col-span-3">
-              {payment.dateCreated.toLocaleString()}
+              {new Date(payment.dateCreated).toLocaleString()}
             </div>
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
@@ -40,7 +40,7 @@ export function PaymentDetailModal({
               Última Actualización:
             </label>
             <div className="col-span-3">
-              {payment.dateLastUpdated.toLocaleString()}
+              {new Date(payment.dateLastUpdated).toLocaleString()}
             </div>
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
@@ -48,7 +48,9 @@ export function PaymentDetailModal({
               Fecha de Liberación:
             </label>
             <div className="col-span-3">
-              {payment.moneyReleaseDate?.toLocaleString() || "N/A"}
+              {payment.moneyReleaseDate
+                ? new Date(payment.moneyReleaseDate).toLocaleString()
+                : "N/A"}
             </div>
           </div>
           <div className="grid grid-cols-4 items-center gap-4">

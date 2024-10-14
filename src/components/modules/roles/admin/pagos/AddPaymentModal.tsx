@@ -1,22 +1,18 @@
 "use client"
-import React, { useState } from "react"
-import { Button } from "@/components/ui/button"
+import React from "react"
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
 } from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Payment } from "./types"
+import { Payment, User } from "@prisma/client"
 import { ManualPaymentForm } from "./ManualPaymentForm"
 
 interface AddPaymentModalProps {
   isOpen: boolean
   onClose: () => void
-  onAddPayment: (payment: Payment) => void
+  onAddPayment: (payment: Payment & { user: User }) => void
 }
 
 export function AddPaymentModal({
@@ -28,9 +24,9 @@ export function AddPaymentModal({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Add New Payment</DialogTitle>
+          <DialogTitle>Cargar Pago y Asignar Paquete - Manual</DialogTitle>
         </DialogHeader>
-        <ManualPaymentForm />
+        <ManualPaymentForm onAddPayment={onAddPayment} onClose={onClose} />
       </DialogContent>
     </Dialog>
   )

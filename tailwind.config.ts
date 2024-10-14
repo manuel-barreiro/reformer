@@ -25,7 +25,7 @@ const config = {
       },
       colors: {
         grey_pebble: "#414141",
-        pearl: "#f2f0e5",
+        pearl: "#F7F5ED",
         midnight: "#231f20",
         rust: "#893f24",
         inputBg: "#D9D9D9",
