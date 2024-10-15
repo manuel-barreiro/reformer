@@ -6,7 +6,7 @@ import { LogoutIcon } from "@/assets/icons"
 export default function LogoutButtonDesktop() {
   return (
     <Button
-      className="w-full items-center justify-center rounded-lg bg-rust px-6 py-3 text-lg text-pearl xl:justify-between"
+      className="w-full items-center justify-center rounded-lg bg-rust px-6 py-3 text-lg text-pearl hover:bg-rust/90 xl:justify-between"
       onClick={async () => await signOut({ callbackUrl: "/sing-in" })}
     >
       <span>SIGN OUT</span>
