@@ -1,12 +1,17 @@
 "use client"
-import { useRef, useEffect, useState } from "react"
+import { useRef } from "react"
 import marmolBg from "/public/images/marmolBg.png"
 import Image from "next/image"
 import { motion, useScroll, useTransform } from "framer-motion"
 import Link from "next/link"
 import { ClassPackage } from "@prisma/client"
+import { cn } from "@/lib/utils"
 
-export default function Paquetes() {
+export default function Paquetes({
+  activeClassPackages,
+}: {
+  activeClassPackages: ClassPackage[]
+}) {
   //Parallax
   const sectionRef = useRef(null)
   const { scrollYProgress } = useScroll({
@@ -26,21 +31,6 @@ export default function Paquetes() {
     animate: { x: 0, opacity: 1 },
   }
 
-  const [packages, setPackages] = useState([])
-
-  useEffect(() => {
-    const handlePackageUpdate = async () => {
-      // Fetch the updated packages immediately after an update
-      const response = await fetch("/api/user-packages")
-      const data = await response.json()
-      data.sort(
-        (a: ClassPackage, b: ClassPackage) => a.classCount - b.classCount
-      )
-      setPackages(data)
-    }
-    handlePackageUpdate()
-  }, [])
-
   return (
     <section
       id="paquetes"
@@ -58,8 +48,18 @@ export default function Paquetes() {
 
       <h2 className="text-lg uppercase md:text-xl">Nuestros paquetes</h2>
 
-      <div className="grid h-auto w-auto max-w-[1000px] grid-cols-1 gap-6 md:grid-cols-2 md:gap-3 lg:grid-cols-4 lg:gap-0">
-        {packages?.map((pack: ClassPackage) => (
+      <div
+        className={cn(
+          "grid h-auto w-auto max-w-[1000px] grid-cols-1 gap-6 md:grid-cols-2 md:gap-3 lg:grid-cols-4 lg:gap-0",
+          activeClassPackages.length === 1 && "md:grid-cols-1 lg:grid-cols-1",
+          activeClassPackages.length === 2 && "md:grid-cols-2 lg:grid-cols-2",
+          activeClassPackages.length === 3 && "md:grid-cols-3 lg:grid-cols-3",
+          activeClassPackages.length === 4 && "md:grid-cols-4 lg:grid-cols-4",
+          activeClassPackages.length === 5 &&
+            "md:grid-cols-3 lg:grid-cols-3 lg:gap-3"
+        )}
+      >
+        {activeClassPackages?.map((pack: ClassPackage) => (
           <Paquete key={pack.id} name={pack.name} />
         ))}
       </div>

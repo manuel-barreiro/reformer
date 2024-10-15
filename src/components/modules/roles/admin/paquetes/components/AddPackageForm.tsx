@@ -70,7 +70,7 @@ export function AddPackageForm({ onSuccess }: { onSuccess: () => void }) {
               <FormLabel>Nombre</FormLabel>
               <FormControl>
                 <Input
-                  className="border border-grey_pebble/40 bg-pearlVariant"
+                  className="border border-rust/50 bg-pearlVariant font-semibold text-grey_pebble/60"
                   {...field}
                 />
               </FormControl>
@@ -86,7 +86,7 @@ export function AddPackageForm({ onSuccess }: { onSuccess: () => void }) {
               <FormLabel>Descripción</FormLabel>
               <FormControl>
                 <Input
-                  className="border border-grey_pebble/40 bg-pearlVariant"
+                  className="border border-rust/50 bg-pearlVariant font-semibold text-grey_pebble/60"
                   {...field}
                 />
               </FormControl>
@@ -102,7 +102,7 @@ export function AddPackageForm({ onSuccess }: { onSuccess: () => void }) {
               <FormLabel>Cantidad de clases</FormLabel>
               <FormControl>
                 <Input
-                  className="border border-grey_pebble/40 bg-pearlVariant"
+                  className="border border-rust/50 bg-pearlVariant font-semibold text-grey_pebble/60"
                   {...field}
                   type="number"
                 />
@@ -119,7 +119,7 @@ export function AddPackageForm({ onSuccess }: { onSuccess: () => void }) {
               <FormLabel>Precio</FormLabel>
               <FormControl>
                 <Input
-                  className="border border-grey_pebble/40 bg-pearlVariant"
+                  className="border border-rust/50 bg-pearlVariant font-semibold text-grey_pebble/60"
                   {...field}
                   type="number"
                   step="0.01"
@@ -137,7 +137,7 @@ export function AddPackageForm({ onSuccess }: { onSuccess: () => void }) {
               <FormLabel>Duración (meses)</FormLabel>
               <FormControl>
                 <Input
-                  className="border border-grey_pebble/40 bg-pearlVariant"
+                  className="border border-rust/50 bg-pearlVariant font-semibold text-grey_pebble/60"
                   {...field}
                   type="number"
                 />

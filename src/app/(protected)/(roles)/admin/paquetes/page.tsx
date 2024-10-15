@@ -1,5 +1,4 @@
 import AdminPackagesPage from "@/components/modules/roles/admin/paquetes/AdminPackagesPage"
-import { prisma } from "@/lib/prisma"
 import { getAllClassPackages } from "@/actions/package-actions"
 
 export default async function page() {

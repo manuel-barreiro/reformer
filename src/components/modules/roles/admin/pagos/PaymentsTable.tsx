@@ -1,9 +1,10 @@
 "use client"
-import React, { useState, useCallback } from "react"
+import React, { useState, useCallback, useMemo } from "react"
 import {
   useReactTable,
   getCoreRowModel,
   getPaginationRowModel,
+  getFilteredRowModel,
   flexRender,
 } from "@tanstack/react-table"
 import {
@@ -16,7 +17,8 @@ import {
 } from "@/components/ui/table"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Button } from "@/components/ui/button"
-import { Plus } from "lucide-react"
+import { Plus, Search } from "lucide-react"
+import { Input } from "@/components/ui/input"
 import { createColumns } from "./columns"
 import { PaginationControls } from "./PaginationControls"
 import { Payment, User } from "@prisma/client"
@@ -36,6 +38,7 @@ export function PaymentsTable({ initialPayments }: PaymentsTableProps) {
   const [selectedPayment, setSelectedPayment] = useState<
     (Payment & { user: User }) | null
   >(null)
+  const [globalFilter, setGlobalFilter] = useState("")
 
   const handleOpenDetailModal = useCallback(
     (payment: Payment & { user: User }) => {
@@ -45,13 +48,31 @@ export function PaymentsTable({ initialPayments }: PaymentsTableProps) {
     []
   )
 
-  const columns = createColumns(handleOpenDetailModal)
+  const columns = useMemo(
+    () => createColumns(handleOpenDetailModal),
+    [handleOpenDetailModal]
+  )
 
   const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    state: {
+      globalFilter,
+    },
+    onGlobalFilterChange: setGlobalFilter,
+    globalFilterFn: (row, columnId, filterValue) => {
+      const searchValue = filterValue.toLowerCase()
+      const payment = row.original
+      return (
+        payment.paymentId.toLowerCase().includes(searchValue) ||
+        payment.user.name.toLowerCase().includes(searchValue) ||
+        (payment.user.surname || "").toLowerCase().includes(searchValue) ||
+        payment.user.email.toLowerCase().includes(searchValue)
+      )
+    },
     initialState: {
       pagination: {
         pageSize: 5,
@@ -76,7 +97,6 @@ export function PaymentsTable({ initialPayments }: PaymentsTableProps) {
         newPaymentMethod
       )
 
-      // Update the local state
       setData((prevData) =>
         prevData.map((payment) =>
           payment.paymentId === paymentId
@@ -85,11 +105,9 @@ export function PaymentsTable({ initialPayments }: PaymentsTableProps) {
         )
       )
 
-      // Close the modal after updating
       setIsDetailModalOpen(false)
     } catch (error) {
       console.error("Failed to update payment:", error)
-      // Handle the error (e.g., show an error message to the user)
     }
   }
 
@@ -97,13 +115,25 @@ export function PaymentsTable({ initialPayments }: PaymentsTableProps) {
     <div className="w-full max-w-4xl space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="font-marcellus text-2xl font-bold uppercase">Pagos</h2>
-        <Button
-          onClick={() => setIsAddModalOpen(true)}
-          className="bg-midnight font-dm_mono"
-        >
-          <Plus className="mr-2 h-4 w-4" /> Agregar pago
-        </Button>
+        <div className="flex items-center gap-2">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-gray-400" />
+            <Input
+              value={globalFilter}
+              onChange={(e) => setGlobalFilter(e.target.value)}
+              className="w-80 rounded-lg border border-rust/50 bg-pearlVariant pl-10 font-semibold text-grey_pebble/60 shadow-md"
+              placeholder="Buscar..."
+            />
+          </div>
+          <Button
+            onClick={() => setIsAddModalOpen(true)}
+            className="bg-midnight font-dm_mono"
+          >
+            <Plus className="mr-2 h-4 w-4" /> Agregar pago
+          </Button>
+        </div>
       </div>
+
       <div className="rounded-md border">
         <ScrollArea className="h-[400px]">
           <Table>
@@ -150,7 +180,7 @@ export function PaymentsTable({ initialPayments }: PaymentsTableProps) {
                     colSpan={columns.length}
                     className="h-24 text-center"
                   >
-                    No results.
+                    No se encontraron resultados.
                   </TableCell>
                 </TableRow>
               )}

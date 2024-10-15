@@ -69,7 +69,7 @@ export const createColumns = (
 
       return (
         <div className="flex w-full justify-center">
-          <Badge className="flex w-full justify-center bg-midnight py-1 font-dm_mono text-[10px] text-pearl">
+          <Badge className="flex w-full justify-center bg-grey_pebble py-1 font-dm_mono text-[10px] text-pearl">
             {paymentMethodMap[row.original.paymentTypeId] ||
               row.original.paymentTypeId}
           </Badge>
@@ -83,7 +83,7 @@ export const createColumns = (
     cell: ({ row }) => {
       return (
         <div className="flex w-full justify-center">
-          <Badge className="flex w-full justify-center bg-midnight py-1 font-dm_mono text-[10px] text-pearl">
+          <Badge className="flex w-full justify-center bg-grey_pebble py-1 font-dm_mono text-[10px] text-pearl">
             {statusMap[row.original.status] || row.original.status}
           </Badge>
         </div>
