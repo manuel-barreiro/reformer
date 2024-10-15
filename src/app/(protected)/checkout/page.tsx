@@ -1,18 +1,7 @@
 import CheckoutPage from "@/components/modules/checkout/CheckoutPage"
-import { prisma } from "@/lib/prisma"
-
-async function getClassPackages() {
-  return await prisma.classPackage.findMany({
-    where: {
-      isActive: true,
-    },
-    orderBy: {
-      classCount: "asc",
-    },
-  })
-}
+import { getActiveClassPackages } from "@/actions/package-actions"
 
 export default async function Checkout() {
-  const classPackages = await getClassPackages()
+  const classPackages = await getActiveClassPackages()
   return <CheckoutPage classPackages={classPackages} />
 }

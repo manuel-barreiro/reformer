@@ -10,7 +10,7 @@ import {
   CommandList,
   CommandItem,
 } from "@/components/ui/command"
-import { searchUsers } from "@/actions/manual-payment"
+import { searchUsers } from "@/actions/search-user"
 import { X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 

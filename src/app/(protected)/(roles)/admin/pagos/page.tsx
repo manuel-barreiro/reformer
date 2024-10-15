@@ -1,6 +1,6 @@
 import { Suspense } from "react"
 import { PaymentsTable } from "@/components/modules/roles/admin/pagos/PaymentsTable"
-import { getPayments } from "@/actions/fetch-payments"
+import { getPayments } from "@/actions/payment-actions"
 
 export default async function PaymentsPage() {
   const initialPayments = await getPayments()

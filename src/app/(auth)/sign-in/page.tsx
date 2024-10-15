@@ -33,7 +33,7 @@ export default function SignIn({
         </Link>
       </Button>
       <div
-        style={{ cursor: "url(icons/solGreyPebble.svg),auto" }}
+        style={{ cursor: "url(/icons/solGreyPebble.svg),auto" }}
         className="flex min-h-[86dvh] items-center justify-center bg-pearl py-12"
       >
         <div className="relative flex flex-col items-center gap-4 text-midnight">

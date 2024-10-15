@@ -1,6 +1,11 @@
 import { NextResponse } from "next/server"
 import { MercadoPagoConfig, Payment } from "mercadopago"
-import { Prisma, PrismaClient, PackageStatus } from "@prisma/client"
+import {
+  Prisma,
+  PrismaClient,
+  PackageStatus,
+  PaymentType,
+} from "@prisma/client"
 
 const prisma = new PrismaClient()
 
@@ -28,6 +33,7 @@ export async function POST(request: Request) {
         })
 
         const paymentData: Prisma.PaymentCreateInput = {
+          paymentType: PaymentType.mercadopago,
           paymentId: pago.id?.toString() || "",
           dateCreated: pago.date_created
             ? new Date(pago.date_created)
@@ -79,11 +85,13 @@ export async function POST(request: Request) {
             throw new Error("ClassPackage not found")
           }
 
+          // Calculate expiration date based on class package duration and current date
           const expirationDate = new Date()
           expirationDate.setMonth(
             expirationDate.getMonth() + classPackage.durationMonths
           )
 
+          // Create the payment and purchasedPackage entries
           savedPayment = await prisma.payment.create({
             data: {
               ...paymentData,

@@ -65,7 +65,7 @@ export async function POST(request: Request) {
       },
       auto_return: "approved",
       notification_url:
-        "https://describe-sunshine-film-charged.trycloudflare.com/api/notify",
+        "https://selling-well-penny-raymond.trycloudflare.com/api/notify",
       metadata: {
         user_id: session.user.id,
         class_package_id: classPackage.id,

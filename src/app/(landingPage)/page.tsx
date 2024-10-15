@@ -25,7 +25,7 @@ export default function Home() {
 
   return (
     <>
-      <main>
+      <main style={{ cursor: "url(/icons/solPearl.svg),auto" }}>
         <div className="h-0 w-full scroll-mt-32" id="home" />
         <Hero />
         <Brand />

@@ -1,5 +1,5 @@
 "use client"
-import React, { useState } from "react"
+import React, { useState, useCallback } from "react"
 import {
   useReactTable,
   getCoreRowModel,
@@ -17,10 +17,12 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Button } from "@/components/ui/button"
 import { Plus } from "lucide-react"
-import { columns } from "./columns"
+import { createColumns } from "./columns"
 import { PaginationControls } from "./PaginationControls"
 import { Payment, User } from "@prisma/client"
 import { AddPaymentModal } from "./AddPaymentModal"
+import { PaymentDetailModal } from "./PaymentDetailModal"
+import { updatePayment } from "@/actions/payment-actions"
 
 interface PaymentsTableProps {
   initialPayments: (Payment & { user: User })[]
@@ -30,6 +32,20 @@ export function PaymentsTable({ initialPayments }: PaymentsTableProps) {
   const [data, setData] =
     useState<(Payment & { user: User })[]>(initialPayments)
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false)
+  const [selectedPayment, setSelectedPayment] = useState<
+    (Payment & { user: User }) | null
+  >(null)
+
+  const handleOpenDetailModal = useCallback(
+    (payment: Payment & { user: User }) => {
+      setSelectedPayment(payment)
+      setIsDetailModalOpen(true)
+    },
+    []
+  )
+
+  const columns = createColumns(handleOpenDetailModal)
 
   const table = useReactTable({
     data,
@@ -47,6 +63,36 @@ export function PaymentsTable({ initialPayments }: PaymentsTableProps) {
     setData([...data, newPayment])
     setIsAddModalOpen(false)
   }
+
+  const handleUpdatePayment = async (
+    paymentId: string,
+    newStatus: string,
+    newPaymentMethod: string
+  ) => {
+    try {
+      const updatedPayment = await updatePayment(
+        paymentId,
+        newStatus,
+        newPaymentMethod
+      )
+
+      // Update the local state
+      setData((prevData) =>
+        prevData.map((payment) =>
+          payment.paymentId === paymentId
+            ? { ...payment, ...updatedPayment }
+            : payment
+        )
+      )
+
+      // Close the modal after updating
+      setIsDetailModalOpen(false)
+    } catch (error) {
+      console.error("Failed to update payment:", error)
+      // Handle the error (e.g., show an error message to the user)
+    }
+  }
+
   return (
     <div className="w-full max-w-4xl space-y-4">
       <div className="flex items-center justify-between">
@@ -67,7 +113,7 @@ export function PaymentsTable({ initialPayments }: PaymentsTableProps) {
                   {headerGroup.headers.map((header) => (
                     <TableHead
                       key={header.id}
-                      className="font-dm_sans text-sm font-semibold text-midnight"
+                      className="text-center font-dm_sans text-sm font-semibold text-midnight"
                     >
                       {header.isPlaceholder
                         ? null
@@ -89,7 +135,7 @@ export function PaymentsTable({ initialPayments }: PaymentsTableProps) {
                     className="border-b border-grey_pebble"
                   >
                     {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id}>
+                      <TableCell key={cell.id} className="text-center">
                         {flexRender(
                           cell.column.columnDef.cell,
                           cell.getContext()
@@ -118,6 +164,14 @@ export function PaymentsTable({ initialPayments }: PaymentsTableProps) {
         onClose={() => setIsAddModalOpen(false)}
         onAddPayment={handleAddPayment}
       />
+      {selectedPayment && (
+        <PaymentDetailModal
+          isOpen={isDetailModalOpen}
+          onClose={() => setIsDetailModalOpen(false)}
+          payment={selectedPayment}
+          onUpdatePayment={handleUpdatePayment}
+        />
+      )}
     </div>
   )
 }

@@ -12,6 +12,29 @@ const packageSchema = z.object({
   durationMonths: z.coerce.number().min(1, "Duration must be at least 1 day"),
 })
 
+export async function getActiveClassPackages() {
+  return await prisma.classPackage.findMany({
+    where: {
+      deletedAt: null,
+      isActive: true,
+    },
+    orderBy: {
+      classCount: "asc",
+    },
+  })
+}
+
+export async function getAllClassPackages() {
+  return await prisma.classPackage.findMany({
+    where: {
+      deletedAt: null,
+    },
+    orderBy: {
+      classCount: "asc",
+    },
+  })
+}
+
 export async function createPackage(formData: FormData) {
   const validatedFields = packageSchema.safeParse({
     name: formData.get("name"),
@@ -61,10 +84,28 @@ export async function updatePackage(id: string, formData: FormData) {
   }
 }
 
-export async function deletePackage(id: string) {
+// This function is not used in the app because it can cause data loss
+// export async function deletePackage(id: string) {
+//   try {
+//     await prisma.classPackage.delete({
+//       where: { id },
+//     })
+//     revalidatePath("/admin/packages")
+//     return { success: true }
+//   } catch (error) {
+//     return { error: "Failed to delete package" }
+//   }
+// }
+
+// Instead of deleting a package, we soft delete it by setting deletedAt to a date
+export async function softDeletePackage(id: string) {
   try {
-    await prisma.classPackage.delete({
+    await prisma.classPackage.update({
       where: { id },
+      data: {
+        isActive: false,
+        deletedAt: new Date(),
+      },
     })
     revalidatePath("/admin/packages")
     return { success: true }

@@ -25,7 +25,10 @@ import {
 } from "@/components/ui/alert-dialog"
 import { EditPackageForm } from "./components/EditPackageForm"
 import { Button } from "@/components/ui/button"
-import { deletePackage, togglePackageStatus } from "@/actions/package-actions"
+import {
+  softDeletePackage,
+  togglePackageStatus,
+} from "@/actions/package-actions"
 import { cn } from "@/lib/utils"
 
 export default function AdminPackageCard({
@@ -55,7 +58,7 @@ export default function AdminPackageCard({
   }
 
   const handleDeletePackage = async () => {
-    const result = await deletePackage(pack.id)
+    const result = await softDeletePackage(pack.id)
     if (result.error) {
       console.error("Error deleting package:", result.error)
     } else {

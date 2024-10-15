@@ -7,7 +7,6 @@ import * as z from "zod"
 import { User, ClassPackage, Payment } from "@prisma/client"
 import { useTransition } from "react"
 import { numberFormatter } from "@/lib/numberFormatter"
-
 import { Button } from "@/components/ui/button"
 import {
   Form,
@@ -40,7 +39,7 @@ const formSchema = z.object({
       password: z.string().nullable(),
       emailVerified: z.date().nullable(),
       image: z.string().nullable(),
-      role: z.enum(["user", "admin"]), // Assuming these are the roles
+      role: z.enum(["user", "admin"]),
       createdAt: z.date(),
       updatedAt: z.date(),
     })

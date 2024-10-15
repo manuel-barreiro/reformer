@@ -64,11 +64,7 @@ export default async function RootLayout({
 }>) {
   const session = await auth()
   return (
-    <html
-      lang="es"
-      className="scrollbar-hide scroll-smooth"
-      style={{ cursor: "url(/icons/solPearl.svg),auto" }}
-    >
+    <html lang="es" className="scrollbar-hide scroll-smooth">
       <body
         className={`${marcellus.variable} ${dm_sans.variable} ${dm_sans.className} ${dm_mono.variable} scrollbar-hide`}
       >

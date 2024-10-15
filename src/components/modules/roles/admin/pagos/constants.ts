@@ -1,13 +1,13 @@
 export const paymentMethodMap: { [key: string]: string } = {
-  cash: "Efectivo",
-  bank_transfer: "Transferencia",
-  debit_card: "Débito",
-  credit_card: "Crédito",
+  cash: "EFECTIVO",
+  bank_transfer: "TRANSFERENCIA",
+  debit_card: "DÉBITO",
+  credit_card: "CRÉDITO",
 }
 
 export const statusMap: { [key: string]: string } = {
   pending: "PENDIENTE",
-  paid: "PAGADA",
+  paid: "PAGADO",
   approved: "APROBADA",
 }
 
@@ -19,11 +19,11 @@ export const productMap: { [key: string]: string } = {
 }
 
 export const manualPaymentMap: { [key: string]: string } = {
-  cash: "Efectivo",
-  bank_transfer: "Transferencia",
+  cash: "EFECTIVO",
+  bank_transfer: "TRANSFERENCIA",
 }
 
 export const manualPaymentStatusMap: { [key: string]: string } = {
   pending: "PENDIENTE",
-  paid: "PAGADA",
+  paid: "PAGADO",
 }

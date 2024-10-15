@@ -30,7 +30,7 @@ export default function AdminPackagesPage({
   const handlePackageUpdate = async () => {
     // Fetch the updated packages immediately after an update
     setIsOpen(false)
-    const response = await fetch("/api/packages")
+    const response = await fetch("/api/admin-packages")
     const data = await response.json()
     data.sort((a: ClassPackage, b: ClassPackage) => a.classCount - b.classCount)
     setPackages(data)

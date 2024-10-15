@@ -1,9 +1,8 @@
 "use client"
-import { useRef, useEffect, use, useState } from "react"
+import { useRef, useEffect, useState } from "react"
 import marmolBg from "/public/images/marmolBg.png"
 import Image from "next/image"
 import { motion, useScroll, useTransform } from "framer-motion"
-import { useParallax } from "@/lib/useParallax"
 import Link from "next/link"
 import { ClassPackage } from "@prisma/client"
 
@@ -32,7 +31,7 @@ export default function Paquetes() {
   useEffect(() => {
     const handlePackageUpdate = async () => {
       // Fetch the updated packages immediately after an update
-      const response = await fetch("/api/packages")
+      const response = await fetch("/api/user-packages")
       const data = await response.json()
       data.sort(
         (a: ClassPackage, b: ClassPackage) => a.classCount - b.classCount

@@ -62,6 +62,7 @@ model Payment {
   status             String
   statusDetail       String?
   paymentTypeId      String
+  paymentType        PaymentType      @default(mercadopago)
   userId             String
   user               User             @relation(fields: [userId], references: [id])
   purchasedPackage   PurchasedPackage?
@@ -75,8 +76,9 @@ model ClassPackage {
   description   String?
   classCount    Int
   price         Float
-  durationMonths  Int
+  durationMonths Int
   isActive      Boolean           @default(true)
+  deletedAt     DateTime?
   createdAt     DateTime          @default(now())
   updatedAt     DateTime          @updatedAt
   purchasedPackages PurchasedPackage[]
@@ -106,4 +108,9 @@ enum PackageStatus {
   active
   expired
   cancelled
+}
+
+enum PaymentType {
+  mercadopago
+  manual
 }

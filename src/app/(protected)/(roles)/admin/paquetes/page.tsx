@@ -1,16 +1,9 @@
 import AdminPackagesPage from "@/components/modules/roles/admin/paquetes/AdminPackagesPage"
 import { prisma } from "@/lib/prisma"
-
-async function getClassPackages() {
-  return await prisma.classPackage.findMany({
-    orderBy: {
-      classCount: "asc",
-    },
-  })
-}
+import { getAllClassPackages } from "@/actions/package-actions"
 
 export default async function page() {
-  const initialPackages = await getClassPackages()
+  const initialPackages = await getAllClassPackages()
 
   return (
     <main className="flex min-h-[86dvh] flex-col items-center justify-center gap-5">

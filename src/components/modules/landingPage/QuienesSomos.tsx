@@ -37,7 +37,7 @@ export default function QuienesSomos() {
 
       <div
         className="flex h-auto scroll-mt-28 items-center justify-center p-16 py-20 lg:basis-[60%] lg:py-28"
-        style={{ cursor: "url(icons/solGreyPebble.svg),auto" }}
+        style={{ cursor: "url(/icons/solGreyPebble.svg),auto" }}
         id="quienesSomosMobile"
       >
         <div className="flex max-w-lg flex-col items-start gap-10 text-justify font-dm_sans">
