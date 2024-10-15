@@ -1,6 +1,6 @@
 "use client"
 import React, { useState, useTransition } from "react"
-import { UserInfo } from "@/components/modules/user/perfil/utils/mockUserInfo"
+import { UserInfo } from "@/components/modules/roles/user/perfil/utils/mockUserInfo"
 import { Button } from "@/components/ui/button"
 import {
   Form,
