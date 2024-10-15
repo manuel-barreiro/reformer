@@ -3,7 +3,7 @@
 import React, { useState } from "react"
 import { ClassPackage } from "@prisma/client"
 import { numberFormatter } from "@/lib/numberFormatter"
-import { EditPen, TrashIcon, BlockIcon } from "@/assets/icons"
+import { EditPen, TrashIcon } from "@/assets/icons"
 import { LockIcon, LockOpen } from "lucide-react"
 import {
   Dialog,
@@ -31,28 +31,32 @@ import {
 } from "@/actions/package-actions"
 import { cn } from "@/lib/utils"
 
+interface AdminPackageCardProps {
+  pack: ClassPackage
+  onPackageUpdate: (updatedPackage: ClassPackage) => void
+  onPackageDelete: (packageId: string) => void
+}
+
 export default function AdminPackageCard({
   pack,
   onPackageUpdate,
-}: {
-  pack: ClassPackage
-  onPackageUpdate: () => void
-}) {
+  onPackageDelete,
+}: AdminPackageCardProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [isAlertOpen, setIsAlertOpen] = useState(false)
   const [alertType, setAlertType] = useState<"block" | "delete">("block")
 
-  const handleEditSubmit = () => {
+  const handleEditSubmit = (updatedPackage: ClassPackage) => {
     setIsOpen(false)
-    onPackageUpdate()
+    onPackageUpdate(updatedPackage)
   }
 
   const handleBlockPackage = async () => {
     const result = await togglePackageStatus(pack.id)
     if (result.error) {
       console.error("Error updating package status:", result.error)
-    } else {
-      onPackageUpdate()
+    } else if (result.package) {
+      onPackageUpdate(result.package)
     }
     setIsAlertOpen(false)
   }
@@ -61,8 +65,8 @@ export default function AdminPackageCard({
     const result = await softDeletePackage(pack.id)
     if (result.error) {
       console.error("Error deleting package:", result.error)
-    } else {
-      onPackageUpdate()
+    } else if (result.package && result.isDeleted) {
+      onPackageDelete(pack.id)
     }
     setIsAlertOpen(false)
   }

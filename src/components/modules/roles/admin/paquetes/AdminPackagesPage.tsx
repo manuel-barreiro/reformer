@@ -27,15 +27,24 @@ export default function AdminPackagesPage({
   const [isOpen, setIsOpen] = useState(false)
   const router = useRouter()
 
-  const handlePackageUpdate = async () => {
-    // Fetch the updated packages immediately after an update
+  const handlePackageUpdate = (updatedPackage: ClassPackage) => {
+    setPackages((prevPackages) => {
+      const index = prevPackages.findIndex((p) => p.id === updatedPackage.id)
+      if (index !== -1) {
+        const newPackages = [...prevPackages]
+        newPackages[index] = updatedPackage
+        return newPackages
+      }
+      return [...prevPackages, updatedPackage]
+    })
     setIsOpen(false)
-    const response = await fetch("/api/admin-packages")
-    const data = await response.json()
-    data.sort((a: ClassPackage, b: ClassPackage) => a.classCount - b.classCount)
-    setPackages(data)
+    router.refresh()
+  }
 
-    // Force a revalidation of the current page
+  const handlePackageDelete = (deletedPackageId: string) => {
+    setPackages((prevPackages) =>
+      prevPackages.filter((p) => p.id !== deletedPackageId)
+    )
     router.refresh()
   }
 
@@ -63,6 +72,7 @@ export default function AdminPackagesPage({
         <PackageList
           packages={packages}
           onPackageUpdate={handlePackageUpdate}
+          onPackageDelete={handlePackageDelete}
         />
       </ScrollArea>
     </section>

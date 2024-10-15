@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import React, { useState } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
@@ -15,6 +15,7 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { createPackage } from "@/actions/package-actions"
+import { ClassPackage } from "@prisma/client"
 
 const packageSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -26,7 +27,11 @@ const packageSchema = z.object({
 
 type PackageFormValues = z.infer<typeof packageSchema>
 
-export function AddPackageForm({ onSuccess }: { onSuccess: () => void }) {
+interface AddPackageFormProps {
+  onSuccess: (pack: ClassPackage) => void
+}
+
+export function AddPackageForm({ onSuccess }: AddPackageFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const form = useForm<PackageFormValues>({
@@ -47,15 +52,19 @@ export function AddPackageForm({ onSuccess }: { onSuccess: () => void }) {
       formData.append(key, value.toString())
     })
 
-    const result = await createPackage(formData)
-    setIsSubmitting(false)
-
-    if (result.error) {
-      console.error(result.error)
-    } else {
-      console.log("Package created successfully:", result.package)
-      form.reset()
-      onSuccess()
+    try {
+      const result = await createPackage(formData)
+      if (result && result.package) {
+        console.log("Package created successfully:", result.package)
+        form.reset()
+        onSuccess(result.package)
+      } else {
+        throw new Error("Failed to create package")
+      }
+    } catch (error) {
+      console.error("Error creating package:", error)
+    } finally {
+      setIsSubmitting(false)
     }
   }
 

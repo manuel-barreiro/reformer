@@ -1,3 +1,4 @@
+"use client"
 import React, { useState } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -27,7 +28,7 @@ type PackageFormValues = z.infer<typeof packageSchema>
 
 interface EditPackageFormProps {
   pack: ClassPackage
-  onSuccess: () => void
+  onSuccess: (updatedPackage: ClassPackage) => void
 }
 
 export function EditPackageForm({ pack, onSuccess }: EditPackageFormProps) {
@@ -51,14 +52,18 @@ export function EditPackageForm({ pack, onSuccess }: EditPackageFormProps) {
       formData.append(key, value.toString())
     })
 
-    const result = await updatePackage(pack.id, formData)
-    setIsSubmitting(false)
-
-    if (result.error) {
-      console.error(result.error)
-    } else {
-      console.log("Package updated successfully:", result.package)
-      onSuccess()
+    try {
+      const result = await updatePackage(pack.id, formData)
+      if (result && result.package) {
+        console.log("Package updated successfully:", result.package)
+        onSuccess(result.package)
+      } else {
+        throw new Error("Failed to update package")
+      }
+    } catch (error) {
+      console.error("Error updating package:", error)
+    } finally {
+      setIsSubmitting(false)
     }
   }
 

@@ -52,7 +52,7 @@ export async function createPackage(formData: FormData) {
     const newPackage = await prisma.classPackage.create({
       data: validatedFields.data,
     })
-    revalidatePath("/admin/packages")
+    revalidatePath("/admin/paquetes")
     return { success: true, package: newPackage }
   } catch (error) {
     return { error: "Failed to create package" }
@@ -77,38 +77,24 @@ export async function updatePackage(id: string, formData: FormData) {
       where: { id },
       data: validatedFields.data,
     })
-    revalidatePath("/admin/packages")
+    revalidatePath("/admin/paquetes")
     return { success: true, package: updatedPackage }
   } catch (error) {
     return { error: "Failed to update package" }
   }
 }
 
-// This function is not used in the app because it can cause data loss
-// export async function deletePackage(id: string) {
-//   try {
-//     await prisma.classPackage.delete({
-//       where: { id },
-//     })
-//     revalidatePath("/admin/packages")
-//     return { success: true }
-//   } catch (error) {
-//     return { error: "Failed to delete package" }
-//   }
-// }
-
-// Instead of deleting a package, we soft delete it by setting deletedAt to a date
 export async function softDeletePackage(id: string) {
   try {
-    await prisma.classPackage.update({
+    const deletedPackage = await prisma.classPackage.update({
       where: { id },
       data: {
         isActive: false,
         deletedAt: new Date(),
       },
     })
-    revalidatePath("/admin/packages")
-    return { success: true }
+    revalidatePath("/admin/paquetes")
+    return { success: true, package: deletedPackage, isDeleted: true }
   } catch (error) {
     return { error: "Failed to delete package" }
   }
@@ -124,7 +110,7 @@ export async function togglePackageStatus(id: string) {
       where: { id },
       data: { isActive: !classPackage.isActive },
     })
-    revalidatePath("/admin/packages")
+    revalidatePath("/admin/paquetes")
     return { success: true, package: updatedPackage }
   } catch (error) {
     return { error: "Failed to toggle package status" }
