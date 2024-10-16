@@ -64,7 +64,7 @@ export async function POST(request: Request) {
         failure: `${process.env.NEXT_PUBLIC_URL}/checkout/failure`,
       },
       auto_return: "approved",
-      notification_url: "${process.env.NEXT_PUBLIC_URL}/api/notify",
+      notification_url: `${process.env.NEXT_PUBLIC_URL}/api/notify`,
       metadata: {
         user_id: session.user.id,
         class_package_id: classPackage.id,

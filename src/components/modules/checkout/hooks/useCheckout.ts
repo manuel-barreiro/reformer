@@ -12,7 +12,7 @@ export const useCheckout = (classPackages: ClassPackage[]) => {
   const handleCheckout = async () => {
     try {
       const response = await fetch(
-        `https://${process.env.NEXT_PUBLIC_URL}/api/create-preference`,
+        `${process.env.NEXT_PUBLIC_URL}/api/create-preference`,
         {
           method: "POST",
           headers: {
