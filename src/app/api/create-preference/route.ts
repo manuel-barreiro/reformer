@@ -59,9 +59,9 @@ export async function POST(request: Request) {
         excluded_payment_methods: [{ id: "pagofacil" }, { id: "rapipago" }],
       },
       back_urls: {
-        success: `http://${process.env.NEXTAUTH_URL}/paquetes`,
-        pending: `http://${process.env.NEXTAUTH_URL}/pending`,
-        failure: `http://${process.env.NEXTAUTH_URL}/failure`,
+        success: `https://reformer.com.ar/api/notify/paquetes`,
+        pending: `https://reformer.com.ar/api/notify/pending`,
+        failure: `https://reformer.com.ar/api/notify/failure`,
       },
       auto_return: "approved",
       notification_url: "https://reformer.com.ar/api/notify",

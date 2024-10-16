@@ -11,7 +11,7 @@ export const useCheckout = (classPackages: ClassPackage[]) => {
   const handleCheckout = async () => {
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_URL}/api/create-preference`,
+        `https://reformer.com.ar/api/notify/api/create-preference`,
         {
           method: "POST",
           headers: {
