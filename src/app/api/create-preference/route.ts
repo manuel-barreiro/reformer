@@ -59,7 +59,7 @@ export async function POST(request: Request) {
         excluded_payment_methods: [{ id: "pagofacil" }, { id: "rapipago" }],
       },
       back_urls: {
-        success: `https://www.reformer.com.ar/checkout/paquetes`,
+        success: `https://www.reformer.com.ar/checkout/success`,
         pending: `https://www.reformer.com.ar/checkout/pending`,
         failure: `https://www.reformer.com.ar/checkout/failure`,
       },
