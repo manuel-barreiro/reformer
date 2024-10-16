@@ -20,13 +20,17 @@ export function AddPaymentModal({
   onClose,
   onAddPayment,
 }: AddPaymentModalProps) {
+  const handleAddPayment = async (payment: Payment & { user: User }) => {
+    onAddPayment(payment)
+    onClose()
+  }
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Cargar Pago y Asignar Paquete - Manual</DialogTitle>
         </DialogHeader>
-        <ManualPaymentForm onAddPayment={onAddPayment} onClose={onClose} />
+        <ManualPaymentForm onAddPayment={handleAddPayment} onClose={onClose} />
       </DialogContent>
     </Dialog>
   )

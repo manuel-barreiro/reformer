@@ -81,7 +81,7 @@ export function PaymentsTable({ initialPayments }: PaymentsTableProps) {
   })
 
   const handleAddPayment = (newPayment: Payment & { user: User }) => {
-    setData([...data, newPayment])
+    setData((prevData) => [newPayment, ...prevData])
     setIsAddModalOpen(false)
   }
 

@@ -27,6 +27,7 @@ import {
 import { UserSearch } from "@/components/modules/roles/common/UserSearch"
 import { createManualPayment } from "@/actions/manual-payment"
 import { fetchClassPackages } from "@/actions/fetch-class-packages"
+import { toast } from "@/components/ui/use-toast"
 
 const formSchema = z.object({
   user: z
@@ -75,7 +76,6 @@ export function ManualPaymentForm({
   }, [])
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    setError(null)
     startTransition(async () => {
       try {
         if (!values.user) {
@@ -94,15 +94,24 @@ export function ManualPaymentForm({
           values.paymentTypeId
         )
         onAddPayment({ ...payment, user: values.user })
-        alert("Pago registrado exitosamente")
         form.reset()
-        onClose()
+        toast({
+          title: "Pago registrado",
+          description: "El pago manual se ha registrado exitosamente.",
+          variant: "reformer",
+        })
       } catch (error) {
         console.error("Error al registrar el pago:", error)
-        setError("Error al registrar el pago. Por favor, intente nuevamente.")
-      }
-    })
+        toast({
+          title: "Error",
+          description: "Error al registrar el pago. Por favor, intente nuevamente.",
+          variant: "destructive",
+        })
+      }})
+    
   }
+
+  
 
   return (
     <Form {...form}>

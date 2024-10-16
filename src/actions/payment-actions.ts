@@ -2,6 +2,7 @@
 
 import { prisma } from "@/lib/prisma"
 import { Payment, User } from "@prisma/client"
+import { revalidatePath } from "next/cache"
 
 export async function getPayments(): Promise<(Payment & { user: User })[]> {
   return await prisma.payment.findMany({
@@ -30,10 +31,11 @@ export async function updatePayment(
       data: {
         status: newStatus,
         paymentTypeId: newPaymentMethod,
-        dateLastUpdated: new Date(), // Update the last modified date
+        dateLastUpdated: new Date(),
       },
     })
 
+    revalidatePath("/admin/pagos")
     return updatedPayment
   } catch (error) {
     console.error("Error updating payment:", error)
