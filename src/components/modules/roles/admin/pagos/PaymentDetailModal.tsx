@@ -5,9 +5,22 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogFooter,
 } from "@/components/ui/dialog"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 import { Payment, User } from "@prisma/client"
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table"
+import { Button } from "@/components/ui/button"
 import { getFullName } from "@/components/modules/roles/admin/pagos/lib/getFullName"
 import { numberFormatter } from "@/lib/numberFormatter"
 import { toast } from "@/components/ui/use-toast"
@@ -22,6 +35,7 @@ interface PaymentDetailModalProps {
     newStatus: string,
     newPaymentMethod: string
   ) => Promise<void>
+  onDeletePayment: (paymentId: string) => Promise<void>
 }
 
 export function PaymentDetailModal({
@@ -29,8 +43,10 @@ export function PaymentDetailModal({
   onClose,
   payment,
   onUpdatePayment,
+  onDeletePayment,
 }: PaymentDetailModalProps) {
-  const [isPending, startTransition] = useTransition()
+  const [isUpdating, startUpdateTransition] = useTransition()
+  const [isDeleting, startDeleteTransition] = useTransition()
   const isManualPayment = payment.paymentType === "manual"
 
   const paymentDetails = [
@@ -65,11 +81,12 @@ export function PaymentDetailModal({
     { label: "Descripción", value: payment.description || "N/A" },
     { label: "Estado Detallado", value: payment.statusDetail || "N/A" },
   ]
+
   const handleSubmit = async (values: {
     status: string
     paymentMethod: string
   }) => {
-    startTransition(async () => {
+    startUpdateTransition(async () => {
       try {
         await onUpdatePayment(
           payment.paymentId,
@@ -94,11 +111,33 @@ export function PaymentDetailModal({
     })
   }
 
+  const handleDelete = async () => {
+    startDeleteTransition(async () => {
+      try {
+        await onDeletePayment(payment.paymentId)
+        toast({
+          title: "Pago eliminado",
+          description: "El pago se ha eliminado exitosamente.",
+          variant: "reformer",
+        })
+        onClose()
+      } catch (error) {
+        console.error("Error al eliminar el pago:", error)
+        toast({
+          title: "Error",
+          description:
+            "Error al eliminar el pago. Por favor, intente nuevamente.",
+          variant: "destructive",
+        })
+      }
+    })
+  }
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="w-full sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle className="mb-2 text-2xl font-bold">
+          <DialogTitle className="text-2xl font-bold">
             Detalles del Pago
           </DialogTitle>
         </DialogHeader>
@@ -113,12 +152,46 @@ export function PaymentDetailModal({
           </TableBody>
         </Table>
         {isManualPayment && (
-          <UpdateExistingPaymentForm
-            payment={payment}
-            onSubmit={handleSubmit}
-            isPending={isPending}
-          />
+          <>
+            <UpdateExistingPaymentForm
+              payment={payment}
+              onSubmit={handleSubmit}
+              isPending={isUpdating}
+            />
+          </>
         )}
+        <DialogFooter>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button
+                variant="destructive"
+                className="w-full bg-midnight py-6 font-dm_mono text-pearl duration-300 ease-in-out"
+                disabled={isDeleting}
+              >
+                {isDeleting ? "Eliminando..." : "Eliminar Pago"}
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>¿Está seguro?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Esta acción eliminará permanentemente el pago y el paquete de
+                  clases asociado. Esta acción no se puede deshacer.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={handleDelete}
+                  className="bg-rust"
+                  disabled={isDeleting}
+                >
+                  {isDeleting ? "Eliminando..." : "Eliminar"}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   )

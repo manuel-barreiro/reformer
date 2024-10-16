@@ -24,7 +24,7 @@ import { PaginationControls } from "./PaginationControls"
 import { Payment, User } from "@prisma/client"
 import { AddPaymentModal } from "./AddPaymentModal"
 import { PaymentDetailModal } from "./PaymentDetailModal"
-import { updatePayment } from "@/actions/payment-actions"
+import { updatePayment, deletePayment } from "@/actions/payment-actions"
 
 interface PaymentsTableProps {
   initialPayments: (Payment & { user: User })[]
@@ -108,6 +108,19 @@ export function PaymentsTable({ initialPayments }: PaymentsTableProps) {
       setIsDetailModalOpen(false)
     } catch (error) {
       console.error("Failed to update payment:", error)
+      throw error
+    }
+  }
+
+  const handleDeletePayment = async (paymentId: string) => {
+    try {
+      await deletePayment(paymentId)
+      setData((prevData) =>
+        prevData.filter((payment) => payment.paymentId !== paymentId)
+      )
+    } catch (error) {
+      console.error("Failed to delete payment:", error)
+      throw error
     }
   }
 
@@ -200,6 +213,7 @@ export function PaymentsTable({ initialPayments }: PaymentsTableProps) {
           onClose={() => setIsDetailModalOpen(false)}
           payment={selectedPayment}
           onUpdatePayment={handleUpdatePayment}
+          onDeletePayment={handleDeletePayment}
         />
       )}
     </div>

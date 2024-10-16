@@ -42,3 +42,32 @@ export async function updatePayment(
     throw new Error("Failed to update payment")
   }
 }
+
+export async function deletePayment(paymentId: string): Promise<void> {
+  try {
+    // Start a transaction to ensure both operations succeed or fail together
+    await prisma.$transaction(async (tx) => {
+      // First, find and delete the associated PurchasedPackage if it exists
+      const payment = await tx.payment.findUnique({
+        where: { paymentId },
+        include: { purchasedPackage: true },
+      })
+
+      if (payment?.purchasedPackage) {
+        await tx.purchasedPackage.delete({
+          where: { id: payment.purchasedPackage.id },
+        })
+      }
+
+      // Then delete the payment
+      await tx.payment.delete({
+        where: { paymentId },
+      })
+    })
+
+    revalidatePath("/admin/pagos")
+  } catch (error) {
+    console.error("Error deleting payment:", error)
+    throw new Error("Failed to delete payment")
+  }
+}

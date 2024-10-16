@@ -58,62 +58,70 @@ export function UpdateExistingPaymentForm({
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        <FormField
-          control={form.control}
-          name="status"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Estado del Pago</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl>
-                  <SelectTrigger className="border-rust/50 bg-pearlVariant font-semibold text-grey_pebble/60">
-                    <SelectValue placeholder="Seleccionar estado" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent className="bg-grey_pebble text-pearl">
-                  {Object.entries(statusMap).map(([key, value]) => (
-                    <SelectItem
-                      key={key}
-                      value={key}
-                      className="border-b border-pearl/50 uppercase hover:!bg-pearlVariant3"
-                    >
-                      {value}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="paymentMethod"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Método de Pago</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl>
-                  <SelectTrigger className="border-rust/50 bg-pearlVariant font-semibold text-grey_pebble/60">
-                    <SelectValue placeholder="Seleccionar método de pago" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent className="bg-grey_pebble text-pearl">
-                  {Object.entries(manualPaymentMap).map(([key, value]) => (
-                    <SelectItem
-                      key={key}
-                      value={key}
-                      className="border-b border-pearl/50 uppercase hover:!bg-pearlVariant3"
-                    >
-                      {value}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <div className="grid grid-cols-2 gap-2">
+          <FormField
+            control={form.control}
+            name="status"
+            render={({ field }) => (
+              <FormItem className="col-span-1 w-full">
+                <FormLabel>Estado del Pago</FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
+                  <FormControl>
+                    <SelectTrigger className="border-rust/50 bg-pearlVariant font-semibold text-grey_pebble/60">
+                      <SelectValue placeholder="Seleccionar estado" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent className="bg-grey_pebble text-pearl">
+                    {Object.entries(statusMap).map(([key, value]) => (
+                      <SelectItem
+                        key={key}
+                        value={key}
+                        className="border-b border-pearl/50 uppercase hover:!bg-pearlVariant3"
+                      >
+                        {value}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="paymentMethod"
+            render={({ field }) => (
+              <FormItem className="col-span-1 w-full">
+                <FormLabel>Método de Pago</FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
+                  <FormControl>
+                    <SelectTrigger className="border-rust/50 bg-pearlVariant font-semibold text-grey_pebble/60">
+                      <SelectValue placeholder="Seleccionar método de pago" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent className="bg-grey_pebble text-pearl">
+                    {Object.entries(manualPaymentMap).map(([key, value]) => (
+                      <SelectItem
+                        key={key}
+                        value={key}
+                        className="border-b border-pearl/50 uppercase hover:!bg-pearlVariant3"
+                      >
+                        {value}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
         <Button
           type="submit"
           disabled={isPending}
