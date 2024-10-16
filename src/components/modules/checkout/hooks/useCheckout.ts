@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { ClassPackage } from "@prisma/client"
+import { toast } from "@/components/ui/use-toast"
 
 export const useCheckout = (classPackages: ClassPackage[]) => {
   const [selectedPackage, setSelectedPackage] = useState<ClassPackage>(
@@ -11,7 +12,7 @@ export const useCheckout = (classPackages: ClassPackage[]) => {
   const handleCheckout = async () => {
     try {
       const response = await fetch(
-        `https://reformer.com.ar/api/create-preference`,
+        `https://www.reformer.com.ar/api/create-preference`,
         {
           method: "POST",
           headers: {
@@ -36,7 +37,6 @@ export const useCheckout = (classPackages: ClassPackage[]) => {
       }
     } catch (error) {
       console.error("Error during checkout:", error)
-      // Handle the error (e.g., show an error message to the user)
     }
   }
 

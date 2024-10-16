@@ -29,7 +29,7 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       { url: "/icons/favicon-light.png" },
-      new URL("/icons/favicon-light.png", "https://reformer.com.ar"),
+      new URL("/icons/favicon-light.png", "https://www.reformer.com.ar"),
       { url: "/icons/favicon-dark.png", media: "(prefers-color-scheme: dark)" },
     ],
     shortcut: ["/icons/favicon-light.png"],
