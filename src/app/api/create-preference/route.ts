@@ -64,8 +64,7 @@ export async function POST(request: Request) {
         failure: `http://${process.env.NEXTAUTH_URL}/failure`,
       },
       auto_return: "approved",
-      notification_url:
-        "https://selling-well-penny-raymond.trycloudflare.com/api/notify",
+      notification_url: "https://reformer.com.ar/api/notify",
       metadata: {
         user_id: session.user.id,
         class_package_id: classPackage.id,
