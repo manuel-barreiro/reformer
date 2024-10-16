@@ -26,7 +26,7 @@ export default function SignUp() {
         </Link>
       </Button>
       <div
-        style={{ cursor: "url(icons/solGreyPebble.svg),auto" }}
+        style={{ cursor: "url(/icons/solGreyPebble.svg),auto" }}
         className="flex min-h-[100dvh] items-center justify-center bg-pearl py-12"
       >
         <div className="flex flex-col items-center gap-4 text-midnight">

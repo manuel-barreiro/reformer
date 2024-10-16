@@ -8,18 +8,20 @@ datasource db {
 }
 
 model User {
-  id            String    @id @default(cuid())
-  name          String
-  surname       String?
-  email         String    @unique
-  phone         String?
-  password      String?
-  emailVerified DateTime?
-  image         String?
-  role          Role      @default(user)
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  accounts      Account[]
+  id               String            @id @default(cuid())
+  name             String
+  surname          String?
+  email            String            @unique
+  phone            String?
+  password         String?
+  emailVerified    DateTime?
+  image            String?
+  role             Role              @default(user)
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  accounts         Account[]
+  payments         Payment[]
+  purchasedPackages PurchasedPackage[]
 }
 
 model Account {
@@ -49,7 +51,66 @@ model VerificationToken {
   @@id([identifier])
 }
 
+model Payment {
+  id                 String           @id @default(cuid())
+  paymentId          String           @unique     
+  dateCreated        DateTime
+  dateLastUpdated    DateTime
+  moneyReleaseDate   DateTime?
+  description        String?
+  total              Float
+  status             String
+  statusDetail       String?
+  paymentTypeId      String
+  paymentType        PaymentType      @default(mercadopago)
+  userId             String
+  user               User             @relation(fields: [userId], references: [id])
+  purchasedPackage   PurchasedPackage?
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+}
+
+model ClassPackage {
+  id            String            @id @default(cuid())
+  name          String
+  description   String?
+  classCount    Int
+  price         Float
+  durationMonths Int
+  isActive      Boolean           @default(true)
+  deletedAt     DateTime?
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+  purchasedPackages PurchasedPackage[]
+}
+
+model PurchasedPackage {
+  id               String       @id @default(cuid())
+  userId           String
+  classPackageId   String
+  remainingClasses Int
+  expirationDate   DateTime
+  status           PackageStatus @default(active)
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+  user             User         @relation(fields: [userId], references: [id])
+  classPackage     ClassPackage @relation(fields: [classPackageId], references: [id])
+  payment          Payment?     @relation(fields: [paymentId], references: [id])
+  paymentId        String?      @unique
+}
+
 enum Role {
   user
   admin
+}
+
+enum PackageStatus {
+  active
+  expired
+  cancelled
+}
+
+enum PaymentType {
+  mercadopago
+  manual
 }

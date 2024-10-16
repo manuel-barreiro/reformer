@@ -25,12 +25,14 @@ const config = {
       },
       colors: {
         grey_pebble: "#414141",
-        pearl: "#f2f0e5",
+        pearl: "#F7F5ED",
         midnight: "#231f20",
         rust: "#893f24",
         inputBg: "#D9D9D9",
         pearlVariant: "#E9E7D9",
         pearlVariant2: "#F0EEE3",
+        pearlVariant3: "#D6D4C6",
+        tableContent: "#878686",
       },
       keyframes: {
         marquee: {

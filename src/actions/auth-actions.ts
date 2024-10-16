@@ -1,11 +1,11 @@
-"use server";
+"use server"
 
-import { signIn } from "@/auth";
-import { loginSchema, registerSchema } from "@/lib/zod-schemas";
-import { prisma } from "@/lib/prisma";
-import { AuthError } from "next-auth";
-import { z } from "zod";
-import bcrypt from "bcryptjs";
+import { signIn } from "@/auth"
+import { loginSchema, registerSchema } from "@/lib/zod-schemas"
+import { prisma } from "@/lib/prisma"
+import { AuthError } from "next-auth"
+import { z } from "zod"
+import bcrypt from "bcryptjs"
 
 export const loginAction = async (values: z.infer<typeof loginSchema>) => {
   try {
@@ -13,24 +13,24 @@ export const loginAction = async (values: z.infer<typeof loginSchema>) => {
       email: values.email,
       password: values.password,
       redirect: false,
-    });
-    return { success: true };
+    })
+    return { success: true }
   } catch (error: any) {
     if (error instanceof AuthError) {
-      return { error: error.cause?.err?.message };
+      return { error: error.cause?.err?.message }
     }
-    return { error: error.message };
+    return { error: error.message }
   }
-};
+}
 
 export const registerAction = async (
   values: z.infer<typeof registerSchema>
 ) => {
   try {
     // Validate the data server-side
-    const { data, success } = await registerSchema.safeParse(values);
+    const { data, success } = await registerSchema.safeParse(values)
     if (!success) {
-      throw new Error("Invalid credentials");
+      throw new Error("Invalid credentials")
     }
 
     // Check if the user already exists
@@ -38,14 +38,14 @@ export const registerAction = async (
       where: {
         email: data.email,
       },
-    });
+    })
 
     if (user) {
-      throw new Error("Email already in use");
+      throw new Error("Email already in use")
     }
 
     // logic to salt and hash password
-    const hashedPassword = await bcrypt.hash(data.password, 10);
+    const hashedPassword = await bcrypt.hash(data.password, 10)
 
     // Create the user in the database
     await prisma.user.create({
@@ -56,20 +56,20 @@ export const registerAction = async (
         phone: data.phone,
         password: hashedPassword,
       },
-    });
+    })
 
     // Log in the user
     await signIn("credentials", {
       email: data.email,
       password: data.password,
       redirect: false,
-    });
+    })
 
-    return { success: true };
+    return { success: true }
   } catch (error: any) {
     if (error instanceof AuthError) {
-      return { error: error.cause?.err?.message };
+      return { error: error.cause?.err?.message }
     }
-    return { error: error.message };
+    return { error: error.message }
   }
-};
+}
