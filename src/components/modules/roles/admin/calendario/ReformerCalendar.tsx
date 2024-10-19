@@ -1,6 +1,7 @@
 "use client"
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
+import { Class } from "@prisma/client"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import React, { useState } from "react"
 import { CaptionProps } from "react-day-picker"
@@ -8,11 +9,13 @@ import { CaptionProps } from "react-day-picker"
 interface ReformerCalendarProps {
   date: Date
   onDateChange: (date: Date) => void
+  monthClasses: Class[]
 }
 
 export default function ReformerCalendar({
   date,
   onDateChange,
+  monthClasses,
 }: ReformerCalendarProps) {
   const [month, setMonth] = useState<Date>(new Date())
 
@@ -23,33 +26,34 @@ export default function ReformerCalendar({
       onSelect={(newDate) => newDate && onDateChange(newDate)}
       month={month}
       onMonthChange={setMonth}
+      className="p-0 md:border-r-[1px] md:border-grey_pebble md:pr-10"
       classNames={{
         months: "space-y-4",
         month: "space-y-4",
-        caption: "flex justify-between pt-1 relative items-center",
+        caption: "flex justify-between pt-1 relative items-center ",
         caption_label: "text-lg font-semibold text-3xl!",
         nav: "space-x-1 flex items-center",
         nav_button: "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100",
         table: "w-full border-collapse",
         head_row: "flex w-full",
-        head_cell: "text-gray-500 w-16 font-normal text-sm mb-2",
+        head_cell: "text-gray-500 w-full  font-normal text-sm mb-2",
         row: "flex w-full gap-1 mb-1",
         cell: "relative p-0 text-center text-sm focus-within:relative focus-within:z-20",
-        day: "h-16 w-16 p-2 hover:bg-pearlVariant3 bg-pearlVariant rounded-md aria-selected:bg-grey_pebble",
+        day: "h-10 w-10 md:h-12 md:w-12 lg:h-14 lg:w-14 xl:w-16 xl:h-16 p-0 hover:bg-pearlVariant3 bg-pearlVariant rounded-md aria-selected:bg-grey_pebble",
         day_selected: "bg-grey_pebble text-white hover:bg-grey_pebble",
         day_today: "bg-accent text-accent-foreground",
         day_outside: "opacity-50 bg-transparent",
       }}
       components={{
         Caption: ({ displayMonth }: CaptionProps) => (
-          <div className="mb-4 flex items-center justify-between text-grey_pebble">
+          <div className="mb-4 flex items-center gap-2 text-grey_pebble sm:justify-between">
             <p className="font-dm_sans text-2xl font-medium">
               <span className="font-semibold capitalize">
                 {displayMonth.toLocaleString("default", { month: "long" })}{" "}
               </span>
               {displayMonth.getFullYear()}
             </p>
-            <div className="flex space-x-2">
+            <nav className="flex space-x-2">
               <Button
                 variant="outline"
                 className="h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100"
@@ -72,7 +76,7 @@ export default function ReformerCalendar({
               >
                 <ChevronRight className="h-4 w-4" />
               </Button>
-            </div>
+            </nav>
           </div>
         ),
       }}

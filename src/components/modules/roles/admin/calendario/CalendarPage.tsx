@@ -1,15 +1,20 @@
 import { Suspense } from "react"
 import ClientCalendarPage from "./ClientCalendarPage"
-// import { fetchClasses } from '@/lib/api' // You'll need to implement this function
-import { Class, mockClasses } from "./mockClasses"
+import { getClasses } from "@/actions/class"
+import { startOfDay, endOfDay } from "date-fns"
 
 async function CalendarPage() {
   const initialDate = new Date()
-  const classes: Class[] = mockClasses
+  const dayStart = startOfDay(initialDate)
+  const dayEnd = endOfDay(initialDate)
+  const initialClasses = await getClasses(dayStart, dayEnd)
 
   return (
     <Suspense fallback={<div>Loading...</div>}>
-      <ClientCalendarPage initialDate={initialDate} initialClasses={classes} />
+      <ClientCalendarPage
+        initialDate={initialDate}
+        initialClasses={initialClasses}
+      />
     </Suspense>
   )
 }

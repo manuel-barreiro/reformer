@@ -46,7 +46,7 @@ export default async function SideMenu() {
   const menuItems = userRole === "admin" ? adminMenuItems : userMenuItems
 
   return (
-    <div className="flex h-full w-full flex-col items-start justify-center gap-6 pt-5 text-sm md:items-start xl:w-[90%] xl:gap-10 xl:pt-0">
+    <div className="flex w-full flex-col items-start justify-center gap-6 pt-5 text-sm md:items-start xl:gap-10 xl:pt-0">
       <div className="flex w-full items-center justify-between gap-12 xl:flex-col">
         <span className="hidden self-start font-marcellus text-4xl font-medium text-grey_pebble xl:block">
           {userRole === "admin" ? "Admin" : "Mi Perfil"}
@@ -79,7 +79,7 @@ export default async function SideMenu() {
         <LogoutButtonMobile />
       </div>
 
-      <div className="grid w-full grid-cols-2 gap-2 xl:flex xl:flex-col">
+      <div className="grid w-full grid-cols-3 gap-2 xl:flex xl:flex-col">
         {menuItems.map((item) => (
           <SideMenuButton key={item.href} title={item.title} href={item.href} />
         ))}

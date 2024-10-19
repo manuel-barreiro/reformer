@@ -49,7 +49,7 @@ export default function AdminPackagesPage({
   }
 
   return (
-    <section className="h-full w-full">
+    <>
       <div className="flex w-full items-center justify-between border-b border-grey_pebble pb-4 font-dm_sans text-xs font-medium uppercase sm:text-sm md:justify-between md:pb-6 md:pl-10 lg:text-lg">
         <div className="flex items-center gap-4">
           <h1 className="py-2">Paquetes</h1>
@@ -75,6 +75,6 @@ export default function AdminPackagesPage({
           onPackageDelete={handlePackageDelete}
         />
       </ScrollArea>
-    </section>
+    </>
   )
 }

@@ -1,36 +1,94 @@
 "use client"
+
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { PlusCircle } from "lucide-react"
-import React from "react"
-import { Class } from "./mockClasses"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { MoreVertical, PlusCircle } from "lucide-react"
+import { ClassFormDialog } from "@/components/modules/roles/admin/calendario/ClassFormDialog"
+import { deleteClass } from "@/actions/class"
+import { toast } from "@/components/ui/use-toast"
+import { useState } from "react"
+import { ClassWithBookings } from "./useClassesData"
 
 interface ClassesScheduleProps {
   date: Date
-  classes: Class[]
+  classes: ClassWithBookings[]
+  isLoading: boolean
+  onClassChange: () => Promise<void>
 }
 
 export default function ClassesSchedule({
   date,
   classes,
+  isLoading,
+  onClassChange,
 }: ClassesScheduleProps) {
+  const [timeOfDay, setTimeOfDay] = useState("AM")
+  const [category, setCategory] = useState("PILATES")
+
+  const filteredClasses = Array.isArray(classes)
+    ? classes.filter((class_) => {
+        const hour = new Date(class_.startTime).getHours()
+        const isAM = hour < 12
+        const matchesTime = timeOfDay === "AM" ? isAM : !isAM
+        const matchesCategory = class_.category === category
+        return matchesTime && matchesCategory
+      })
+    : []
+
+  const handleDeleteClass = async (classId: string) => {
+    try {
+      const result = await deleteClass(classId)
+      if (result.success) {
+        toast({
+          title: "Class deleted",
+          description: "The class has been deleted successfully.",
+          variant: "reformer",
+        })
+        await onClassChange() // Refetch classes after deletion
+      } else {
+        throw new Error(result.error)
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to delete class. Please try again.",
+        variant: "destructive",
+      })
+    }
+  }
+
+  if (isLoading) {
+    return (
+      <div className="flex h-full w-full items-center justify-center">
+        <div className="h-32 w-32 animate-spin rounded-full border-b-2 border-gray-900"></div>
+      </div>
+    )
+  }
+
   return (
-    <div className="flex h-full w-full flex-col gap-4 border-l-[1px] border-grey_pebble px-10 text-grey_pebble">
-      <div className="flex items-center gap-5 font-dm_sans">
+    <div className="flex h-full w-full flex-col gap-4 text-grey_pebble">
+      <div className="flex items-center justify-between gap-5 font-dm_sans">
         <div className="flex items-baseline gap-2 text-xl">
           <span className="font-semibold capitalize">
             {date?.toLocaleDateString("es-ES", {
-              weekday: "short",
+              weekday: "long",
             })}
           </span>
-          <span>
+          <span className="">
             {date?.toLocaleDateString("es-ES", {
               day: "numeric",
+              month: "numeric",
             })}
           </span>
         </div>
-        <Tabs defaultValue="AM" className="w-full">
+        <Tabs value={timeOfDay} onValueChange={setTimeOfDay} className="w-full">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="AM">AM</TabsTrigger>
             <TabsTrigger value="PM">PM</TabsTrigger>
@@ -38,38 +96,95 @@ export default function ClassesSchedule({
         </Tabs>
       </div>
 
-      <Tabs defaultValue="pilates" className="w-full">
+      <Tabs value={category} onValueChange={setCategory} className="w-full">
         <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="pilates">Pilates</TabsTrigger>
-          <TabsTrigger value="yoga">Yoga</TabsTrigger>
+          <TabsTrigger value="PILATES">Pilates</TabsTrigger>
+          <TabsTrigger value="YOGA">Yoga</TabsTrigger>
         </TabsList>
       </Tabs>
 
       <div>
-        {/* Class List */}
         <div className="space-y-4">
-          {classes.map((clase) => (
-            <Card key={clase.id} className="border bg-pearlVariant p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="font-dm_sans font-semibold text-grey_pebble">
-                    {clase.category} - {clase.type}
-                  </h3>
-                  <div className="flex items-center gap-2 text-sm text-gray-500">
-                    <span>CUPOS</span>
-                    <span>{clase.bookings.length}/8</span>
+          {filteredClasses.length === 0 ? (
+            <div className="text-center text-gray-500">
+              No classes scheduled for this time period.
+            </div>
+          ) : (
+            filteredClasses.map((class_) => (
+              <Card key={class_.id} className="border bg-pearlVariant p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="font-dm_sans font-semibold text-grey_pebble">
+                      {class_.category} - {class_.type.replace("_", " ")}
+                    </h3>
+                    <div className="flex items-center gap-4 text-sm text-gray-500">
+                      <span>
+                        {new Date(class_.startTime).toLocaleTimeString(
+                          "es-ES",
+                          {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          }
+                        )}{" "}
+                        -{" "}
+                        {new Date(class_.endTime).toLocaleTimeString("es-ES", {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </span>
+                      <span className="flex items-center gap-2">
+                        <span>CUPOS</span>
+                        <span>
+                          {class_.bookings.length}/{class_.maxCapacity}
+                        </span>
+                      </span>
+                    </div>
+                    <p className="mt-1 text-sm text-gray-500">
+                      Instructor: {class_.instructor}
+                    </p>
                   </div>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="icon">
+                        <MoreVertical className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem asChild>
+                        <ClassFormDialog
+                          classToEdit={class_}
+                          onSuccess={onClassChange}
+                          trigger={
+                            <button className="w-full cursor-pointer">
+                              Edit Class
+                            </button>
+                          }
+                        />
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        className="text-red-600 focus:text-red-600"
+                        onClick={() => handleDeleteClass(class_.id)}
+                      >
+                        Delete Class
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
-              </div>
-            </Card>
-          ))}
+              </Card>
+            ))
+          )}
         </div>
 
-        {/* Add Class Button */}
-        <Button className="mt-6 w-full bg-[#8B4513] hover:bg-[#723A0F]">
-          <PlusCircle className="mr-2 h-4 w-4" />
-          Agregar Clase
-        </Button>
+        <ClassFormDialog
+          selectedDate={date}
+          onSuccess={onClassChange}
+          trigger={
+            <Button className="mt-6 w-full bg-[#8B4513] hover:bg-[#723A0F]">
+              <PlusCircle className="mr-2 h-4 w-4" />
+              Add Class
+            </Button>
+          }
+        />
       </div>
     </div>
   )

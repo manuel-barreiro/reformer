@@ -1,14 +1,18 @@
 "use client"
-
-import { useState } from "react"
+import { useState, useEffect, useCallback } from "react"
 import ReformerCalendar from "./ReformerCalendar"
 import ClassesSchedule from "./ClassesSchedule"
-import { Class } from "./mockClasses"
-import { Separator } from "@/components/ui/separator"
+import { Booking, Class } from "@prisma/client"
+import { getClasses } from "@/actions/class"
+import { startOfDay, endOfDay, startOfMonth, endOfMonth } from "date-fns"
 
 interface ClientCalendarPageProps {
   initialDate: Date
-  initialClasses: Class[]
+  initialClasses: (Class & { bookings: Booking[] })[]
+}
+
+export interface ClassWithBookings extends Class {
+  bookings: Booking[]
 }
 
 const ClientCalendarPage = ({
@@ -16,19 +20,61 @@ const ClientCalendarPage = ({
   initialClasses,
 }: ClientCalendarPageProps) => {
   const [date, setDate] = useState<Date>(initialDate)
-  const [classes, setClasses] = useState<Class[]>(initialClasses)
+  const [classes, setClasses] = useState<ClassWithBookings[]>(initialClasses)
+  const [monthClasses, setMonthClasses] = useState<Class[]>([])
+  const [isLoading, setIsLoading] = useState(false)
+
+  const fetchMonthClasses = useCallback(async (currentDate: Date) => {
+    const monthStart = startOfMonth(currentDate)
+    const monthEnd = endOfMonth(currentDate)
+    const fetchedMonthClasses = await getClasses(monthStart, monthEnd)
+    setMonthClasses(fetchedMonthClasses)
+  }, [])
+
+  const fetchDayClasses = useCallback(async (currentDate: Date) => {
+    setIsLoading(true)
+    try {
+      const dayStart = startOfDay(currentDate)
+      const dayEnd = endOfDay(currentDate)
+      const dayClasses = (await getClasses(
+        dayStart,
+        dayEnd
+      )) as ClassWithBookings[]
+      setClasses(dayClasses)
+    } catch (error) {
+      console.error("Error fetching classes:", error)
+    } finally {
+      setIsLoading(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    fetchMonthClasses(date)
+  }, [date, fetchMonthClasses])
 
   const handleDateChange = async (newDate: Date) => {
     setDate(newDate)
-    // Fetch new classes for the selected date
-    // const newClasses = await fetchClasses(newDate)
-    setClasses(initialClasses)
+    await fetchDayClasses(newDate)
+  }
+
+  const handleClassChange = async () => {
+    await fetchDayClasses(date)
+    await fetchMonthClasses(date)
   }
 
   return (
-    <div className="flex min-h-[86dvh] flex-col items-start justify-between gap-8 p-6 lg:flex-row">
-      <ReformerCalendar date={date} onDateChange={handleDateChange} />
-      <ClassesSchedule date={date} classes={classes} />
+    <div className="flex flex-col gap-10 md:flex-row md:pl-10 lg:items-stretch">
+      <ReformerCalendar
+        date={date}
+        onDateChange={handleDateChange}
+        monthClasses={monthClasses}
+      />
+      <ClassesSchedule
+        date={date}
+        classes={classes}
+        isLoading={isLoading}
+        onClassChange={handleClassChange}
+      />
     </div>
   )
 }
