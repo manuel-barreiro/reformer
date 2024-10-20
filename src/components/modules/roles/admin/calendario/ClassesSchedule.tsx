@@ -9,7 +9,13 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { MoreVertical, PlusCircle } from "lucide-react"
+import {
+  Edit,
+  EditIcon,
+  MoreVertical,
+  PlusCircle,
+  TrashIcon,
+} from "lucide-react"
 import { ClassFormDialog } from "@/components/modules/roles/admin/calendario/ClassFormDialog"
 import { deleteClass } from "@/actions/class"
 import { toast } from "@/components/ui/use-toast"
@@ -20,7 +26,7 @@ interface ClassesScheduleProps {
   date: Date
   classes: ClassWithBookings[]
   isLoading: boolean
-  onClassChange: () => Promise<void>
+  onClassChange: () => void
 }
 
 export default function ClassesSchedule({
@@ -64,13 +70,13 @@ export default function ClassesSchedule({
     }
   }
 
-  if (isLoading) {
-    return (
-      <div className="flex h-full w-full items-center justify-center">
-        <div className="h-32 w-32 animate-spin rounded-full border-b-2 border-gray-900"></div>
-      </div>
-    )
-  }
+  // if (isLoading) {
+  //   return (
+  //     <div className="flex h-full w-full items-center justify-center">
+  //       <div className="h-32 w-32 animate-spin rounded-full border-b-2 border-gray-900"></div>
+  //     </div>
+  //   )
+  // }
 
   return (
     <div className="flex h-full w-full flex-col gap-4 text-grey_pebble">
@@ -105,7 +111,11 @@ export default function ClassesSchedule({
 
       <div>
         <div className="space-y-4">
-          {filteredClasses.length === 0 ? (
+          {isLoading ? (
+            <div className="flex h-full w-full items-center justify-center">
+              <div className="h-32 w-32 animate-spin rounded-full border-b-2 border-gray-900" />
+            </div>
+          ) : filteredClasses.length === 0 ? (
             <div className="text-center text-gray-500">
               No classes scheduled for this time period.
             </div>
@@ -143,32 +153,24 @@ export default function ClassesSchedule({
                       Instructor: {class_.instructor}
                     </p>
                   </div>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon">
-                        <MoreVertical className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem asChild>
-                        <ClassFormDialog
-                          classToEdit={class_}
-                          onSuccess={onClassChange}
-                          trigger={
-                            <button className="w-full cursor-pointer">
-                              Edit Class
-                            </button>
-                          }
-                        />
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        className="text-red-600 focus:text-red-600"
-                        onClick={() => handleDeleteClass(class_.id)}
-                      >
-                        Delete Class
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                  <div>
+                    <Button
+                      variant="ghost"
+                      onClick={() => handleDeleteClass(class_.id)}
+                    >
+                      <TrashIcon className="h-4 w-4 text-midnight" />
+                    </Button>
+                    <ClassFormDialog
+                      selectedDate={date}
+                      classToEdit={class_}
+                      onSuccess={onClassChange}
+                      trigger={
+                        <Button variant="ghost">
+                          <EditIcon className="h-4 w-4 text-midnight" />
+                        </Button>
+                      }
+                    />
+                  </div>
                 </div>
               </Card>
             ))

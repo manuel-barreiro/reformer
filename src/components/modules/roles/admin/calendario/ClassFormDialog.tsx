@@ -1,4 +1,5 @@
-import { useState } from "react"
+"use client"
+import { useCallback, useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
@@ -29,6 +30,13 @@ import { Button } from "@/components/ui/button"
 import { toast } from "@/components/ui/use-toast"
 import { Class } from "@prisma/client"
 import { createClass, updateClass } from "@/actions/class"
+import { parse, set } from "date-fns"
+import { fromZonedTime, format } from "date-fns-tz"
+import React from "react"
+
+const timeZone = "America/Argentina/Buenos_Aires" // Argentina's time zone
+const yogaTypes = ["VINYASA", "HATHA", "BALANCE"]
+const pilatesTypes = ["STRENGTH_CORE", "LOWER_BODY", "FULL_BODY"]
 
 const formSchema = z.object({
   category: z.enum(["YOGA", "PILATES"]),
@@ -50,19 +58,21 @@ const formSchema = z.object({
 type FormValues = z.infer<typeof formSchema>
 
 interface ClassFormDialogProps {
-  selectedDate?: Date
+  selectedDate: Date
   classToEdit?: Class
   trigger?: React.ReactNode
-  onSuccess?: () => Promise<void>
+  onSuccess: () => void
 }
 
-export function ClassFormDialog({
-  selectedDate,
-  classToEdit,
-  trigger,
-  onSuccess,
-}: ClassFormDialogProps) {
+export const ClassFormDialog = React.forwardRef<
+  HTMLDivElement,
+  ClassFormDialogProps
+>(({ selectedDate, classToEdit, trigger, onSuccess }, ref) => {
+  useEffect(() => {
+    console.log("selectedDate in ClassFormDialog:", selectedDate)
+  }, [selectedDate])
   const [open, setOpen] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -71,72 +81,156 @@ export function ClassFormDialog({
           category: classToEdit.category,
           type: classToEdit.type,
           date: classToEdit.date.toISOString().split("T")[0],
-          startTime: classToEdit.startTime.toISOString().slice(11, 16),
-          endTime: classToEdit.endTime.toISOString().slice(11, 16),
+          startTime: new Date(classToEdit.startTime).toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: false,
+          }),
+          endTime: new Date(classToEdit.endTime).toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: false,
+          }),
           instructor: classToEdit.instructor,
-          maxCapacity: Number(classToEdit.maxCapacity),
+          maxCapacity: classToEdit.maxCapacity,
         }
       : {
-          date: selectedDate?.toISOString().split("T")[0] || "",
+          date: "",
           startTime: "",
           endTime: "",
           instructor: "",
-          maxCapacity: Number(8),
+          maxCapacity: 8,
         },
   })
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
-    const dateStr = values.date
-    const startTimeStr = values.startTime
-    const endTimeStr = values.endTime
-
-    const startTime = new Date(`${dateStr}T${startTimeStr}:00`)
-    const endTime = new Date(`${dateStr}T${endTimeStr}:00`)
-
-    const classData = {
-      ...values,
-      date: new Date(dateStr),
-      startTime: startTime,
-      endTime: endTime,
-      maxCapacity: Number(values.maxCapacity),
+  useEffect(() => {
+    if (selectedDate && !classToEdit) {
+      form.setValue("date", selectedDate.toISOString().split("T")[0])
     }
+  }, [selectedDate, classToEdit, form])
 
-    console.log("Submitting class data:", classData)
+  const onSubmit = useCallback(
+    async (values: FormValues) => {
+      setIsSubmitting(true)
+      const dateStr = values.date // e.g., '2024-11-16'
+      const startTimeStr = values.startTime // e.g., '14:00'
+      const endTimeStr = values.endTime // e.g., '15:30'
 
-    try {
-      let result
-      if (classToEdit) {
-        result = await updateClass(classToEdit.id, classData)
-      } else {
-        result = await createClass(classData)
+      console.log("dateStr:", dateStr)
+      console.log("startTimeStr:", startTimeStr)
+      console.log("endTimeStr:", endTimeStr)
+
+      const [startHours, startMinutes] = startTimeStr.split(":").map(Number)
+      const [endHours, endMinutes] = endTimeStr.split(":").map(Number)
+
+      // Parse the date without time (local date)
+      const date = parse(dateStr, "yyyy-MM-dd", new Date())
+
+      // Set the start time with correct hours and minutes
+      let startTime = set(date, { hours: startHours, minutes: startMinutes })
+
+      // Convert to UTC using the updated 'fromZonedTime'
+      startTime = fromZonedTime(startTime, timeZone)
+      console.log(
+        "Start time (UTC):",
+        format(startTime, "yyyy-MM-dd'T'HH:mm:ssXXX", { timeZone: "UTC" })
+      )
+
+      // Set the end time
+      let endTime = set(date, { hours: endHours, minutes: endMinutes })
+
+      // Convert end time to UTC using 'fromZonedTime'
+      endTime = fromZonedTime(endTime, timeZone)
+      console.log(
+        "End time (UTC):",
+        format(endTime, "yyyy-MM-dd'T'HH:mm:ssXXX", { timeZone: "UTC" })
+      )
+
+      // Class data with UTC times
+      const classData = {
+        ...values,
+        date: new Date(dateStr),
+        startTime,
+        endTime,
+        maxCapacity: Number(values.maxCapacity),
       }
 
-      if (result.success) {
+      console.log("Class data:", classData)
+
+      try {
+        let result
+        if (classToEdit) {
+          result = await updateClass(classToEdit.id, classData)
+        } else {
+          result = await createClass(classData)
+        }
+
+        if (result.success) {
+          setOpen(false)
+          onSuccess()
+          setTimeout(() => {
+            toast({
+              title: classToEdit ? "Class updated" : "Class created",
+              description: `The class has been ${classToEdit ? "updated" : "created"} successfully.`,
+              variant: "reformer",
+            })
+          }, 300)
+        }
+      } catch (error) {
         toast({
-          title: classToEdit ? "Class updated" : "Class created",
-          description: `The class has been ${classToEdit ? "updated" : "created"} successfully.`,
-          variant: "reformer",
+          title: "Error",
+          description:
+            error instanceof Error ? error.message : "Something went wrong.",
+          variant: "destructive",
         })
-        setOpen(false)
-        form.reset()
-        if (onSuccess) await onSuccess()
-      } else {
-        throw new Error(result.error || "An unknown error occurred")
+        console.error("Class operation error:", error)
+      } finally {
+        setIsSubmitting(false)
       }
-    } catch (error) {
-      toast({
-        title: "Error",
-        description:
-          error instanceof Error ? error.message : "Something went wrong.",
-        variant: "destructive",
-      })
-      console.error("Class operation error:", error)
-    }
-  }
+    },
+    [classToEdit, onSuccess]
+  )
 
-  const yogaTypes = ["VINYASA", "HATHA", "BALANCE"]
-  const pilatesTypes = ["STRENGTH_CORE", "LOWER_BODY", "FULL_BODY"]
   const selectedCategory = form.watch("category")
+
+  useEffect(() => {
+    if (open) {
+      form.reset(
+        classToEdit
+          ? {
+              category: classToEdit.category,
+              type: classToEdit.type,
+              date: classToEdit.date.toISOString().split("T")[0],
+              startTime: new Date(classToEdit.startTime).toLocaleTimeString(
+                [],
+                {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                  hour12: false,
+                }
+              ),
+              endTime: new Date(classToEdit.endTime).toLocaleTimeString([], {
+                hour: "2-digit",
+                minute: "2-digit",
+                hour12: false,
+              }),
+              instructor: classToEdit.instructor,
+              maxCapacity: classToEdit.maxCapacity,
+            }
+          : {
+              date: selectedDate.toISOString().split("T")[0],
+              startTime: "",
+              endTime: "",
+              instructor: "",
+              maxCapacity: 8,
+            }
+      )
+    }
+  }, [open, classToEdit, selectedDate, form])
+
+  const handleOpenChange = useCallback((newOpen: boolean) => {
+    setOpen(newOpen)
+  }, [])
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -217,15 +311,7 @@ export function ClassFormDialog({
                 <FormItem>
                   <FormLabel>Date</FormLabel>
                   <FormControl>
-                    <Input
-                      type="date"
-                      {...field}
-                      value={
-                        selectedDate
-                          ? selectedDate.toISOString().split("T")[0]
-                          : ""
-                      }
-                    />
+                    <Input type="date" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -290,12 +376,16 @@ export function ClassFormDialog({
               )}
             />
 
-            <Button type="submit" className="w-full">
-              {classToEdit ? "Update Class" : "Create Class"}
+            <Button type="submit" className="w-full" disabled={isSubmitting}>
+              {isSubmitting
+                ? "Processing..."
+                : classToEdit
+                  ? "Update Class"
+                  : "Create Class"}
             </Button>
           </form>
         </Form>
       </DialogContent>
     </Dialog>
   )
-}
+})

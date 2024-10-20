@@ -50,17 +50,17 @@ const ClientCalendarPage = ({
 
   useEffect(() => {
     fetchMonthClasses(date)
-  }, [date, fetchMonthClasses])
+    fetchDayClasses(date)
+  }, [date, fetchMonthClasses, fetchDayClasses])
 
-  const handleDateChange = async (newDate: Date) => {
+  const handleDateChange = useCallback((newDate: Date) => {
     setDate(newDate)
-    await fetchDayClasses(newDate)
-  }
+  }, [])
 
-  const handleClassChange = async () => {
-    await fetchDayClasses(date)
-    await fetchMonthClasses(date)
-  }
+  const handleClassChange = useCallback(() => {
+    fetchDayClasses(date)
+    fetchMonthClasses(date)
+  }, [date, fetchDayClasses, fetchMonthClasses])
 
   return (
     <div className="flex flex-col gap-10 md:flex-row md:pl-10 lg:items-stretch">

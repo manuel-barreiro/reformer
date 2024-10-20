@@ -2,6 +2,7 @@ import { Suspense } from "react"
 import ClientCalendarPage from "./ClientCalendarPage"
 import { getClasses } from "@/actions/class"
 import { startOfDay, endOfDay } from "date-fns"
+import ErrorBoundary from "./ErrorBoundary"
 
 async function CalendarPage() {
   const initialDate = new Date()
@@ -10,12 +11,14 @@ async function CalendarPage() {
   const initialClasses = await getClasses(dayStart, dayEnd)
 
   return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <ClientCalendarPage
-        initialDate={initialDate}
-        initialClasses={initialClasses}
-      />
-    </Suspense>
+    <ErrorBoundary>
+      <Suspense fallback={<div>Loading...</div>}>
+        <ClientCalendarPage
+          initialDate={initialDate}
+          initialClasses={initialClasses}
+        />
+      </Suspense>
+    </ErrorBoundary>
   )
 }
 
