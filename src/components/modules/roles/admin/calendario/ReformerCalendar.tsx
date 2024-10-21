@@ -3,8 +3,10 @@ import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
 import { Class } from "@prisma/client"
 import { ChevronLeft, ChevronRight } from "lucide-react"
-import React, { useState, useMemo } from "react"
+import React, { useEffect, useState } from "react"
 import { CaptionProps } from "react-day-picker"
+import { format, isValid } from "date-fns"
+import { toZonedTime } from "date-fns-tz"
 
 interface ReformerCalendarProps {
   date: Date
@@ -17,15 +19,21 @@ export default function ReformerCalendar({
   onDateChange,
   monthClasses,
 }: ReformerCalendarProps) {
-  const [month, setMonth] = useState<Date>(new Date())
+  const [currentMonth, setCurrentMonth] = useState(date)
 
-  const classDays = useMemo(() => {
-    const days = new Set<string>()
-    monthClasses.forEach((cls) => {
-      days.add(cls.date.toISOString().split("T")[0])
-    })
-    return days
-  }, [monthClasses])
+  const classDays = new Set(
+    monthClasses
+      .map((cls) => {
+        const classDate = new Date(cls.date)
+        // Convert to local timezone before formatting
+        const localDate = toZonedTime(
+          classDate,
+          "America/Argentina/Buenos_Aires"
+        )
+        return isValid(classDate) ? format(localDate, "yyyy-MM-dd") : null
+      })
+      .filter(Boolean)
+  )
 
   const CustomDay = ({
     date: dayDate,
@@ -63,13 +71,13 @@ export default function ReformerCalendar({
       mode="single"
       selected={date}
       onSelect={(newDate) => newDate && onDateChange(newDate)}
-      month={month}
-      onMonthChange={setMonth}
+      month={currentMonth}
+      onMonthChange={setCurrentMonth}
       className="p-0 md:border-r-[1px] md:border-grey_pebble md:pr-10"
       classNames={{
         months: "space-y-4",
         month: "space-y-4",
-        caption: "flex justify-between pt-1 relative items-center ",
+        caption: "flex justify-between pt-1 relative items-center",
         caption_label: "text-lg font-semibold text-3xl!",
         nav: "space-x-1 flex items-center",
         nav_button: "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100",
@@ -97,9 +105,10 @@ export default function ReformerCalendar({
                 variant="outline"
                 className="h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100"
                 onClick={() => {
-                  const prevMonth = new Date(month)
+                  const prevMonth = new Date(currentMonth)
                   prevMonth.setMonth(prevMonth.getMonth() - 1)
-                  setMonth(prevMonth)
+                  setCurrentMonth(prevMonth)
+                  onDateChange(prevMonth)
                 }}
               >
                 <ChevronLeft className="h-4 w-4" />
@@ -108,9 +117,10 @@ export default function ReformerCalendar({
                 variant="outline"
                 className="h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100"
                 onClick={() => {
-                  const nextMonth = new Date(month)
+                  const nextMonth = new Date(currentMonth)
                   nextMonth.setMonth(nextMonth.getMonth() + 1)
-                  setMonth(nextMonth)
+                  setCurrentMonth(nextMonth)
+                  onDateChange(nextMonth)
                 }}
               >
                 <ChevronRight className="h-4 w-4" />

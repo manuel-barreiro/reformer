@@ -1,10 +1,8 @@
 "use client"
-import { useState, useEffect, useCallback } from "react"
 import ReformerCalendar from "./ReformerCalendar"
 import ClassesSchedule from "./ClassesSchedule"
 import { Booking, Class } from "@prisma/client"
-import { getClasses } from "@/actions/class"
-import { startOfDay, endOfDay, startOfMonth, endOfMonth } from "date-fns"
+import { useClassesData } from "@/components/modules/roles/admin/calendario/useClassesData"
 
 interface ClientCalendarPageProps {
   initialDate: Date
@@ -19,61 +17,27 @@ const ClientCalendarPage = ({
   initialDate,
   initialClasses,
 }: ClientCalendarPageProps) => {
-  const [date, setDate] = useState<Date>(initialDate)
-  const [classes, setClasses] = useState<ClassWithBookings[]>(initialClasses)
-  const [monthClasses, setMonthClasses] = useState<Class[]>([])
-  const [isLoading, setIsLoading] = useState(false)
-
-  const fetchMonthClasses = useCallback(async (currentDate: Date) => {
-    const monthStart = startOfMonth(currentDate)
-    const monthEnd = endOfMonth(currentDate)
-    const fetchedMonthClasses = await getClasses(monthStart, monthEnd)
-    setMonthClasses(fetchedMonthClasses)
-  }, [])
-
-  const fetchDayClasses = useCallback(async (currentDate: Date) => {
-    setIsLoading(true)
-    try {
-      const dayStart = startOfDay(currentDate)
-      const dayEnd = endOfDay(currentDate)
-      const dayClasses = (await getClasses(
-        dayStart,
-        dayEnd
-      )) as ClassWithBookings[]
-      setClasses(dayClasses)
-    } catch (error) {
-      console.error("Error fetching classes:", error)
-    } finally {
-      setIsLoading(false)
-    }
-  }, [])
-
-  useEffect(() => {
-    fetchMonthClasses(date)
-    fetchDayClasses(date)
-  }, [date, fetchMonthClasses, fetchDayClasses])
-
-  const handleDateChange = useCallback((newDate: Date) => {
-    setDate(newDate)
-  }, [])
-
-  const handleClassChange = useCallback(() => {
-    fetchDayClasses(date)
-    fetchMonthClasses(date)
-  }, [date, fetchDayClasses, fetchMonthClasses])
+  const {
+    currentDate,
+    currentMonthClasses,
+    selectedDayClasses,
+    isLoading,
+    handleDateChange,
+    refreshData,
+  } = useClassesData(initialDate, initialClasses)
 
   return (
     <div className="flex flex-col justify-items-stretch gap-10 md:flex-row md:pl-10">
       <ReformerCalendar
-        date={date}
+        date={currentDate}
         onDateChange={handleDateChange}
-        monthClasses={monthClasses}
+        monthClasses={currentMonthClasses}
       />
       <ClassesSchedule
-        date={date}
-        classes={classes}
+        date={currentDate}
+        classes={selectedDayClasses}
         isLoading={isLoading}
-        onClassChange={handleClassChange}
+        onClassChange={refreshData}
       />
     </div>
   )

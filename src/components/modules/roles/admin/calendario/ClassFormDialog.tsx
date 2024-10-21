@@ -31,10 +31,11 @@ import { toast } from "@/components/ui/use-toast"
 import { Class } from "@prisma/client"
 import { createClass, updateClass } from "@/actions/class"
 import { parse, set } from "date-fns"
-import { fromZonedTime, format } from "date-fns-tz"
+import { fromZonedTime, format, toZonedTime } from "date-fns-tz"
 import React from "react"
+import { ClassWithBookings } from "./types"
 
-const timeZone = "America/Argentina/Buenos_Aires" // Argentina's time zone
+const timeZone = "America/Argentina/Buenos_Aires"
 const yogaTypes = ["VINYASA", "HATHA", "BALANCE"]
 const pilatesTypes = ["STRENGTH_CORE", "LOWER_BODY", "FULL_BODY"]
 
@@ -59,19 +60,16 @@ type FormValues = z.infer<typeof formSchema>
 
 interface ClassFormDialogProps {
   selectedDate: Date
-  classToEdit?: Class
-  trigger?: React.ReactNode
+  classToEdit?: ClassWithBookings
   onSuccess: () => void
+  trigger: React.ReactNode
 }
 
 export const ClassFormDialog = React.forwardRef<
   HTMLDivElement,
   ClassFormDialogProps
 >(({ selectedDate, classToEdit, trigger, onSuccess }, ref) => {
-  useEffect(() => {
-    console.log("selectedDate in ClassFormDialog:", selectedDate)
-  }, [selectedDate])
-  const [open, setOpen] = useState(false)
+  const [isOpen, setIsOpen] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const form = useForm<FormValues>({
@@ -95,7 +93,9 @@ export const ClassFormDialog = React.forwardRef<
           maxCapacity: classToEdit.maxCapacity,
         }
       : {
-          date: "",
+          category: "YOGA",
+          type: "VINYASA",
+          date: selectedDate.toISOString().split("T")[0],
           startTime: "",
           endTime: "",
           instructor: "",
@@ -103,98 +103,65 @@ export const ClassFormDialog = React.forwardRef<
         },
   })
 
-  useEffect(() => {
-    if (selectedDate && !classToEdit) {
-      form.setValue("date", selectedDate.toISOString().split("T")[0])
+  const handleSubmit = async (values: FormValues) => {
+    setIsSubmitting(true)
+    const dateStr = values.date
+    const startTimeStr = values.startTime
+    const endTimeStr = values.endTime
+
+    const [startHours, startMinutes] = startTimeStr.split(":").map(Number)
+    const [endHours, endMinutes] = endTimeStr.split(":").map(Number)
+
+    // Create date in local timezone
+    const date = parse(dateStr, "yyyy-MM-dd", new Date())
+
+    // Set times in local timezone
+    let startTime = set(date, { hours: startHours, minutes: startMinutes })
+    let endTime = set(date, { hours: endHours, minutes: endMinutes })
+
+    // Ensure dates are in the correct timezone
+    const timeZone = "America/Argentina/Buenos_Aires"
+    const zonedDate = toZonedTime(date, timeZone)
+    startTime = toZonedTime(startTime, timeZone)
+    endTime = toZonedTime(endTime, timeZone)
+
+    const classData = {
+      ...values,
+      date: zonedDate,
+      startTime,
+      endTime,
+      maxCapacity: Number(values.maxCapacity),
     }
-  }, [selectedDate, classToEdit, form])
 
-  const onSubmit = useCallback(
-    async (values: FormValues) => {
-      setIsSubmitting(true)
-      const dateStr = values.date // e.g., '2024-11-16'
-      const startTimeStr = values.startTime // e.g., '14:00'
-      const endTimeStr = values.endTime // e.g., '15:30'
-
-      console.log("dateStr:", dateStr)
-      console.log("startTimeStr:", startTimeStr)
-      console.log("endTimeStr:", endTimeStr)
-
-      const [startHours, startMinutes] = startTimeStr.split(":").map(Number)
-      const [endHours, endMinutes] = endTimeStr.split(":").map(Number)
-
-      // Parse the date without time (local date)
-      const date = parse(dateStr, "yyyy-MM-dd", new Date())
-
-      // Set the start time with correct hours and minutes
-      let startTime = set(date, { hours: startHours, minutes: startMinutes })
-
-      // Convert to UTC using the updated 'fromZonedTime'
-      startTime = fromZonedTime(startTime, timeZone)
-      console.log(
-        "Start time (UTC):",
-        format(startTime, "yyyy-MM-dd'T'HH:mm:ssXXX", { timeZone: "UTC" })
-      )
-
-      // Set the end time
-      let endTime = set(date, { hours: endHours, minutes: endMinutes })
-
-      // Convert end time to UTC using 'fromZonedTime'
-      endTime = fromZonedTime(endTime, timeZone)
-      console.log(
-        "End time (UTC):",
-        format(endTime, "yyyy-MM-dd'T'HH:mm:ssXXX", { timeZone: "UTC" })
-      )
-
-      // Class data with UTC times
-      const classData = {
-        ...values,
-        date: new Date(dateStr),
-        startTime,
-        endTime,
-        maxCapacity: Number(values.maxCapacity),
+    try {
+      if (classToEdit) {
+        await updateClass(classToEdit.id, classData)
+      } else {
+        await createClass(classData)
       }
-
-      console.log("Class data:", classData)
-
-      try {
-        let result
-        if (classToEdit) {
-          result = await updateClass(classToEdit.id, classData)
-        } else {
-          result = await createClass(classData)
-        }
-
-        if (result.success) {
-          setOpen(false)
-          onSuccess()
-          setTimeout(() => {
-            toast({
-              title: classToEdit ? "Class updated" : "Class created",
-              description: `The class has been ${classToEdit ? "updated" : "created"} successfully.`,
-              variant: "reformer",
-            })
-          }, 300)
-        }
-      } catch (error) {
-        toast({
-          title: "Error",
-          description:
-            error instanceof Error ? error.message : "Something went wrong.",
-          variant: "destructive",
-        })
-        console.error("Class operation error:", error)
-      } finally {
-        setIsSubmitting(false)
-      }
-    },
-    [classToEdit, onSuccess]
-  )
+      setIsOpen(false)
+      onSuccess() // This will trigger a refresh of the data
+      toast({
+        title: classToEdit ? "Class updated" : "Class created",
+        description: `The class has been ${classToEdit ? "updated" : "created"} successfully.`,
+        variant: "reformer",
+      })
+    } catch (error) {
+      console.error("Error submitting class:", error)
+      toast({
+        title: "Error",
+        description: `Failed to ${classToEdit ? "update" : "create"} class. Please try again.`,
+        variant: "destructive",
+      })
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
 
   const selectedCategory = form.watch("category")
 
   useEffect(() => {
-    if (open) {
+    if (isOpen) {
       form.reset(
         classToEdit
           ? {
@@ -218,6 +185,8 @@ export const ClassFormDialog = React.forwardRef<
               maxCapacity: classToEdit.maxCapacity,
             }
           : {
+              category: "YOGA",
+              type: "VINYASA",
               date: selectedDate.toISOString().split("T")[0],
               startTime: "",
               endTime: "",
@@ -226,14 +195,10 @@ export const ClassFormDialog = React.forwardRef<
             }
       )
     }
-  }, [open, classToEdit, selectedDate, form])
-
-  const handleOpenChange = useCallback((newOpen: boolean) => {
-    setOpen(newOpen)
-  }, [])
+  }, [isOpen, classToEdit, selectedDate, form])
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         {trigger || <Button>{classToEdit ? "Edit Class" : "Add Class"}</Button>}
       </DialogTrigger>
@@ -244,7 +209,10 @@ export const ClassFormDialog = React.forwardRef<
           </DialogTitle>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <form
+            onSubmit={form.handleSubmit(handleSubmit)}
+            className="space-y-4"
+          >
             <FormField
               control={form.control}
               name="category"

@@ -8,7 +8,7 @@ import { ClassFormDialog } from "@/components/modules/roles/admin/calendario/Cla
 import { deleteClass } from "@/actions/class"
 import { toast } from "@/components/ui/use-toast"
 import { useState } from "react"
-import { ClassWithBookings } from "./useClassesData"
+import { ClassWithBookings } from "@/components/modules/roles/admin/calendario/types"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Skeleton } from "@/components/ui/skeleton"
 

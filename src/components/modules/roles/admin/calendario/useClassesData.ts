@@ -1,22 +1,63 @@
-import { useState, useEffect, useCallback } from "react"
-import { startOfMonth, endOfMonth, isSameMonth } from "date-fns"
-import { Class, Booking } from "@prisma/client"
+import { useCallback, useState, useMemo, useRef, useEffect } from "react"
+import {
+  startOfMonth,
+  endOfMonth,
+  isSameMonth,
+  parseISO,
+  isValid,
+  format,
+} from "date-fns"
+import { toZonedTime } from "date-fns-tz"
 import { getClasses } from "@/actions/class"
+import { ClassWithBookings } from "@/components/modules/roles/admin/calendario/ClientCalendarPage"
 
-export type ClassWithBookings = Class & { bookings: Booking[] }
+interface ClassesCache {
+  [key: string]: ClassWithBookings[]
+}
 
-export const useClassesData = (initialDate: Date) => {
-  const [selectedDate, setSelectedDate] = useState<Date>(initialDate)
-  const [monthClasses, setMonthClasses] = useState<ClassWithBookings[]>([])
-  const [isLoading, setIsLoading] = useState<boolean>(false)
+const TIMEZONE = "America/Argentina/Buenos_Aires"
 
-  const fetchMonthClasses = useCallback(async (date: Date) => {
+export function useClassesData(
+  initialDate: Date,
+  initialClasses: ClassWithBookings[]
+) {
+  const [currentDate, setCurrentDate] = useState<Date>(initialDate)
+  const [classes, setClasses] = useState<ClassWithBookings[]>(initialClasses)
+  const [isLoading, setIsLoading] = useState(false)
+  const classesCache = useRef<ClassesCache>({})
+
+  const parseDate = (date: Date | string): Date => {
+    const timeZone = "America/Argentina/Buenos_Aires"
+    if (date instanceof Date) {
+      return isValid(date)
+        ? toZonedTime(date, timeZone)
+        : toZonedTime(new Date(), timeZone)
+    }
+    const parsedDate = parseISO(date)
+    return isValid(parsedDate)
+      ? toZonedTime(parsedDate, timeZone)
+      : toZonedTime(new Date(), timeZone)
+  }
+
+  const fetchClasses = useCallback(async (date: Date) => {
     setIsLoading(true)
-    const monthStart = startOfMonth(date)
-    const monthEnd = endOfMonth(date)
+    const monthKey = `${date.getFullYear()}-${date.getMonth()}`
+
     try {
-      const classes = await getClasses(monthStart, monthEnd)
-      setMonthClasses(classes)
+      // Always fetch fresh data when refreshing
+      const monthStart = startOfMonth(date)
+      const monthEnd = endOfMonth(date)
+      const newClasses = await getClasses(monthStart, monthEnd)
+
+      const parsedClasses = newClasses.map((cls) => ({
+        ...cls,
+        date: parseDate(cls.date),
+        startTime: parseDate(cls.startTime),
+        endTime: parseDate(cls.endTime),
+      }))
+
+      setClasses(parsedClasses)
+      classesCache.current[monthKey] = parsedClasses
     } catch (error) {
       console.error("Error fetching classes:", error)
     } finally {
@@ -24,35 +65,41 @@ export const useClassesData = (initialDate: Date) => {
     }
   }, [])
 
-  useEffect(() => {
-    if (!isSameMonth(selectedDate, monthClasses[0]?.date)) {
-      fetchMonthClasses(selectedDate)
-    }
-  }, [selectedDate, monthClasses, fetchMonthClasses])
+  const selectedDayClasses = useMemo(() => {
+    const timeZone = "America/Argentina/Buenos_Aires"
+    return classes.filter((cls) => {
+      const classDate = toZonedTime(new Date(cls.date), timeZone)
+      const currentDateInZone = toZonedTime(currentDate, timeZone)
+      return (
+        format(classDate, "yyyy-MM-dd") ===
+        format(currentDateInZone, "yyyy-MM-dd")
+      )
+    })
+  }, [classes, currentDate])
 
-  const handleDateChange = (newDate: Date) => {
-    setSelectedDate(newDate)
-    if (!isSameMonth(newDate, selectedDate)) {
-      fetchMonthClasses(newDate)
-    }
-  }
+  const handleDateChange = useCallback(
+    (newDate: Date) => {
+      setCurrentDate(newDate)
+      if (!isSameMonth(newDate, currentDate)) {
+        fetchClasses(newDate)
+      }
+    },
+    [currentDate, fetchClasses]
+  )
 
-  const getDayClasses = (date: Date): ClassWithBookings[] => {
-    return monthClasses.filter(
-      (cls) => cls.date.toDateString() === date.toDateString()
-    )
-  }
-
-  const refreshClasses = async () => {
-    fetchMonthClasses(selectedDate)
-  }
+  const refreshData = useCallback(() => {
+    // Clear the cache for the current month to force a fresh fetch
+    const monthKey = `${currentDate.getFullYear()}-${currentDate.getMonth()}`
+    delete classesCache.current[monthKey]
+    fetchClasses(currentDate)
+  }, [currentDate, fetchClasses])
 
   return {
-    selectedDate,
-    monthClasses,
+    currentDate,
+    currentMonthClasses: classes,
+    selectedDayClasses,
     isLoading,
     handleDateChange,
-    getDayClasses,
-    refreshClasses,
+    refreshData,
   }
 }
