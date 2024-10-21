@@ -3,34 +3,42 @@ import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
 import { Class } from "@prisma/client"
 import { ChevronLeft, ChevronRight } from "lucide-react"
-import React, { useEffect, useState } from "react"
+import React, { useState } from "react"
 import { CaptionProps } from "react-day-picker"
 import { format, isValid } from "date-fns"
 import { toZonedTime } from "date-fns-tz"
+import { BookingWithClass } from "@/components/modules/roles/user/reservas/ReservasPage"
 
 interface ReformerCalendarProps {
   date: Date
   onDateChange: (date: Date) => void
   monthClasses: Class[]
+  monthBookings: BookingWithClass[]
+  userRole: string
 }
 
 export default function ReformerCalendar({
   date,
   onDateChange,
   monthClasses,
+  monthBookings,
+  userRole,
 }: ReformerCalendarProps) {
   const [currentMonth, setCurrentMonth] = useState(date)
 
   const classDays = new Set(
-    monthClasses
-      .map((cls) => {
-        const classDate = new Date(cls.date)
-        // Convert to local timezone before formatting
+    (userRole === "admin" ? monthClasses : monthBookings)
+      .map((item) => {
+        const itemDate = new Date(
+          userRole === "admin"
+            ? (item as Class).date
+            : (item as BookingWithClass).class.date
+        )
         const localDate = toZonedTime(
-          classDate,
+          itemDate,
           "America/Argentina/Buenos_Aires"
         )
-        return isValid(classDate) ? format(localDate, "yyyy-MM-dd") : null
+        return isValid(itemDate) ? format(localDate, "yyyy-MM-dd") : null
       })
       .filter(Boolean)
   )

@@ -1,22 +1,23 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { EditIcon, PlusCircle, TrashIcon } from "lucide-react"
+import { PlusCircle } from "lucide-react"
 import { ClassFormDialog } from "@/components/modules/roles/admin/calendario/ClassFormDialog"
 import { deleteClass } from "@/actions/class"
 import { toast } from "@/components/ui/use-toast"
 import { useState } from "react"
-import { ClassWithBookings } from "@/components/modules/roles/admin/calendario/types"
+import { ClassWithBookings } from "@/components/modules/roles/common/calendario/types"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Skeleton } from "@/components/ui/skeleton"
+import ClassCard from "@/components/modules/roles/common/calendario/ClassCard"
 
 interface ClassesScheduleProps {
   date: Date
   classes: ClassWithBookings[]
   isLoading: boolean
   onClassChange: () => void
+  userRole: string
 }
 
 export default function ClassesSchedule({
@@ -24,6 +25,7 @@ export default function ClassesSchedule({
   classes,
   isLoading,
   onClassChange,
+  userRole,
 }: ClassesScheduleProps) {
   const [timeOfDay, setTimeOfDay] = useState("AM")
   const [category, setCategory] = useState("PILATES")
@@ -114,73 +116,31 @@ export default function ClassesSchedule({
             </div>
           ) : (
             filteredClasses.map((class_) => (
-              <Card key={class_.id} className="border bg-pearlVariant p-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="font-dm_sans font-semibold text-grey_pebble">
-                      {class_.category} - {class_.type.replace("_", " ")}
-                    </h3>
-                    <div className="flex items-center gap-4 text-sm text-gray-500">
-                      <span>
-                        {new Date(class_.startTime).toLocaleTimeString(
-                          "es-ES",
-                          {
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          }
-                        )}{" "}
-                        -{" "}
-                        {new Date(class_.endTime).toLocaleTimeString("es-ES", {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })}
-                      </span>
-                      <span className="flex items-center gap-2">
-                        <span>CUPOS</span>
-                        <span>
-                          {class_.bookings.length}/{class_.maxCapacity}
-                        </span>
-                      </span>
-                    </div>
-                    <p className="mt-1 text-sm text-gray-500">
-                      Instructor: {class_.instructor}
-                    </p>
-                  </div>
-                  <div>
-                    <Button
-                      variant="ghost"
-                      onClick={() => handleDeleteClass(class_.id)}
-                    >
-                      <TrashIcon className="h-4 w-4 text-midnight" />
-                    </Button>
-                    <ClassFormDialog
-                      selectedDate={date}
-                      classToEdit={class_}
-                      onSuccess={onClassChange}
-                      trigger={
-                        <Button variant="ghost">
-                          <EditIcon className="h-4 w-4 text-midnight" />
-                        </Button>
-                      }
-                    />
-                  </div>
-                </div>
-              </Card>
+              <ClassCard
+                key={class_.id}
+                date={date}
+                class_={class_}
+                onClassChange={onClassChange}
+                handleDeleteClass={handleDeleteClass}
+                userRole={userRole}
+              />
             ))
           )}
         </div>
       </ScrollArea>
 
-      <ClassFormDialog
-        selectedDate={date}
-        onSuccess={onClassChange}
-        trigger={
-          <Button className="mt-6 w-full bg-[#8B4513] hover:bg-[#723A0F]">
-            <PlusCircle className="mr-2 h-4 w-4" />
-            Nueva Clase
-          </Button>
-        }
-      />
+      {userRole === "admin" && (
+        <ClassFormDialog
+          selectedDate={date}
+          onSuccess={onClassChange}
+          trigger={
+            <Button className="mt-6 w-full bg-[#8B4513] hover:bg-[#723A0F]">
+              <PlusCircle className="mr-2 h-4 w-4" />
+              Nueva Clase
+            </Button>
+          }
+        />
+      )}
     </div>
   )
 }

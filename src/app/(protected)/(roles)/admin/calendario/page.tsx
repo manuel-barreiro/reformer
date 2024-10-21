@@ -1,5 +1,8 @@
-import CalendarPage from "@/components/modules/roles/admin/calendario/CalendarPage"
+import CalendarPage from "@/components/modules/roles/common/calendario/CalendarPage"
+import { auth } from "@/auth"
 
 export default async function page() {
-  return <CalendarPage />
+  const session = await auth()
+  const userRole = session?.user?.role
+  return <CalendarPage userRole={userRole ?? "user"} />
 }

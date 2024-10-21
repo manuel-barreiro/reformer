@@ -1,5 +1,5 @@
 "use client"
-import { useCallback, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
@@ -28,14 +28,12 @@ import {
 } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
 import { toast } from "@/components/ui/use-toast"
-import { Class } from "@prisma/client"
 import { createClass, updateClass } from "@/actions/class"
 import { parse, set } from "date-fns"
-import { fromZonedTime, format, toZonedTime } from "date-fns-tz"
+import { toZonedTime } from "date-fns-tz"
 import React from "react"
-import { ClassWithBookings } from "./types"
+import { ClassWithBookings } from "@/components/modules/roles/common/calendario/types"
 
-const timeZone = "America/Argentina/Buenos_Aires"
 const yogaTypes = ["VINYASA", "HATHA", "BALANCE"]
 const pilatesTypes = ["STRENGTH_CORE", "LOWER_BODY", "FULL_BODY"]
 
