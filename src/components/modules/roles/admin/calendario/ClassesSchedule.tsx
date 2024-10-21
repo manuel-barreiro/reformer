@@ -3,24 +3,14 @@
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import {
-  Edit,
-  EditIcon,
-  MoreVertical,
-  PlusCircle,
-  TrashIcon,
-} from "lucide-react"
+import { EditIcon, PlusCircle, TrashIcon } from "lucide-react"
 import { ClassFormDialog } from "@/components/modules/roles/admin/calendario/ClassFormDialog"
 import { deleteClass } from "@/actions/class"
 import { toast } from "@/components/ui/use-toast"
 import { useState } from "react"
 import { ClassWithBookings } from "./useClassesData"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import { Skeleton } from "@/components/ui/skeleton"
 
 interface ClassesScheduleProps {
   date: Date
@@ -70,54 +60,57 @@ export default function ClassesSchedule({
     }
   }
 
-  // if (isLoading) {
-  //   return (
-  //     <div className="flex h-full w-full items-center justify-center">
-  //       <div className="h-32 w-32 animate-spin rounded-full border-b-2 border-gray-900"></div>
-  //     </div>
-  //   )
-  // }
-
   return (
-    <div className="flex h-full w-full flex-col gap-4 text-grey_pebble">
-      <div className="flex items-center justify-between gap-5 font-dm_sans">
-        <div className="flex items-baseline gap-2 text-xl">
-          <span className="font-semibold capitalize">
-            {date?.toLocaleDateString("es-ES", {
-              weekday: "long",
-            })}
-          </span>
-          <span className="">
-            {date?.toLocaleDateString("es-ES", {
-              day: "numeric",
-              month: "numeric",
-            })}
-          </span>
+    <div className="flex w-full flex-col justify-between gap-4 text-grey_pebble">
+      <div className="flex flex-col gap-3">
+        <div className="flex h-full items-center justify-between gap-5 font-dm_sans">
+          <div className="flex items-baseline gap-2 text-xl">
+            <span className="font-semibold capitalize">
+              {date?.toLocaleDateString("es-ES", {
+                weekday: "long",
+              })}
+            </span>
+            <span className="">
+              {date?.toLocaleDateString("es-ES", {
+                day: "numeric",
+                month: "numeric",
+              })}
+            </span>
+          </div>
+          <Tabs
+            value={timeOfDay}
+            onValueChange={setTimeOfDay}
+            className="w-full"
+          >
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="AM">AM</TabsTrigger>
+              <TabsTrigger value="PM">PM</TabsTrigger>
+            </TabsList>
+          </Tabs>
         </div>
-        <Tabs value={timeOfDay} onValueChange={setTimeOfDay} className="w-full">
+
+        <Tabs value={category} onValueChange={setCategory} className="w-full">
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="AM">AM</TabsTrigger>
-            <TabsTrigger value="PM">PM</TabsTrigger>
+            <TabsTrigger value="PILATES">Pilates</TabsTrigger>
+            <TabsTrigger value="YOGA">Yoga</TabsTrigger>
           </TabsList>
         </Tabs>
       </div>
 
-      <Tabs value={category} onValueChange={setCategory} className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="PILATES">Pilates</TabsTrigger>
-          <TabsTrigger value="YOGA">Yoga</TabsTrigger>
-        </TabsList>
-      </Tabs>
-
-      <div>
-        <div className="space-y-4">
+      <ScrollArea className="w-full overflow-y-auto pr-4 md:h-96">
+        <div className="space-y-2 py-5">
           {isLoading ? (
-            <div className="flex h-full w-full items-center justify-center">
-              <div className="h-32 w-32 animate-spin rounded-full border-b-2 border-gray-900" />
-            </div>
+            Array(3)
+              .fill(null)
+              .map((_, index) => (
+                <Skeleton
+                  key={index}
+                  className="h-24 w-full rounded-lg bg-pearlVariant"
+                />
+              ))
           ) : filteredClasses.length === 0 ? (
-            <div className="text-center text-gray-500">
-              No classes scheduled for this time period.
+            <div className="my-auto text-center text-gray-500">
+              No se encontraron resultados.
             </div>
           ) : (
             filteredClasses.map((class_) => (
@@ -176,18 +169,18 @@ export default function ClassesSchedule({
             ))
           )}
         </div>
+      </ScrollArea>
 
-        <ClassFormDialog
-          selectedDate={date}
-          onSuccess={onClassChange}
-          trigger={
-            <Button className="mt-6 w-full bg-[#8B4513] hover:bg-[#723A0F]">
-              <PlusCircle className="mr-2 h-4 w-4" />
-              Add Class
-            </Button>
-          }
-        />
-      </div>
+      <ClassFormDialog
+        selectedDate={date}
+        onSuccess={onClassChange}
+        trigger={
+          <Button className="mt-6 w-full bg-[#8B4513] hover:bg-[#723A0F]">
+            <PlusCircle className="mr-2 h-4 w-4" />
+            Nueva Clase
+          </Button>
+        }
+      />
     </div>
   )
 }

@@ -63,7 +63,7 @@ const ClientCalendarPage = ({
   }, [date, fetchDayClasses, fetchMonthClasses])
 
   return (
-    <div className="flex flex-col gap-10 md:flex-row md:pl-10 lg:items-stretch">
+    <div className="flex flex-col justify-items-stretch gap-10 md:flex-row md:pl-10">
       <ReformerCalendar
         date={date}
         onDateChange={handleDateChange}
