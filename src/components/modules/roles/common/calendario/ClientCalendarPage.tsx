@@ -4,16 +4,13 @@ import ClassesSchedule from "@/components/modules/roles/common/calendario/Classe
 import { Booking, Class } from "@prisma/client"
 import { useClassesData } from "@/components/modules/roles/common/calendario/useClassesData"
 import { BookingWithClass } from "@/components/modules/roles/user/reservas/ReservasPage"
+import { ClassWithBookings } from "./types"
 
 interface ClientCalendarPageProps {
   initialDate: Date
-  initialClasses: (Class & { bookings: Booking[] })[]
+  initialClasses: ClassWithBookings[]
   userRole: string
   userBookings: BookingWithClass[]
-}
-
-export interface ClassWithBookings extends Class {
-  bookings: Booking[]
 }
 
 const ClientCalendarPage = ({
@@ -28,6 +25,7 @@ const ClientCalendarPage = ({
     currentMonthBookings,
     selectedDayClasses,
     isLoading,
+    updateClassBookings,
     handleDateChange,
     refreshData,
   } = useClassesData(initialDate, initialClasses, userBookings, userRole)
@@ -42,6 +40,7 @@ const ClientCalendarPage = ({
         userRole={userRole}
       />
       <ClassesSchedule
+        updateClassBookings={updateClassBookings}
         date={currentDate}
         classes={selectedDayClasses}
         isLoading={isLoading}

@@ -5,14 +5,15 @@ import { revalidatePath } from "next/cache"
 import { auth } from "@/auth"
 import { addHours, isBefore } from "date-fns"
 
-export async function bookClass(classId: string) {
+export async function bookClass(classId: string, adminSelectedUserId?: string) {
   try {
     const session = await auth()
     if (!session || !session.user) {
       throw new Error("User not authenticated")
     }
 
-    const userId = session.user.id
+    // For admin bookings, use the provided userId, otherwise use the authenticated user's ID
+    const userId = adminSelectedUserId || session.user.id
     if (!userId) {
       throw new Error("User ID is undefined")
     }
@@ -27,7 +28,7 @@ export async function bookClass(classId: string) {
     })
 
     if (existingBooking) {
-      throw new Error("You have already booked this class")
+      throw new Error("User has already booked this class")
     }
 
     // Check if the class is full
@@ -55,6 +56,8 @@ export async function bookClass(classId: string) {
       orderBy: { expirationDate: "asc" }, // Use the package expiring soonest
     })
 
+    console.log("activePurchasedPackage", activePurchasedPackage)
+
     if (!activePurchasedPackage) {
       throw new Error("No active package with remaining classes found")
     }
@@ -67,9 +70,10 @@ export async function bookClass(classId: string) {
         purchasedPackageId: activePurchasedPackage.id,
         status: "confirmed",
       },
+      include: {
+        user: true, // Include user details in the response
+      },
     })
-
-    console.log("Booking created", booking)
 
     // Decrease the remaining classes in the purchased package
     await prisma.purchasedPackage.update({
@@ -81,7 +85,9 @@ export async function bookClass(classId: string) {
       },
     })
 
-    revalidatePath("/calendario")
+    adminSelectedUserId
+      ? revalidatePath("/admin/calendario")
+      : revalidatePath("/calendario")
     return { success: true, booking }
   } catch (error) {
     if (error instanceof Error) {
@@ -213,7 +219,7 @@ export async function deleteBooking(bookingId: string) {
     })
 
     if (!booking) {
-      return { success: false, error: "Booking not found" }
+      return { success: false, error: "No se encontró la reserva" }
     }
 
     // Start a transaction to handle both the booking deletion and package update
@@ -236,7 +242,11 @@ export async function deleteBooking(bookingId: string) {
 
     return { success: true }
   } catch (error) {
-    console.error("Error deleting booking:", error)
-    return { success: false, error: "Failed to delete booking" }
+    console.error("Error borrando reserva:", error)
+    return {
+      success: false,
+      error:
+        error instanceof Error ? error.message : "Error desconocido al borrar",
+    }
   }
 }

@@ -64,7 +64,7 @@ export function UserSearch({ onSelectUser, selectedUser }: UserSearchProps) {
   }
 
   return (
-    <div className="relative border-rust/50 bg-pearlVariant font-semibold text-grey_pebble/60">
+    <div className="relative rounded-md border-rust/50 bg-pearlVariant font-semibold text-grey_pebble/60">
       {selectedUser ? (
         <div className="flex items-center justify-between rounded-md border border-rust p-2">
           <span className="font-marcellus">

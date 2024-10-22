@@ -23,10 +23,13 @@ export default function ActionDialog({
   buttons,
   className,
   closeOnTop,
+  open,
+  onOpenChange,
+  disabled,
 }: {
   trigger: JSX.Element
   content?: JSX.Element
-  title: string
+  title: string | JSX.Element
   description?: string | JSX.Element
   action: () => void
   buttonText: string
@@ -34,13 +37,16 @@ export default function ActionDialog({
   buttons: boolean
   className?: string
   closeOnTop?: boolean
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
+  disabled?: boolean
 }) {
   return (
-    <AlertDialog>
+    <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogTrigger asChild>{trigger}</AlertDialogTrigger>
       <AlertDialogContent className={className}>
         <AlertDialogHeader>
-          <div className="flex items-center justify-between">
+          <div className="flex items-start justify-between">
             <AlertDialogTitle>{title}</AlertDialogTitle>
             {closeOnTop && (
               <AlertDialogCancel

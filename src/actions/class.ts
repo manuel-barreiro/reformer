@@ -102,15 +102,55 @@ export async function getClasses(startDate: Date, endDate: Date) {
 
 export async function deleteClass(classId: string) {
   try {
-    await prisma.class.update({
-      where: { id: classId },
-      data: { isActive: false },
+    // Start a transaction to handle both the class deletion and booking refunds
+    await prisma.$transaction(async (tx) => {
+      // Get all confirmed bookings for this class
+      const confirmedBookings = await tx.booking.findMany({
+        where: {
+          classId: classId,
+          status: "confirmed",
+        },
+        include: {
+          purchasedPackage: true,
+        },
+      })
+
+      // For each confirmed booking, increment the remaining classes in the associated package
+      for (const booking of confirmedBookings) {
+        await tx.purchasedPackage.update({
+          where: {
+            id: booking.purchasedPackageId,
+          },
+          data: {
+            remainingClasses: {
+              increment: 1,
+            },
+          },
+        })
+
+        // Update booking status to cancelled
+        await tx.booking.update({
+          where: { id: booking.id },
+          data: { status: "cancelled" },
+        })
+      }
+
+      // Deactivate the class (soft delete)
+      await tx.class.update({
+        where: { id: classId },
+        data: { isActive: false },
+      })
     })
 
+    revalidatePath("/admin/calendario")
     return { success: true }
   } catch (error) {
-    console.error("Error deleting class:", error)
-    return { success: false, error: "Failed to delete class" }
+    console.error("Error al eliminar clase", error)
+    return {
+      success: false,
+      error:
+        error instanceof Error ? error.message : "Error desconocido al borrar",
+    }
   }
 }
 

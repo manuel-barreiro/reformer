@@ -10,11 +10,15 @@ import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table"
 import { bookClass } from "@/actions/booking-actions"
 import { toast } from "@/components/ui/use-toast"
 import ClassAttendantsDialog from "./ClassAttendantsDialog"
+import { useCallback } from "react"
+import { Progress } from "@/components/ui/progress"
+import { Span } from "next/dist/trace"
 
 interface ClassCardProps {
   date: Date
   class_: ClassWithBookings
   onClassChange: () => void
+  updateClassBookings: (classId: string, updatedBookings: any[]) => void
   handleDeleteClass: (classId: string) => Promise<void>
   userRole: string
 }
@@ -23,6 +27,7 @@ export default function ClassCard({
   date,
   class_,
   onClassChange,
+  updateClassBookings, // Add this new prop
   handleDeleteClass,
   userRole,
 }: ClassCardProps) {
@@ -61,14 +66,32 @@ export default function ClassCard({
     }
   }
 
+  const handleBookingChange = useCallback(
+    (updatedBookings: any[]) => {
+      updateClassBookings(class_.id, updatedBookings)
+    },
+    [class_.id, updateClassBookings]
+  )
+
   const confirmedBookings = class_.bookings.filter(
     (booking) => booking.status === "confirmed"
   )
 
   return (
-    <Card key={class_.id} className="border bg-pearlVariant p-4">
+    <Card
+      key={class_.id}
+      className="relative animate-fade-down border bg-pearlVariant px-4 py-2"
+    >
       <div className="flex items-center justify-between gap-6">
         <div className="w-auto">
+          {userRole === "admin" && (
+            <p className="flex items-center gap-2 text-sm">
+              <Users className="h-4 w-4 text-midnight" />
+              <span>
+                {confirmedBookings.length}/{class_.maxCapacity}
+              </span>
+            </p>
+          )}
           <h3 className="font-dm_sans font-semibold text-grey_pebble">
             {class_.category} - {class_.type.replace("_", " ")}
           </h3>
@@ -84,14 +107,6 @@ export default function ClassCard({
                 minute: "2-digit",
               })}
             </span>
-            {userRole === "admin" && (
-              <span className="flex items-center gap-2">
-                <Users className="h-4 w-4 text-midnight" />
-                <span>
-                  {confirmedBookings.length}/{class_.maxCapacity}
-                </span>
-              </span>
-            )}
           </div>
           <p className="mt-1 text-sm text-gray-500">
             Instructor: {class_.instructor}
@@ -107,7 +122,16 @@ export default function ClassCard({
                 </Button>
               }
               title="Eliminar Clase"
-              description="¿Deseas eliminar esta clase? Esta acción no se puede revertir."
+              description={
+                <div className="flex max-w-md flex-col gap-1">
+                  <span>¿Estás seguro de que deseas eliminar esta clase?</span>
+                  <span>• Esta acción no se puede deshacer.</span>
+                  <span>
+                    • Se re-asignará la clase a los paquetes activos de los
+                    usuarios que reservaron esta clase.{" "}
+                  </span>
+                </div>
+              }
               action={() => handleDeleteClass(class_.id)}
               buttonText="Eliminar"
               icon={<TrashIcon className="h-4 w-4 text-pearl" />}
@@ -124,7 +148,8 @@ export default function ClassCard({
             />
             <ClassAttendantsDialog
               classBookings={confirmedBookings}
-              onBookingChange={onClassChange}
+              onBookingChange={handleBookingChange} // Use the new handler
+              class_={class_}
             />
           </div>
         )}
@@ -163,6 +188,10 @@ export default function ClassCard({
           </div>
         )}
       </div>
+      <Progress
+        value={(confirmedBookings.length / class_.maxCapacity) * 100}
+        className="absolute left-0 right-0 top-0 h-1 w-full rounded-b-none rounded-t-md"
+      />
     </Card>
   )
 }

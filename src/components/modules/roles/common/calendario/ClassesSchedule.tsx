@@ -17,6 +17,7 @@ interface ClassesScheduleProps {
   classes: ClassWithBookings[]
   isLoading: boolean
   onClassChange: () => void
+  updateClassBookings: (classId: string, updatedBookings: any[]) => void
   userRole: string
 }
 
@@ -25,6 +26,7 @@ export default function ClassesSchedule({
   classes,
   isLoading,
   onClassChange,
+  updateClassBookings,
   userRole,
 }: ClassesScheduleProps) {
   const [timeOfDay, setTimeOfDay] = useState("AM")
@@ -121,6 +123,7 @@ export default function ClassesSchedule({
                 date={date}
                 class_={class_}
                 onClassChange={onClassChange}
+                updateClassBookings={updateClassBookings}
                 handleDeleteClass={handleDeleteClass}
                 userRole={userRole}
               />

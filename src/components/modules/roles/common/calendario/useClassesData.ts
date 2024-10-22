@@ -9,7 +9,7 @@ import {
 } from "date-fns"
 import { toZonedTime } from "date-fns-tz"
 import { getClasses } from "@/actions/class"
-import { ClassWithBookings } from "@/components/modules/roles/common/calendario/ClientCalendarPage"
+import { ClassWithBookings } from "@/components/modules/roles/common/calendario/types"
 import { BookingWithClass } from "@/components/modules/roles/user/reservas/ReservasPage"
 import { getUserBookingsInRange } from "@/actions/booking-actions"
 
@@ -32,22 +32,21 @@ export function useClassesData(
   const classesCache = useRef<ClassesCache>({})
 
   const parseDate = (date: Date | string): Date => {
-    const timeZone = "America/Argentina/Buenos_Aires"
     if (date instanceof Date) {
       return isValid(date)
-        ? toZonedTime(date, timeZone)
-        : toZonedTime(new Date(), timeZone)
+        ? toZonedTime(date, TIMEZONE)
+        : toZonedTime(new Date(), TIMEZONE)
     }
     const parsedDate = parseISO(date)
     return isValid(parsedDate)
-      ? toZonedTime(parsedDate, timeZone)
-      : toZonedTime(new Date(), timeZone)
+      ? toZonedTime(parsedDate, TIMEZONE)
+      : toZonedTime(new Date(), TIMEZONE)
   }
 
   const fetchClasses = useCallback(
     async (date: Date) => {
       setIsLoading(true)
-      const monthKey = `${date.getFullYear()}-${date.getMonth()}`
+      const monthKey = format(date, "yyyy-MM")
 
       try {
         const monthStart = startOfMonth(date)
@@ -64,12 +63,10 @@ export function useClassesData(
         setClasses(parsedClasses)
         classesCache.current[monthKey] = parsedClasses
 
-        // Fetch user bookings for the month only if the user is not an admin
         if (userRole !== "admin") {
           const newBookings = await getUserBookingsInRange(monthStart, monthEnd)
           setBookings(newBookings)
         } else {
-          // Clear bookings for admin users
           setBookings([])
         }
       } catch (error) {
@@ -81,11 +78,22 @@ export function useClassesData(
     [userRole]
   )
 
+  // New method to update a specific class's bookings
+  const updateClassBookings = useCallback(
+    (classId: string, updatedBookings: any[]) => {
+      setClasses((prevClasses) =>
+        prevClasses.map((cls) =>
+          cls.id === classId ? { ...cls, bookings: updatedBookings } : cls
+        )
+      )
+    },
+    []
+  )
+
   const selectedDayClasses = useMemo(() => {
-    const timeZone = "America/Argentina/Buenos_Aires"
     return classes.filter((cls) => {
-      const classDate = toZonedTime(new Date(cls.date), timeZone)
-      const currentDateInZone = toZonedTime(currentDate, timeZone)
+      const classDate = toZonedTime(new Date(cls.date), TIMEZONE)
+      const currentDateInZone = toZonedTime(currentDate, TIMEZONE)
       return (
         format(classDate, "yyyy-MM-dd") ===
         format(currentDateInZone, "yyyy-MM-dd")
@@ -104,8 +112,7 @@ export function useClassesData(
   )
 
   const refreshData = useCallback(() => {
-    // Clear the cache for the current month to force a fresh fetch
-    const monthKey = `${currentDate.getFullYear()}-${currentDate.getMonth()}`
+    const monthKey = format(currentDate, "yyyy-MM")
     delete classesCache.current[monthKey]
     fetchClasses(currentDate)
   }, [currentDate, fetchClasses])
@@ -118,5 +125,6 @@ export function useClassesData(
     isLoading,
     handleDateChange,
     refreshData,
+    updateClassBookings, // Export the new method
   }
 }
