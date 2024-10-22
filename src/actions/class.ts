@@ -77,7 +77,16 @@ export async function getClasses(startDate: Date, endDate: Date) {
         ],
       },
       include: {
-        bookings: true, // Include bookings to show capacity
+        bookings: {
+          include: {
+            user: {
+              select: {
+                name: true,
+                email: true,
+              },
+            },
+          },
+        }, // Include bookings to show capacity
       },
       orderBy: {
         startTime: "asc",

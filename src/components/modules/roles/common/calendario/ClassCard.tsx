@@ -9,18 +9,19 @@ import ActionDialog from "@/components/modules/roles/common/ActionDialog"
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table"
 import { bookClass } from "@/actions/booking-actions"
 import { toast } from "@/components/ui/use-toast"
+import ClassAttendantsDialog from "./ClassAttendantsDialog"
 
 interface ClassCardProps {
-  class_: ClassWithBookings
   date: Date
+  class_: ClassWithBookings
   onClassChange: () => void
-  handleDeleteClass: (classId: string) => void
+  handleDeleteClass: (classId: string) => Promise<void>
   userRole: string
 }
 
 export default function ClassCard({
-  class_,
   date,
+  class_,
   onClassChange,
   handleDeleteClass,
   userRole,
@@ -59,6 +60,11 @@ export default function ClassCard({
       })
     }
   }
+
+  const confirmedBookings = class_.bookings.filter(
+    (booking) => booking.status === "confirmed"
+  )
+
   return (
     <Card key={class_.id} className="border bg-pearlVariant p-4">
       <div className="flex items-center justify-between gap-6">
@@ -82,12 +88,7 @@ export default function ClassCard({
               <span className="flex items-center gap-2">
                 <Users className="h-4 w-4 text-midnight" />
                 <span>
-                  {
-                    class_.bookings.filter(
-                      (booking) => booking.status === "confirmed"
-                    ).length
-                  }
-                  /{class_.maxCapacity}
+                  {confirmedBookings.length}/{class_.maxCapacity}
                 </span>
               </span>
             )}
@@ -99,6 +100,7 @@ export default function ClassCard({
         {userRole === "admin" && (
           <div className="flex w-auto flex-col">
             <ActionDialog
+              buttons={true}
               trigger={
                 <Button variant="ghost">
                   <TrashIcon className="h-4 w-4 text-midnight" />
@@ -120,11 +122,16 @@ export default function ClassCard({
                 </Button>
               }
             />
+            <ClassAttendantsDialog
+              classBookings={confirmedBookings}
+              onBookingChange={onClassChange}
+            />
           </div>
         )}
         {userRole === "user" && (
           <div className="flex w-auto flex-col">
             <ActionDialog
+              buttons={true}
               trigger={
                 <Button variant="ghost">
                   <CalendarPlus className="h-4 w-4 text-midnight" />

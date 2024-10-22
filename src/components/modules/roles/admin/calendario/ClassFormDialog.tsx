@@ -28,11 +28,14 @@ import {
 } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
 import { toast } from "@/components/ui/use-toast"
+import { Class } from "@prisma/client"
 import { createClass, updateClass } from "@/actions/class"
 import { parse, set } from "date-fns"
 import { toZonedTime } from "date-fns-tz"
 import React from "react"
 import { ClassWithBookings } from "@/components/modules/roles/common/calendario/types"
+import { TimeInput } from "@/components/modules/roles/common/TimeInput"
+import { NumberInput } from "@/components/modules/roles/common/NumberInput"
 
 const yogaTypes = ["VINYASA", "HATHA", "BALANCE"]
 const pilatesTypes = ["STRENGTH_CORE", "LOWER_BODY", "FULL_BODY"]
@@ -61,14 +64,41 @@ interface ClassFormDialogProps {
   classToEdit?: ClassWithBookings
   onSuccess: () => void
   trigger: React.ReactNode
+  currentFilters?: {
+    timeOfDay: string
+    category: string
+  }
 }
 
 export const ClassFormDialog = React.forwardRef<
   HTMLDivElement,
   ClassFormDialogProps
->(({ selectedDate, classToEdit, trigger, onSuccess }, ref) => {
+>(({ selectedDate, classToEdit, trigger, onSuccess, currentFilters }, ref) => {
   const [isOpen, setIsOpen] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
+
+  const getDefaultCategory = (): "YOGA" | "PILATES" => {
+    if (
+      currentFilters?.category === "YOGA" ||
+      currentFilters?.category === "PILATES"
+    ) {
+      return currentFilters.category
+    }
+    return "YOGA" // Default to YOGA if category is not set or invalid
+  }
+
+  const getDefaultType = (
+    category: "YOGA" | "PILATES"
+  ):
+    | "VINYASA"
+    | "STRENGTH_CORE"
+    | "HATHA"
+    | "BALANCE"
+    | "LOWER_BODY"
+    | "FULL_BODY" => {
+    if (category === "YOGA") return "VINYASA"
+    return "STRENGTH_CORE"
+  }
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -91,11 +121,11 @@ export const ClassFormDialog = React.forwardRef<
           maxCapacity: classToEdit.maxCapacity,
         }
       : {
-          category: "YOGA",
-          type: "VINYASA",
+          category: getDefaultCategory(),
+          type: getDefaultType(getDefaultCategory()),
           date: selectedDate.toISOString().split("T")[0],
-          startTime: "",
-          endTime: "",
+          startTime: currentFilters?.timeOfDay === "AM" ? "09:00" : "13:00",
+          endTime: currentFilters?.timeOfDay === "AM" ? "10:00" : "14:00",
           instructor: "",
           maxCapacity: 8,
         },
@@ -183,27 +213,29 @@ export const ClassFormDialog = React.forwardRef<
               maxCapacity: classToEdit.maxCapacity,
             }
           : {
-              category: "YOGA",
-              type: "VINYASA",
+              category: getDefaultCategory(),
+              type: getDefaultType(getDefaultCategory()),
               date: selectedDate.toISOString().split("T")[0],
-              startTime: "",
-              endTime: "",
+              startTime: currentFilters?.timeOfDay === "AM" ? "09:00" : "13:00",
+              endTime: currentFilters?.timeOfDay === "AM" ? "10:00" : "14:00",
               instructor: "",
               maxCapacity: 8,
             }
       )
     }
-  }, [isOpen, classToEdit, selectedDate, form])
+  }, [isOpen, classToEdit, selectedDate, form, currentFilters])
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        {trigger || <Button>{classToEdit ? "Edit Class" : "Add Class"}</Button>}
+        {trigger || (
+          <Button>{classToEdit ? "Editar Clase" : "Crear Nueva Clase"}</Button>
+        )}
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>
-            {classToEdit ? "Edit Class" : "Create New Class"}
+            {classToEdit ? "Editar Clase" : "Crear Nueva Clase"}
           </DialogTitle>
         </DialogHeader>
         <Form {...form}>
@@ -216,19 +248,29 @@ export const ClassFormDialog = React.forwardRef<
               name="category"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Category</FormLabel>
+                  <FormLabel>Categoría</FormLabel>
                   <Select
                     onValueChange={field.onChange}
                     defaultValue={field.value}
                   >
                     <FormControl>
-                      <SelectTrigger>
+                      <SelectTrigger className="border-rust/50 bg-pearlVariant font-semibold text-grey_pebble/60">
                         <SelectValue placeholder="Select category" />
                       </SelectTrigger>
                     </FormControl>
-                    <SelectContent>
-                      <SelectItem value="YOGA">Yoga</SelectItem>
-                      <SelectItem value="PILATES">Pilates</SelectItem>
+                    <SelectContent className="bg-grey_pebble text-pearl">
+                      <SelectItem
+                        className="border-b border-pearl/50 uppercase hover:!bg-pearlVariant3"
+                        value="YOGA"
+                      >
+                        Yoga
+                      </SelectItem>
+                      <SelectItem
+                        className="border-b border-pearl/50 uppercase hover:!bg-pearlVariant3"
+                        value="PILATES"
+                      >
+                        Pilates
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -241,25 +283,33 @@ export const ClassFormDialog = React.forwardRef<
               name="type"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Type</FormLabel>
+                  <FormLabel>Subcategoría</FormLabel>
                   <Select
                     onValueChange={field.onChange}
                     defaultValue={field.value}
                   >
                     <FormControl>
-                      <SelectTrigger>
+                      <SelectTrigger className="border-rust/50 bg-pearlVariant font-semibold text-grey_pebble/60">
                         <SelectValue placeholder="Select type" />
                       </SelectTrigger>
                     </FormControl>
-                    <SelectContent>
+                    <SelectContent className="bg-grey_pebble text-pearl">
                       {selectedCategory === "YOGA"
                         ? yogaTypes.map((type) => (
-                            <SelectItem key={type} value={type}>
+                            <SelectItem
+                              key={type}
+                              value={type}
+                              className="border-b border-pearl/50 uppercase hover:!bg-pearlVariant3"
+                            >
                               {type.replace("_", " ")}
                             </SelectItem>
                           ))
                         : pilatesTypes.map((type) => (
-                            <SelectItem key={type} value={type}>
+                            <SelectItem
+                              key={type}
+                              value={type}
+                              className="border-b border-pearl/50 uppercase hover:!bg-pearlVariant3"
+                            >
                               {type.replace("_", " ")}
                             </SelectItem>
                           ))}
@@ -275,9 +325,14 @@ export const ClassFormDialog = React.forwardRef<
               name="date"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Date</FormLabel>
+                  <FormLabel>Fecha</FormLabel>
                   <FormControl>
-                    <Input type="date" {...field} />
+                    <Input
+                      className="border border-rust/50 bg-pearlVariant font-semibold text-grey_pebble/60"
+                      disabled={classToEdit ? false : true}
+                      type="date"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -290,9 +345,9 @@ export const ClassFormDialog = React.forwardRef<
                 name="startTime"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Start Time</FormLabel>
+                    <FormLabel>Comienzo</FormLabel>
                     <FormControl>
-                      <Input type="time" {...field} />
+                      <TimeInput {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -304,9 +359,13 @@ export const ClassFormDialog = React.forwardRef<
                 name="endTime"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>End Time</FormLabel>
+                    <FormLabel>Finalización</FormLabel>
                     <FormControl>
-                      <Input type="time" {...field} />
+                      <TimeInput
+                        {...field}
+                        isEndTime
+                        startTime={form.watch("startTime")}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -321,7 +380,10 @@ export const ClassFormDialog = React.forwardRef<
                 <FormItem>
                   <FormLabel>Instructor</FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Input
+                      className="border border-rust/50 bg-pearlVariant font-semibold text-grey_pebble/60"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -335,19 +397,28 @@ export const ClassFormDialog = React.forwardRef<
                 <FormItem>
                   <FormLabel>Max Capacity</FormLabel>
                   <FormControl>
-                    <Input type="number" {...field} />
+                    <NumberInput
+                      value={field.value}
+                      onChange={(newValue) => field.onChange(newValue)}
+                      min={1}
+                      max={50}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
 
-            <Button type="submit" className="w-full" disabled={isSubmitting}>
+            <Button
+              type="submit"
+              className="w-full bg-rust py-6 font-dm_mono text-pearl duration-300 ease-in-out hover:bg-rust/90"
+              disabled={isSubmitting}
+            >
               {isSubmitting
-                ? "Processing..."
+                ? "Procesando..."
                 : classToEdit
-                  ? "Update Class"
-                  : "Create Class"}
+                  ? "Editar Clase"
+                  : "Crear Clase"}
             </Button>
           </form>
         </Form>

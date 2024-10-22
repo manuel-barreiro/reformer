@@ -202,3 +202,41 @@ export async function cancelBooking(bookingId: string) {
     return { success: false, error: "An unknown error occurred" }
   }
 }
+
+export async function deleteBooking(bookingId: string) {
+  try {
+    const booking = await prisma.booking.findUnique({
+      where: { id: bookingId },
+      include: {
+        purchasedPackage: true,
+      },
+    })
+
+    if (!booking) {
+      return { success: false, error: "Booking not found" }
+    }
+
+    // Start a transaction to handle both the booking deletion and package update
+    const result = await prisma.$transaction(async (tx) => {
+      // Delete the booking
+      await tx.booking.delete({
+        where: { id: bookingId },
+      })
+
+      // Update the remaining classes in the purchased package
+      await tx.purchasedPackage.update({
+        where: { id: booking.purchasedPackageId },
+        data: {
+          remainingClasses: {
+            increment: 1,
+          },
+        },
+      })
+    })
+
+    return { success: true }
+  } catch (error) {
+    console.error("Error deleting booking:", error)
+    return { success: false, error: "Failed to delete booking" }
+  }
+}

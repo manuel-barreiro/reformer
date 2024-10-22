@@ -131,6 +131,10 @@ export default function ClassesSchedule({
 
       {userRole === "admin" && (
         <ClassFormDialog
+          currentFilters={{
+            timeOfDay: timeOfDay,
+            category: category,
+          }}
           selectedDate={date}
           onSuccess={onClassChange}
           trigger={

@@ -9,6 +9,8 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
+import { Button } from "@/components/ui/button"
+import { X } from "lucide-react"
 
 export default function ActionDialog({
   trigger,
@@ -18,64 +20,55 @@ export default function ActionDialog({
   action,
   buttonText,
   icon,
+  buttons,
+  className,
+  closeOnTop,
 }: {
   trigger: JSX.Element
   content?: JSX.Element
   title: string
-  description?: string
+  description?: string | JSX.Element
   action: () => void
   buttonText: string
   icon?: JSX.Element
+  buttons: boolean
+  className?: string
+  closeOnTop?: boolean
 }) {
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>{trigger}</AlertDialogTrigger>
-      <AlertDialogContent>
+      <AlertDialogContent className={className}>
         <AlertDialogHeader>
-          <AlertDialogTitle>{title}</AlertDialogTitle>
+          <div className="flex items-center justify-between">
+            <AlertDialogTitle>{title}</AlertDialogTitle>
+            {closeOnTop && (
+              <AlertDialogCancel
+                asChild
+                className="!hover:bg-transparent !bg-transparent"
+              >
+                <button className="!hover:bg-transparent max-w-12 !bg-transparent text-xl font-bold">
+                  <X className="h-4 w-4 text-midnight" />
+                </button>
+              </AlertDialogCancel>
+            )}
+          </div>
           <AlertDialogDescription>{description}</AlertDialogDescription>
         </AlertDialogHeader>
         {content}
-        <AlertDialogFooter>
-          <AlertDialogCancel>Cancelar</AlertDialogCancel>
-          <AlertDialogAction
-            onClick={action}
-            className="flex items-center gap-2"
-          >
-            {icon}
-            <span>{buttonText}</span>
-          </AlertDialogAction>
-        </AlertDialogFooter>
+        {buttons && (
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={action}
+              className="flex items-center gap-2"
+            >
+              {icon}
+              <span>{buttonText}</span>
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        )}
       </AlertDialogContent>
     </AlertDialog>
-    // <Dialog>
-    //   <DialogTrigger asChild>{trigger}</DialogTrigger>
-    //   <DialogContent className="max-w-xs rounded-xl bg-pearl text-midnight sm:max-w-[425px]">
-    //     <DialogHeader>
-    //       <DialogTitle className="font-dm_sans">¿Estás seguro?</DialogTitle>
-    //       <DialogDescription>
-    //         Esta acción no se puede revertir.
-    //       </DialogDescription>
-    //     </DialogHeader>
-    //     <div className="flex flex-col items-center gap-1">
-    //       <DialogClose className="w-full">
-    //         <Button
-    //           type="submit"
-    //           className="w-full bg-rust py-6 font-dm_mono text-pearl duration-300 ease-in-out hover:bg-rust/90"
-    //         >
-    //           CANCELAR RESERVA
-    //         </Button>
-    //       </DialogClose>
-    //       <DialogClose className="w-full">
-    //         <Button
-    //           type="submit"
-    //           className="w-full bg-midnight py-6 font-dm_mono text-pearl duration-300 ease-in-out"
-    //         >
-    //           VOLVER
-    //         </Button>
-    //       </DialogClose>
-    //     </div>
-    //   </DialogContent>
-    // </Dialog>
   )
 }
