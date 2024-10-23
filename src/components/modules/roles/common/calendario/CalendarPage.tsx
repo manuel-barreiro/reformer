@@ -5,6 +5,7 @@ import { startOfMonth, endOfMonth } from "date-fns"
 import ErrorBoundary from "@/components/modules/roles/common/calendario/ErrorBoundary"
 import { Skeleton } from "@/components/ui/skeleton"
 import { getUserBookingsInRange } from "@/actions/booking-actions"
+import { auth } from "@/auth"
 
 async function CalendarPage({ userRole }: { userRole: string }) {
   const initialDate = new Date()
@@ -13,12 +14,16 @@ async function CalendarPage({ userRole }: { userRole: string }) {
   const initialClasses = await getClasses(monthStart, monthEnd)
   const initialBookings = await getUserBookingsInRange(monthStart, monthEnd)
 
+  const session = await auth()
+  const currentUserId = session?.user?.id
+
   return (
     <ErrorBoundary>
       <Suspense
         fallback={<Skeleton className="h-full rounded-lg bg-pearlVariant" />}
       >
         <ClientCalendarPage
+          currentUserId={currentUserId}
           initialDate={initialDate}
           initialClasses={initialClasses}
           userRole={userRole}

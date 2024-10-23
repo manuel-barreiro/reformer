@@ -11,6 +11,7 @@ interface ClientCalendarPageProps {
   initialClasses: ClassWithBookings[]
   userRole: string
   userBookings: BookingWithClass[]
+  currentUserId?: string
 }
 
 const ClientCalendarPage = ({
@@ -18,6 +19,7 @@ const ClientCalendarPage = ({
   initialClasses,
   userRole,
   userBookings,
+  currentUserId,
 }: ClientCalendarPageProps) => {
   const {
     currentDate,
@@ -40,6 +42,7 @@ const ClientCalendarPage = ({
         userRole={userRole}
       />
       <ClassesSchedule
+        currentUserId={currentUserId}
         updateClassBookings={updateClassBookings}
         date={currentDate}
         classes={selectedDayClasses}

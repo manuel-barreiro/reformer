@@ -19,6 +19,7 @@ interface ClassesScheduleProps {
   onClassChange: () => void
   updateClassBookings: (classId: string, updatedBookings: any[]) => void
   userRole: string
+  currentUserId?: string
 }
 
 export default function ClassesSchedule({
@@ -27,6 +28,7 @@ export default function ClassesSchedule({
   isLoading,
   onClassChange,
   updateClassBookings,
+  currentUserId,
   userRole,
 }: ClassesScheduleProps) {
   const [timeOfDay, setTimeOfDay] = useState("AM")
@@ -38,7 +40,15 @@ export default function ClassesSchedule({
         const isAM = hour < 12
         const matchesTime = timeOfDay === "AM" ? isAM : !isAM
         const matchesCategory = class_.category === category
-        return matchesTime && matchesCategory
+        const userHasBooked = class_.bookings.some(
+          (booking) => booking.userId === currentUserId // Check if user has booked this class
+        )
+        // For regular users, show active classes or classes they have booked
+        return (
+          matchesTime &&
+          matchesCategory &&
+          (userRole === "admin" || class_.isActive || userHasBooked)
+        )
       })
     : []
 
@@ -126,6 +136,7 @@ export default function ClassesSchedule({
                 updateClassBookings={updateClassBookings}
                 handleDeleteClass={handleDeleteClass}
                 userRole={userRole}
+                currentUserId={currentUserId}
               />
             ))
           )}

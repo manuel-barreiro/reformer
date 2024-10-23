@@ -41,7 +41,11 @@ export async function bookClass(classId: string, adminSelectedUserId?: string) {
       throw new Error("Class not found")
     }
 
-    if (classDetails.bookings.length >= classDetails.maxCapacity) {
+    const confirmedBookings = classDetails.bookings.filter(
+      (booking) => booking.status === "confirmed"
+    )
+
+    if (confirmedBookings.length >= classDetails.maxCapacity) {
       throw new Error("This class is already full")
     }
 

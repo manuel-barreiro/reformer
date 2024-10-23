@@ -20,22 +20,11 @@ export default function Paquetes({
   })
   const y = useTransform(scrollYProgress, [0, 1], ["-10%", "10%"])
 
-  //Framer motion animation
-  const pilatesAnimationVariants = {
-    initial: { y: 15, opacity: 0 },
-    animate: { y: 0, opacity: 1 },
-  }
-
-  const listAnimationRight = {
-    initial: { x: -15, opacity: 0 },
-    animate: { x: 0, opacity: 1 },
-  }
-
   return (
     <section
       id="paquetes"
       ref={sectionRef}
-      className="relative flex h-auto min-h-[86dvh] w-full flex-col items-center justify-center gap-10 overflow-hidden bg-black/80 px-10 py-20 font-dm_mono text-pearl lg:px-20 lg:py-40"
+      className="relative flex h-auto min-h-[86vh] w-full flex-col items-center justify-center gap-10 overflow-hidden bg-black/80 px-10 py-20 font-dm_mono text-pearl lg:px-20 lg:py-40"
     >
       <motion.div className="absolute -z-10 h-[110%] w-full" style={{ top: y }}>
         <Image

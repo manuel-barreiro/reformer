@@ -49,6 +49,7 @@ export default function ReservasCard({
       </div>
 
       <ActionDialog
+        buttons={true}
         title="¿Estás seguro?"
         description={
           canCancel

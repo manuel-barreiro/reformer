@@ -350,7 +350,7 @@ export const SolMidnight = ({ color = "currentColor", ...props }) => (
     width="35"
     height="33"
     viewBox="0 0 45 43"
-    fill="none"
+    fill={color}
     xmlns="http://www.w3.org/2000/svg"
     {...props}
   >
@@ -373,7 +373,7 @@ export const SolPearl = ({ color = "currentColor", ...props }) => (
     width="35"
     height="33"
     viewBox="0 0 45 43"
-    fill="none"
+    fill={color}
     xmlns="http://www.w3.org/2000/svg"
     {...props}
   >

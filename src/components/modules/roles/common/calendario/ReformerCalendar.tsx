@@ -104,7 +104,7 @@ export default function ReformerCalendar({
           <div className="mb-4 flex items-center gap-2 text-grey_pebble sm:justify-between">
             <p className="font-dm_sans text-2xl font-medium">
               <span className="font-semibold capitalize">
-                {displayMonth.toLocaleString("default", { month: "long" })}{" "}
+                {displayMonth.toLocaleString("es-ES", { month: "long" })}{" "}
               </span>
               {displayMonth.getFullYear()}
             </p>

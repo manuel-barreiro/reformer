@@ -70,11 +70,7 @@ export async function getClasses(startDate: Date, endDate: Date) {
   try {
     const classes = await prisma.class.findMany({
       where: {
-        AND: [
-          { startTime: { gte: startDate } },
-          { endTime: { lte: endDate } },
-          { isActive: true },
-        ],
+        AND: [{ startTime: { gte: startDate } }, { endTime: { lte: endDate } }],
       },
       include: {
         bookings: {
@@ -102,9 +98,9 @@ export async function getClasses(startDate: Date, endDate: Date) {
 
 export async function deleteClass(classId: string) {
   try {
-    // Start a transaction to handle both the class deletion and booking refunds
+    // Start a transaction to handle both the class deletion and package refunds
     await prisma.$transaction(async (tx) => {
-      // Get all confirmed bookings for this class
+      // Get all confirmed bookings for this class to handle package refunds
       const confirmedBookings = await tx.booking.findMany({
         where: {
           classId: classId,
@@ -115,30 +111,30 @@ export async function deleteClass(classId: string) {
         },
       })
 
-      // For each confirmed booking, increment the remaining classes in the associated package
+      // Refund classes back to active packages
       for (const booking of confirmedBookings) {
-        await tx.purchasedPackage.update({
-          where: {
-            id: booking.purchasedPackageId,
-          },
-          data: {
-            remainingClasses: {
-              increment: 1,
+        if (booking.purchasedPackageId) {
+          await tx.purchasedPackage.update({
+            where: {
+              id: booking.purchasedPackageId,
             },
-          },
-        })
-
-        // Update booking status to cancelled
-        await tx.booking.update({
-          where: { id: booking.id },
-          data: { status: "cancelled" },
-        })
+            data: {
+              remainingClasses: {
+                increment: 1,
+              },
+            },
+          })
+        }
       }
 
-      // Deactivate the class (soft delete)
-      await tx.class.update({
+      // Delete all bookings associated with this class
+      await tx.booking.deleteMany({
+        where: { classId: classId },
+      })
+
+      // Delete the class
+      await tx.class.delete({
         where: { id: classId },
-        data: { isActive: false },
       })
     })
 
@@ -150,6 +146,33 @@ export async function deleteClass(classId: string) {
       success: false,
       error:
         error instanceof Error ? error.message : "Error desconocido al borrar",
+    }
+  }
+}
+
+// New function to toggle class visibility
+export async function toggleClassLock(classId: string) {
+  try {
+    const currentClass = await prisma.class.findUnique({
+      where: { id: classId },
+    })
+
+    if (!currentClass) {
+      throw new Error("Class not found")
+    }
+
+    const updatedClass = await prisma.class.update({
+      where: { id: classId },
+      data: { isActive: !currentClass.isActive },
+    })
+
+    revalidatePath("/admin/calendario")
+    return { success: true, data: updatedClass }
+  } catch (error) {
+    console.error("Error toggling class lock:", error)
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Error desconocido",
     }
   }
 }

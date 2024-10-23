@@ -400,7 +400,7 @@ export const ClassFormDialog = React.forwardRef<
                     <NumberInput
                       value={field.value}
                       onChange={(newValue) => field.onChange(newValue)}
-                      min={1}
+                      min={classToEdit ? classToEdit.bookings.length : 1}
                       max={50}
                     />
                   </FormControl>
