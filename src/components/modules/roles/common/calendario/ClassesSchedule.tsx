@@ -40,14 +40,25 @@ export default function ClassesSchedule({
         const isAM = hour < 12
         const matchesTime = timeOfDay === "AM" ? isAM : !isAM
         const matchesCategory = class_.category === category
-        const userHasBooked = class_.bookings.some(
-          (booking) => booking.userId === currentUserId // Check if user has booked this class
+
+        // Check if the current user has a confirmed booking for this class
+        const userHasConfirmedBooking = class_.bookings.some(
+          (booking) =>
+            booking.userId === currentUserId && booking.status === "confirmed"
         )
-        // For regular users, show active classes or classes they have booked
+
+        // For admin, show all classes
+        if (userRole === "admin") {
+          return matchesTime && matchesCategory
+        }
+
+        // For users:
+        // 1. Show active classes (isActive === true)
+        // 2. Show inactive classes (isActive === false) ONLY if user has a confirmed booking
         return (
           matchesTime &&
           matchesCategory &&
-          (userRole === "admin" || class_.isActive || userHasBooked)
+          (class_.isActive || userHasConfirmedBooking)
         )
       })
     : []

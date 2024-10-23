@@ -24,13 +24,23 @@ export const NumberInput = ({
   }
 
   return (
-    <div className="flex items-center">
-      <Button type="button" onClick={decrement} variant="outline" size="sm">
-        <Minus className="h-4 w-4" />
+    <div className="flex w-auto items-center justify-center">
+      <Button
+        type="button"
+        onClick={decrement}
+        variant="outline"
+        className="h-auto rounded-full bg-rust p-1 hover:bg-rust/80"
+      >
+        <Minus className="h-4 w-4 text-pearl md:h-5 md:w-5" />
       </Button>
-      <span className="mx-2 w-8 text-center">{value}</span>
-      <Button type="button" onClick={increment} variant="outline" size="sm">
-        <Plus className="h-4 w-4" />
+      <span className="mx-2 w-8 text-center text-xl font-bold">{value}</span>
+      <Button
+        type="button"
+        onClick={increment}
+        variant="outline"
+        className="h-auto rounded-full bg-rust p-1 hover:bg-rust/80"
+      >
+        <Plus className="h-4 w-4 text-pearl md:h-5 md:w-5" />
       </Button>
     </div>
   )

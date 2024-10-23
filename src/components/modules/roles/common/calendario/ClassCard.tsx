@@ -11,7 +11,6 @@ import {
   LockIcon,
   UnlockIcon,
   CalendarMinus,
-  Loader2,
 } from "lucide-react"
 import { Card } from "@/components/ui/card"
 import { ClassWithBookings } from "@/components/modules/roles/common/calendario/types"
@@ -19,7 +18,7 @@ import ActionDialog from "@/components/modules/roles/common/ActionDialog"
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table"
 import { bookClass, cancelBooking } from "@/actions/booking-actions"
 import { toast } from "@/components/ui/use-toast"
-import ClassAttendantsDialog from "./ClassAttendantsDialog"
+import ClassAttendantsDialog from "@/components/modules/roles/admin/calendario/ClassAttendantsDialog"
 import { useCallback } from "react"
 import { Progress } from "@/components/ui/progress"
 import { toggleClassLock } from "@/actions/class"
@@ -241,17 +240,70 @@ export default function ClassCard({
               buttonText="Eliminar"
               icon={<TrashIcon className="h-4 w-4 text-pearl" />}
             />
-            <Button
-              variant="ghost"
-              onClick={handleToggleLock}
-              title={class_.isActive ? "Bloquear clase" : "Desbloquear clase"}
-            >
-              {class_.isActive ? (
-                <UnlockIcon className="h-4 w-4 text-midnight" />
-              ) : (
-                <LockIcon className="h-4 w-4 text-midnight" />
-              )}
-            </Button>
+            <ActionDialog
+              buttons={true}
+              trigger={
+                <Button
+                  variant="ghost"
+                  title={
+                    class_.isActive ? "Bloquear clase" : "Desbloquear clase"
+                  }
+                >
+                  {class_.isActive ? (
+                    <UnlockIcon className="h-4 w-4 text-midnight" />
+                  ) : (
+                    <LockIcon className="h-4 w-4 text-midnight" />
+                  )}
+                </Button>
+              }
+              title={class_.isActive ? "Bloquear Clase" : "Desbloquear Clase"}
+              description={
+                <div className="flex max-w-md flex-col gap-1">
+                  {class_.isActive ? (
+                    <>
+                      <span>Al bloquear esta clase:</span>
+                      <span>• No será visible para los usuarios</span>
+                      <span>• Las reservas existentes se mantendrán</span>
+                      <span>• No se podrán realizar nuevas reservas</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>Al desbloquear esta clase:</span>
+                      <span>• Será visible para todos los usuarios</span>
+                      <span>• Se podrán realizar nuevas reservas</span>
+                    </>
+                  )}
+                </div>
+              }
+              action={handleToggleLock}
+              buttonText={class_.isActive ? "Bloquear" : "Desbloquear"}
+              icon={
+                class_.isActive ? (
+                  <LockIcon className="h-4 w-4 text-pearl" />
+                ) : (
+                  <UnlockIcon className="h-4 w-4 text-pearl" />
+                )
+              }
+              content={
+                <Table>
+                  <TableBody className="bg-pearlVariant text-sm text-tableContent">
+                    {classDetails.map((detail, index) => (
+                      <TableRow
+                        key={index}
+                        className="border-b border-grey_pebble"
+                      >
+                        <TableCell className="font-medium">
+                          {detail.label}
+                        </TableCell>
+                        <TableCell className="capitalize">
+                          {detail.value}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              }
+            />
             <ClassFormDialog
               selectedDate={date}
               classToEdit={class_}
