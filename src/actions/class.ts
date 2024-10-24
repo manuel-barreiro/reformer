@@ -5,6 +5,8 @@ import { prisma } from "@/lib/prisma"
 import { Class } from "@prisma/client"
 import { revalidatePath } from "next/cache"
 import { z } from "zod"
+import { addDays, isBefore, parse, addWeeks, isAfter, set } from "date-fns"
+import { toZonedTime } from "date-fns-tz"
 
 const classSchema = z.object({
   category: z.enum(["YOGA", "PILATES"]),
@@ -16,11 +18,15 @@ const classSchema = z.object({
     "LOWER_BODY",
     "FULL_BODY",
   ]),
-  date: z.date(),
-  startTime: z.date(),
-  endTime: z.date(),
+  date: z.string(),
+  startTime: z.string(),
+  endTime: z.string(),
   instructor: z.string().min(1),
   maxCapacity: z.number().int().positive(),
+  repeatDaily: z.boolean().default(false),
+  repeatUntil: z.string().optional(),
+  repeatWeekly: z.boolean().default(false),
+  repeatWeeks: z.number().min(1).max(12).optional(),
 })
 
 export type ClassFormData = z.infer<typeof classSchema>
@@ -31,27 +37,91 @@ async function validateAdmin() {
   if (!session || session.user.role !== "admin") {
     throw new Error("Unauthorized")
   }
-  console.log("User is admin")
 }
 
 export async function createClass(data: ClassFormData) {
-  console.log("Received data:", data)
   await validateAdmin()
+  const timeZone = "America/Argentina/Buenos_Aires"
 
   try {
     const validatedData = classSchema.parse(data)
-    console.log("Validated data:", validatedData)
+    const classInstances: Array<any> = []
 
-    const newClass = await prisma.class.create({
-      data: validatedData,
-    })
+    // Parse base date and times
+    const baseDate = parse(validatedData.date, "yyyy-MM-dd", new Date())
+    const [startHours, startMinutes] = validatedData.startTime
+      .split(":")
+      .map(Number)
+    const [endHours, endMinutes] = validatedData.endTime.split(":").map(Number)
 
-    console.log("Created class:", newClass)
+    // Calculate dates for horizontal repetition (within week)
+    const horizontalDates: Date[] = []
+    if (validatedData.repeatDaily && validatedData.repeatUntil) {
+      const endDate = parse(validatedData.repeatUntil, "yyyy-MM-dd", new Date())
+      let currentDate = baseDate
+
+      while (
+        isBefore(currentDate, endDate) ||
+        currentDate.getTime() === endDate.getTime()
+      ) {
+        horizontalDates.push(currentDate)
+        currentDate = addDays(currentDate, 1)
+      }
+    } else {
+      horizontalDates.push(baseDate)
+    }
+
+    // Calculate vertical repetition (weeks)
+    const numberOfWeeks = validatedData.repeatWeekly
+      ? validatedData.repeatWeeks || 1
+      : 1
+
+    // Generate all class instances
+    for (let week = 0; week < numberOfWeeks; week++) {
+      for (const date of horizontalDates) {
+        const weeklyDate = addWeeks(date, week)
+
+        // Don't schedule classes more than 3 months in advance
+        if (isAfter(weeklyDate, addWeeks(new Date(), 12))) continue
+
+        let startTime = set(weeklyDate, {
+          hours: startHours,
+          minutes: startMinutes,
+        })
+        let endTime = set(weeklyDate, {
+          hours: endHours,
+          minutes: endMinutes,
+        })
+
+        startTime = toZonedTime(startTime, timeZone)
+        endTime = toZonedTime(endTime, timeZone)
+
+        const classData = {
+          category: validatedData.category,
+          type: validatedData.type,
+          date: toZonedTime(weeklyDate, timeZone),
+          startTime,
+          endTime,
+          instructor: validatedData.instructor,
+          maxCapacity: validatedData.maxCapacity,
+        }
+
+        const newClass = await prisma.class.create({
+          data: classData,
+        })
+
+        classInstances.push(newClass)
+      }
+    }
 
     revalidatePath("/admin/calendario")
-    return { success: true, data: newClass }
+    return {
+      success: true,
+      data: classInstances,
+      count: classInstances.length,
+    }
   } catch (error) {
-    console.error("Error creating class:", error)
+    console.error("Error creating classes:", error)
     if (error instanceof z.ZodError) {
       return {
         success: false,
@@ -62,7 +132,7 @@ export async function createClass(data: ClassFormData) {
     if (error instanceof Error) {
       return { success: false, error: error.message }
     }
-    return { success: false, error: "Failed to create class" }
+    return { success: false, error: "Failed to create classes" }
   }
 }
 

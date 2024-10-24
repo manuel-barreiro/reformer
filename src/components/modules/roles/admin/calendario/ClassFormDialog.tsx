@@ -6,7 +6,6 @@ import * as z from "zod"
 import {
   Dialog,
   DialogContent,
-  DialogFormContainer,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -31,7 +30,8 @@ import { Button } from "@/components/ui/button"
 import { toast } from "@/components/ui/use-toast"
 import { Class } from "@prisma/client"
 import { createClass, updateClass } from "@/actions/class"
-import { parse, set, addWeeks, isAfter } from "date-fns"
+import { parse, set, addWeeks, addDays, format, isAfter } from "date-fns"
+import { ca, es } from "date-fns/locale"
 import { toZonedTime } from "date-fns-tz"
 import React from "react"
 import { ClassWithBookings } from "@/components/modules/roles/common/calendario/types"
@@ -63,7 +63,9 @@ const formSchema = z.object({
   endTime: z.string(),
   instructor: z.string().min(1, "Instructor is required"),
   maxCapacity: z.number().min(1, "Capacity must be at least 1"),
-  repeatEnabled: z.boolean().default(false),
+  repeatDaily: z.boolean().default(false),
+  repeatUntil: z.string().optional(),
+  repeatWeekly: z.boolean().default(false),
   repeatWeeks: z.number().min(1).max(12).optional(),
 })
 
@@ -86,8 +88,6 @@ export const ClassFormDialog = React.forwardRef<
 >(({ selectedDate, classToEdit, trigger, onSuccess, currentFilters }, ref) => {
   const [isOpen, setIsOpen] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [repeatEnabled, setRepeatEnabled] = useState(false)
-  const [repeatWeeks, setRepeatWeeks] = useState(4)
 
   const getDefaultCategory = (): "YOGA" | "PILATES" => {
     if (
@@ -112,6 +112,18 @@ export const ClassFormDialog = React.forwardRef<
     return "STRENGTH_CORE"
   }
 
+  const generateWeekDates = (startDate: Date) => {
+    const dates = []
+    for (let i = 0; i < 6; i++) {
+      const date = addDays(startDate, i)
+      dates.push({
+        value: format(date, "yyyy-MM-dd"),
+        label: format(date, "EEEE d/M", { locale: es }),
+      })
+    }
+    return dates
+  }
+
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: classToEdit
@@ -131,7 +143,9 @@ export const ClassFormDialog = React.forwardRef<
           }),
           instructor: classToEdit.instructor,
           maxCapacity: classToEdit.maxCapacity,
-          repeatEnabled: false,
+          repeatDaily: false,
+          repeatUntil: undefined,
+          repeatWeekly: false,
           repeatWeeks: 4,
         }
       : {
@@ -142,103 +156,80 @@ export const ClassFormDialog = React.forwardRef<
           endTime: currentFilters?.timeOfDay === "AM" ? "10:00" : "14:00",
           instructor: "",
           maxCapacity: 8,
-          repeatEnabled: false,
+          repeatDaily: false,
+          repeatUntil: undefined,
+          repeatWeekly: false,
           repeatWeeks: 4,
         },
   })
 
+  const weekDates = generateWeekDates(
+    parse(form.watch("date"), "yyyy-MM-dd", new Date())
+  )
+
   const handleSubmit = async (values: FormValues) => {
     setIsSubmitting(true)
-    const timeZone = "America/Argentina/Buenos_Aires"
-
     try {
       if (classToEdit) {
-        // Handle single class update
-        const dateStr = values.date
-        const startTimeStr = values.startTime
-        const endTimeStr = values.endTime
-        const [startHours, startMinutes] = startTimeStr.split(":").map(Number)
-        const [endHours, endMinutes] = endTimeStr.split(":").map(Number)
-
-        const date = parse(dateStr, "yyyy-MM-dd", new Date())
-        let startTime = set(date, { hours: startHours, minutes: startMinutes })
-        let endTime = set(date, { hours: endHours, minutes: endMinutes })
-
-        startTime = toZonedTime(startTime, timeZone)
-        endTime = toZonedTime(endTime, timeZone)
-
-        const classData = {
-          ...values,
-          date: toZonedTime(date, timeZone),
-          startTime,
-          endTime,
-          maxCapacity: Number(values.maxCapacity),
-        }
-
-        await updateClass(classToEdit.id, classData)
-      } else {
-        // Handle creation of one or multiple classes
+        // Parse the date and times
         const baseDate = parse(values.date, "yyyy-MM-dd", new Date())
         const [startHours, startMinutes] = values.startTime
           .split(":")
           .map(Number)
         const [endHours, endMinutes] = values.endTime.split(":").map(Number)
 
-        // Calculate number of weeks to repeat
-        const numberOfWeeks = values.repeatEnabled ? values.repeatWeeks || 1 : 1
+        // Set the hours and minutes on the base date
+        let startTime = set(baseDate, {
+          hours: startHours,
+          minutes: startMinutes,
+        })
+        let endTime = set(baseDate, {
+          hours: endHours,
+          minutes: endMinutes,
+        })
 
-        // Create array of dates for all instances
-        const dates: Date[] = []
-        for (let i = 0; i < numberOfWeeks; i++) {
-          const currentDate = addWeeks(baseDate, i)
-          // Don't schedule classes more than 3 months in advance
-          if (isAfter(currentDate, addWeeks(new Date(), 12))) break
-          dates.push(currentDate)
-        }
+        // Convert to timezone
+        const timeZone = "America/Argentina/Buenos_Aires"
+        const zonedDate = toZonedTime(baseDate, timeZone)
+        startTime = toZonedTime(startTime, timeZone)
+        endTime = toZonedTime(endTime, timeZone)
 
-        console.log("Creating classes for dates:", dates)
+        const result = await updateClass(classToEdit.id, {
+          date: zonedDate,
+          startTime,
+          endTime,
+          instructor: values.instructor,
+          maxCapacity: values.maxCapacity,
+          category: values.category,
+          type: values.type,
+        })
 
-        // Create all class instances
-        for (const date of dates) {
-          let startTime = set(date, {
-            hours: startHours,
-            minutes: startMinutes,
+        if (result.success) {
+          setIsOpen(false)
+          onSuccess()
+          toast({
+            title: "Clase actualizada",
+            description: "La clase se ha actualizado exitosamente.",
+            variant: "reformer",
           })
-          let endTime = set(date, { hours: endHours, minutes: endMinutes })
-
-          startTime = toZonedTime(startTime, timeZone)
-          endTime = toZonedTime(endTime, timeZone)
-
-          const classData = {
-            category: values.category,
-            type: values.type,
-            date: toZonedTime(date, timeZone),
-            startTime,
-            endTime,
-            instructor: values.instructor,
-            maxCapacity: Number(values.maxCapacity),
-          }
-
-          await createClass(classData)
+        }
+      } else {
+        const result = await createClass(values)
+        if (result.success) {
+          setIsOpen(false)
+          onSuccess()
+          toast({
+            title: "Clases creadas",
+            description: `Se han creado ${result.count} clases exitosamente.`,
+            variant: "reformer",
+          })
         }
       }
-
-      setIsOpen(false)
-      onSuccess()
-      toast({
-        title: classToEdit ? "Class updated" : "Classes created",
-        description: classToEdit
-          ? "The class has been updated successfully."
-          : values.repeatEnabled
-            ? `Created ${values.repeatWeeks} weekly classes successfully.`
-            : "The class has been created successfully.",
-        variant: "reformer",
-      })
     } catch (error) {
-      console.error("Error submitting class:", error)
+      console.error("Error:", error)
       toast({
         title: "Error",
-        description: `Failed to ${classToEdit ? "update" : "create"} class. Please try again.`,
+        description: `Error al ${classToEdit ? "actualizar" : "crear"} la(s) clase(s).`,
         variant: "destructive",
       })
     } finally {
@@ -247,6 +238,36 @@ export const ClassFormDialog = React.forwardRef<
   }
 
   const selectedCategory = form.watch("category")
+  const repeatDaily = form.watch("repeatDaily")
+  const repeatWeekly = form.watch("repeatWeekly")
+
+  // Preview calculation
+  const calculatePreviewDates = () => {
+    const dates: Date[] = []
+    const baseDate = parse(form.watch("date"), "yyyy-MM-dd", new Date())
+    const endDate =
+      repeatDaily && form.watch("repeatUntil")
+        ? parse(form.watch("repeatUntil") || "", "yyyy-MM-dd", new Date())
+        : baseDate
+
+    // Calculate horizontal dates (within week)
+    const horizontalDates: Date[] = []
+    let currentDate = baseDate
+    while (currentDate <= endDate) {
+      horizontalDates.push(currentDate)
+      currentDate = addDays(currentDate, 1)
+    }
+
+    // Calculate vertical dates (weeks)
+    const weeks = repeatWeekly ? form.watch("repeatWeeks") || 1 : 1
+    for (let week = 0; week < weeks; week++) {
+      horizontalDates.forEach((date) => {
+        dates.push(addWeeks(date, week))
+      })
+    }
+
+    return dates
+  }
 
   useEffect(() => {
     if (isOpen) {
@@ -271,7 +292,9 @@ export const ClassFormDialog = React.forwardRef<
               }),
               instructor: classToEdit.instructor,
               maxCapacity: classToEdit.maxCapacity,
-              repeatEnabled: false,
+              repeatDaily: false,
+              repeatUntil: undefined,
+              repeatWeekly: false,
               repeatWeeks: 4,
             }
           : {
@@ -282,12 +305,12 @@ export const ClassFormDialog = React.forwardRef<
               endTime: currentFilters?.timeOfDay === "AM" ? "10:00" : "14:00",
               instructor: "",
               maxCapacity: 8,
-              repeatEnabled: false,
+              repeatDaily: false,
+              repeatUntil: undefined,
+              repeatWeekly: false,
               repeatWeeks: 4,
             }
       )
-      setRepeatEnabled(false)
-      setRepeatWeeks(4)
     }
   }, [isOpen, classToEdit, selectedDate, form, currentFilters])
 
@@ -299,7 +322,6 @@ export const ClassFormDialog = React.forwardRef<
         )}
       </DialogTrigger>
       <DialogContent className="sm:max-w-xl md:max-w-2xl">
-        {" "}
         <DialogHeader>
           <DialogTitle>
             {classToEdit ? "Editar Clase" : "Crear Nueva Clase"}
@@ -310,7 +332,6 @@ export const ClassFormDialog = React.forwardRef<
             onSubmit={form.handleSubmit(handleSubmit)}
             className="space-y-4"
           >
-            {/* <DialogFormContainer> */}
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <FormField
                 control={form.control}
@@ -438,7 +459,6 @@ export const ClassFormDialog = React.forwardRef<
                   </FormItem>
                 )}
               />
-
               <FormField
                 control={form.control}
                 name="endTime"
@@ -477,68 +497,119 @@ export const ClassFormDialog = React.forwardRef<
                 </FormItem>
               )}
             />
+
             {!classToEdit && (
-              <FormField
-                control={form.control}
-                name="repeatEnabled"
-                render={({ field }) => (
-                  <FormItem className="flex w-full flex-row items-center justify-between rounded-lg border border-rust/50 bg-pearlVariant p-4">
-                    <div className="space-y-0.5">
-                      <FormLabel>Repetir Semanalmente</FormLabel>
-                    </div>
-                    <FormControl>
-                      <Switch
-                        checked={field.value}
-                        onCheckedChange={(checked) => {
-                          field.onChange(checked)
-                          if (!checked) {
-                            form.setValue("repeatWeeks", 4) // Reset to default when disabled
-                          }
-                        }}
-                      />
-                    </FormControl>
-                  </FormItem>
+              <>
+                {/* Horizontal Repetition */}
+                <FormField
+                  control={form.control}
+                  name="repeatDaily"
+                  render={({ field }) => (
+                    <FormItem className="flex w-full flex-row items-center justify-between rounded-lg border border-rust/50 bg-pearlVariant p-4">
+                      <div className="space-y-0.5">
+                        <FormLabel>Repetir en la semana</FormLabel>
+                      </div>
+                      <FormControl>
+                        <Switch
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+
+                {repeatDaily && (
+                  <FormField
+                    control={form.control}
+                    name="repeatUntil"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Repetir diariamente hasta</FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger className="border-rust/50 bg-pearlVariant font-semibold text-grey_pebble/60">
+                              <SelectValue placeholder="Seleccionar día" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent className="bg-grey_pebble text-pearl">
+                            {weekDates.map((date) => (
+                              <SelectItem
+                                key={date.value}
+                                value={date.value}
+                                className="border-b border-pearl/50 capitalize hover:!bg-pearlVariant3"
+                              >
+                                {date.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                 )}
-              />
-            )}
-            {form.watch("repeatEnabled") && !classToEdit && (
-              <FormField
-                control={form.control}
-                name="repeatWeeks"
-                render={({ field }) => (
-                  <FormItem className="flex w-full flex-row items-center justify-between rounded-lg border border-rust/50 bg-pearlVariant p-4">
-                    <div className="w-full space-y-0.5">
-                      <FormLabel>Número de semanas</FormLabel>
-                    </div>
-                    <FormControl>
-                      <NumberInput
-                        value={field.value || 4}
-                        onChange={(value) => field.onChange(value)}
-                        min={1}
-                        max={12}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
+
+                {/* Vertical Repetition */}
+                <FormField
+                  control={form.control}
+                  name="repeatWeekly"
+                  render={({ field }) => (
+                    <FormItem className="flex w-full flex-row items-center justify-between rounded-lg border border-rust/50 bg-pearlVariant p-4">
+                      <div className="space-y-0.5">
+                        <FormLabel>Repetir semanalmente</FormLabel>
+                      </div>
+                      <FormControl>
+                        <Switch
+                          checked={field.value}
+                          onCheckedChange={(checked) => {
+                            field.onChange(checked)
+                            if (!checked) {
+                              form.setValue("repeatWeeks", 4)
+                            }
+                          }}
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+
+                {repeatWeekly && (
+                  <FormField
+                    control={form.control}
+                    name="repeatWeeks"
+                    render={({ field }) => (
+                      <FormItem className="flex w-full flex-row items-center justify-between rounded-lg border border-rust/50 bg-pearlVariant p-4">
+                        <div className="w-full space-y-0.5">
+                          <FormLabel>Número de semanas</FormLabel>
+                        </div>
+                        <FormControl>
+                          <NumberInput
+                            value={field.value || 4}
+                            onChange={(value) => field.onChange(value)}
+                            min={1}
+                            max={12}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                 )}
-              />
-            )}
-            {form.watch("repeatEnabled") && !classToEdit && (
-              <Accordion type="single" collapsible className="w-full">
-                <AccordionItem value="preview">
-                  <AccordionTrigger className="text-sm">
-                    Ver fechas programadas
-                  </AccordionTrigger>
-                  <AccordionContent>
-                    <div className="space-y-2">
-                      {Array.from(
-                        { length: form.watch("repeatWeeks") || 0 },
-                        (_, index) => {
-                          const date = addWeeks(
-                            parse(form.watch("date"), "yyyy-MM-dd", new Date()),
-                            index
-                          )
-                          return (
+
+                {/* Preview Section */}
+                {(repeatDaily || repeatWeekly) && (
+                  <Accordion type="single" collapsible className="w-full">
+                    <AccordionItem value="preview">
+                      <AccordionTrigger className="text-sm">
+                        Ver fechas programadas
+                      </AccordionTrigger>
+                      <AccordionContent>
+                        <div className="space-y-2">
+                          {calculatePreviewDates().map((date, index) => (
                             <div
                               key={index}
                               className="rounded bg-pearlVariant px-2 py-1 text-sm"
@@ -550,14 +621,15 @@ export const ClassFormDialog = React.forwardRef<
                                 day: "numeric",
                               })}
                             </div>
-                          )
-                        }
-                      )}
-                    </div>
-                  </AccordionContent>
-                </AccordionItem>
-              </Accordion>
-            )}{" "}
+                          ))}
+                        </div>
+                      </AccordionContent>
+                    </AccordionItem>
+                  </Accordion>
+                )}
+              </>
+            )}
+
             <Button
               type="submit"
               className="w-full bg-rust py-6 font-dm_mono text-pearl duration-300 ease-in-out hover:bg-rust/90"
@@ -569,7 +641,6 @@ export const ClassFormDialog = React.forwardRef<
                   ? "Editar Clase"
                   : "Crear Clase"}
             </Button>
-            {/* </DialogFormContainer> */}
           </form>
         </Form>
       </DialogContent>
