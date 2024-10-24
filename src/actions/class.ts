@@ -5,8 +5,7 @@ import { prisma } from "@/lib/prisma"
 import { Class } from "@prisma/client"
 import { revalidatePath } from "next/cache"
 import { z } from "zod"
-import { addDays, isBefore, parse, addWeeks, isAfter, set } from "date-fns"
-import { toZonedTime } from "date-fns-tz"
+import { addDays, addWeeks, isAfter } from "date-fns"
 import { formatLocalDate, localToUTC } from "@/lib/timezone-utils"
 
 const classSchema = z.object({
@@ -106,18 +105,18 @@ export async function createClass(data: ClassFormData) {
     revalidatePath("/admin/calendario")
     return { success: true, data: classInstances, count: classInstances.length }
   } catch (error) {
-    console.error("Error creating classes:", error)
+    console.error("Error creando las clases:", error)
     if (error instanceof z.ZodError) {
       return {
         success: false,
-        error: "Invalid data provided",
+        error: "Datos inválidos",
         details: error.errors,
       }
     }
     if (error instanceof Error) {
       return { success: false, error: error.message }
     }
-    return { success: false, error: "Failed to create classes" }
+    return { success: false, error: "Falló la creación de clases" }
   }
 }
 

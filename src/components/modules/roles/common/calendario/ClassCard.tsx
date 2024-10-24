@@ -12,7 +12,6 @@ import {
   UnlockIcon,
   CalendarMinus,
   Loader2,
-  Lock,
 } from "lucide-react"
 import { Card } from "@/components/ui/card"
 import { ClassWithBookings } from "@/components/modules/roles/common/calendario/types"
@@ -24,7 +23,6 @@ import ClassAttendantsDialog from "@/components/modules/roles/admin/calendario/C
 import { useCallback } from "react"
 import { Progress } from "@/components/ui/progress"
 import { toggleClassLock } from "@/actions/class"
-import { SolMidnight, SolPearl } from "@/assets/icons"
 
 interface ClassCardProps {
   date: Date
@@ -174,11 +172,11 @@ export default function ClassCard({
   return (
     <Card
       key={class_.id}
-      className={`relative animate-fade-down border bg-pearlVariant px-4 py-2 ${
+      className={`relative w-full animate-fade-down border bg-pearlVariant px-4 py-2 ${
         userBooking && "bg-rust text-pearl"
       } ${userRole === "user" && isFull && "!opacity-50"} ${!class_.isActive && userRole === "admin" && "!opacity-70"}`}
     >
-      <div className="flex items-center justify-between gap-6">
+      <div className="relative flex w-full flex-col items-start justify-between gap-3 2xl:flex-row 2xl:items-center 2xl:gap-6">
         <div className="w-auto">
           {userRole === "admin" && (
             <p className="flex items-center gap-2 text-sm">
@@ -218,7 +216,7 @@ export default function ClassCard({
           </p>
         </div>
         {userRole === "admin" && (
-          <div className="grid w-auto grid-cols-2 gap-1">
+          <div className="flex w-full items-center justify-between gap-1 2xl:grid 2xl:w-auto 2xl:grid-cols-2">
             <ActionDialog
               buttons={true}
               trigger={
@@ -327,7 +325,7 @@ export default function ClassCard({
           </div>
         )}
         {userRole === "user" && (
-          <div className="flex w-auto flex-col">
+          <div className="absolute -right-2 top-4 flex w-auto flex-col">
             {userBooking ? (
               <ActionDialog
                 buttons={true}

@@ -170,6 +170,12 @@ export default function ClassesSchedule({
           }
         />
       )}
+
+      {userRole === "user" && (
+        <div className="mt-4 text-center text-xs text-gray-500">
+          * Cualquier duda o consulta, contactate con nosotros.
+        </div>
+      )}
     </div>
   )
 }
