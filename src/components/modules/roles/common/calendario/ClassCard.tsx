@@ -11,6 +11,8 @@ import {
   LockIcon,
   UnlockIcon,
   CalendarMinus,
+  Loader2,
+  Lock,
 } from "lucide-react"
 import { Card } from "@/components/ui/card"
 import { ClassWithBookings } from "@/components/modules/roles/common/calendario/types"
@@ -167,14 +169,14 @@ export default function ClassCard({
     (booking) => booking.status === "confirmed"
   )
 
+  const isFull = confirmedBookings.length >= class_.maxCapacity
+
   return (
     <Card
       key={class_.id}
       className={`relative animate-fade-down border bg-pearlVariant px-4 py-2 ${
-        !class_.isActive && userRole === "admin"
-          ? "line-through"
-          : userBooking && "bg-rust text-pearl"
-      }`}
+        userBooking && "bg-rust text-pearl"
+      } ${userRole === "user" && isFull && "!opacity-50"} ${!class_.isActive && userRole === "admin" && "!opacity-70"}`}
     >
       <div className="flex items-center justify-between gap-6">
         <div className="w-auto">
@@ -187,8 +189,11 @@ export default function ClassCard({
             </p>
           )}
           <h3
-            className={`font-dm_sans font-semibold ${userBooking ? "text-pearl" : "text-grey_pebble"}`}
+            className={`flex items-center gap-2 font-dm_sans font-semibold ${userBooking ? "text-pearl" : "text-grey_pebble"}`}
           >
+            {!class_.isActive && userRole === "admin" && (
+              <LockIcon className="h-4 w-4 text-midnight" />
+            )}{" "}
             {class_.category} - {class_.type.replace("_", " ")}
           </h3>
           <div
@@ -250,9 +255,9 @@ export default function ClassCard({
                   }
                 >
                   {class_.isActive ? (
-                    <UnlockIcon className="h-4 w-4 text-midnight" />
-                  ) : (
                     <LockIcon className="h-4 w-4 text-midnight" />
+                  ) : (
+                    <UnlockIcon className="h-4 w-4 text-midnight" />
                   )}
                 </Button>
               }
@@ -333,7 +338,7 @@ export default function ClassCard({
                     disabled={isPending}
                   >
                     {isPending ? (
-                      <SolPearl className="h-7 w-7 animate-spin text-pearl" />
+                      <Loader2 className="h-7 w-7 animate-spin text-pearlVariant" />
                     ) : (
                       <CalendarMinus className="h-4 w-4" />
                     )}
@@ -365,42 +370,44 @@ export default function ClassCard({
                 icon={<CalendarMinus className="h-4 w-4 text-pearl" />}
               />
             ) : (
-              <ActionDialog
-                buttons={true}
-                trigger={
-                  <Button variant="ghost" disabled={isPending}>
-                    {isPending ? (
-                      <SolMidnight className="h-7 w-7 animate-spin text-midnight" />
-                    ) : (
-                      <CalendarPlus className="h-4 w-4 text-midnight" />
-                    )}
-                  </Button>
-                }
-                title="Reservar Clase"
-                description="¿Deseas reservar esta clase?"
-                action={handleBookClass}
-                buttonText="Reservar"
-                content={
-                  <Table>
-                    <TableBody className="bg-pearlVariant text-sm text-tableContent">
-                      {classDetails.map((detail, index) => (
-                        <TableRow
-                          key={index}
-                          className="border-b border-grey_pebble"
-                        >
-                          <TableCell className="font-medium">
-                            {detail.label}
-                          </TableCell>
-                          <TableCell className="capitalize">
-                            {detail.value}
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                }
-                icon={<CalendarPlus className="h-4 w-4 text-pearl" />}
-              />
+              !isFull && (
+                <ActionDialog
+                  buttons={true}
+                  trigger={
+                    <Button variant="ghost" disabled={isPending}>
+                      {isPending ? (
+                        <Loader2 className="h-7 w-7 animate-spin text-midnight" />
+                      ) : (
+                        <CalendarPlus className="h-4 w-4 text-midnight" />
+                      )}
+                    </Button>
+                  }
+                  title="Reservar Clase"
+                  description="¿Deseas reservar esta clase?"
+                  action={handleBookClass}
+                  buttonText="Reservar"
+                  content={
+                    <Table>
+                      <TableBody className="bg-pearlVariant text-sm text-tableContent">
+                        {classDetails.map((detail, index) => (
+                          <TableRow
+                            key={index}
+                            className="border-b border-grey_pebble"
+                          >
+                            <TableCell className="font-medium">
+                              {detail.label}
+                            </TableCell>
+                            <TableCell className="capitalize">
+                              {detail.value}
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  }
+                  icon={<CalendarPlus className="h-4 w-4 text-pearl" />}
+                />
+              )
             )}
           </div>
         )}

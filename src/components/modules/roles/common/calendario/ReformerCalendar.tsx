@@ -3,9 +3,18 @@ import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
 import { Class } from "@prisma/client"
 import { ChevronLeft, ChevronRight } from "lucide-react"
-import React, { useState } from "react"
+import React, { useState, useMemo } from "react"
 import { CaptionProps } from "react-day-picker"
-import { format, isValid } from "date-fns"
+import {
+  format,
+  isValid,
+  isBefore,
+  isAfter,
+  addMonths,
+  startOfDay,
+  endOfMonth,
+  startOfMonth,
+} from "date-fns"
 import { toZonedTime } from "date-fns-tz"
 import { BookingWithClass } from "@/components/modules/roles/user/reservas/ReservasPage"
 
@@ -25,23 +34,65 @@ export default function ReformerCalendar({
   userRole,
 }: ReformerCalendarProps) {
   const [currentMonth, setCurrentMonth] = useState(date)
+  const today = startOfDay(new Date())
 
-  const classDays = new Set(
-    (userRole === "admin" ? monthClasses : monthBookings)
-      .map((item) => {
-        const itemDate = new Date(
-          userRole === "admin"
-            ? (item as Class).date
-            : (item as BookingWithClass).class.date
-        )
-        const localDate = toZonedTime(
-          itemDate,
-          "America/Argentina/Buenos_Aires"
-        )
-        return isValid(itemDate) ? format(localDate, "yyyy-MM-dd") : null
-      })
-      .filter(Boolean)
+  // Available class days for both users and admin
+  const availableClassDays = useMemo(
+    () =>
+      new Set(
+        monthClasses
+          .map((item) => {
+            const itemDate = new Date(item.date)
+            const localDate = toZonedTime(
+              itemDate,
+              "America/Argentina/Buenos_Aires"
+            )
+            return isValid(itemDate) ? format(localDate, "yyyy-MM-dd") : null
+          })
+          .filter(Boolean)
+      ),
+    [monthClasses]
   )
+
+  // User's booked class days
+  const bookedClassDays = useMemo(
+    () =>
+      new Set(
+        monthBookings
+          .map((booking) => {
+            const itemDate = new Date(booking.class.date)
+            const localDate = toZonedTime(
+              itemDate,
+              "America/Argentina/Buenos_Aires"
+            )
+            return isValid(itemDate) ? format(localDate, "yyyy-MM-dd") : null
+          })
+          .filter(Boolean)
+      ),
+    [monthBookings]
+  )
+
+  const lastAvailableDate = useMemo(() => {
+    if (userRole === "admin") {
+      return endOfMonth(addMonths(today, 3))
+    }
+    return endOfMonth(addMonths(today, 1))
+  }, [userRole, today])
+
+  const disabledDays = useMemo(() => {
+    if (userRole === "admin") {
+      return undefined
+    }
+    return [
+      {
+        before: today,
+        after: lastAvailableDate,
+      },
+    ]
+  }, [userRole, lastAvailableDate, today])
+
+  const fromMonth = userRole === "admin" ? undefined : startOfMonth(today)
+  const toMonth = lastAvailableDate
 
   const CustomDay = ({
     date: dayDate,
@@ -50,29 +101,69 @@ export default function ReformerCalendar({
     date: Date
     displayMonth: Date
   }) => {
-    const isClassDay = classDays.has(dayDate.toISOString().split("T")[0])
+    const dateStr = format(dayDate, "yyyy-MM-dd")
+    const isAvailableClass = availableClassDays.has(dateStr)
+    const isBookedClass = bookedClassDays.has(dateStr)
     const isSelectedMonth = dayDate.getMonth() === displayMonth.getMonth()
     const isSelected = dayDate.toDateString() === date.toDateString()
+    const isPastDay = isBefore(dayDate, today)
 
     return (
       <div
         className={`relative h-full w-full rounded-md ${
           isSelected
             ? "bg-grey_pebble text-pearl"
-            : isClassDay && isSelectedMonth
-              ? "bg-rust/80 text-pearl"
+            : (isBookedClass && isSelectedMonth) ||
+                (userRole === "admin" && isAvailableClass)
+              ? "!bg-rust/80 text-pearl"
               : ""
-        }`}
+        } ${userRole === "admin" && isPastDay ? "opacity-40" : ""}`}
       >
-        <span className={`absolute inset-0 flex items-center justify-center`}>
+        <span
+          className={`absolute inset-0 flex items-center justify-center ${isPastDay && "line-through"}`}
+        >
           {dayDate.getDate()}
         </span>
         {isSelected && (
           <span className="absolute bottom-2 left-1/2 h-1 w-1 -translate-x-1/2 rounded-full bg-pearl"></span>
         )}
+        {/* Show dot for available classes for users */}
+        {userRole !== "admin" &&
+          isAvailableClass &&
+          !isBookedClass &&
+          !isSelected &&
+          isSelectedMonth &&
+          !isPastDay && (
+            <span className="absolute bottom-2 left-1/2 h-1 w-1 -translate-x-1/2 rounded-full bg-grey_pebble"></span>
+          )}
       </div>
     )
   }
+
+  const handleMonthChange = (increment: number) => {
+    const newMonth = new Date(currentMonth)
+    newMonth.setMonth(newMonth.getMonth() + increment)
+
+    if (userRole === "admin") {
+      if (increment > 0 && isAfter(startOfMonth(newMonth), addMonths(today, 3)))
+        return
+    } else {
+      if (increment > 0 && isAfter(startOfMonth(newMonth), addMonths(today, 1)))
+        return
+      if (increment < 0 && isBefore(endOfMonth(newMonth), today)) return
+    }
+
+    setCurrentMonth(newMonth)
+    onDateChange(newMonth)
+  }
+
+  const canNavigateNext =
+    userRole === "admin"
+      ? !isAfter(startOfMonth(currentMonth), addMonths(today, 2))
+      : !isAfter(startOfMonth(currentMonth), addMonths(today, 0))
+
+  const canNavigatePrev =
+    userRole === "admin" ? true : !isBefore(endOfMonth(currentMonth), today)
 
   return (
     <Calendar
@@ -81,6 +172,9 @@ export default function ReformerCalendar({
       onSelect={(newDate) => newDate && onDateChange(newDate)}
       month={currentMonth}
       onMonthChange={setCurrentMonth}
+      disabled={disabledDays}
+      fromMonth={fromMonth}
+      toMonth={toMonth}
       className="p-0 md:border-r-[1px] md:border-grey_pebble md:pr-10"
       classNames={{
         months: "space-y-4",
@@ -98,6 +192,7 @@ export default function ReformerCalendar({
         day_selected: "",
         day_today: "bg-accent text-accent-foreground",
         day_outside: "opacity-50 bg-transparent",
+        day_disabled: "opacity-50 cursor-not-allowed bg-pearlVariant",
       }}
       components={{
         Caption: ({ displayMonth }: CaptionProps) => (
@@ -112,24 +207,16 @@ export default function ReformerCalendar({
               <Button
                 variant="outline"
                 className="h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100"
-                onClick={() => {
-                  const prevMonth = new Date(currentMonth)
-                  prevMonth.setMonth(prevMonth.getMonth() - 1)
-                  setCurrentMonth(prevMonth)
-                  onDateChange(prevMonth)
-                }}
+                onClick={() => handleMonthChange(-1)}
+                disabled={!canNavigatePrev}
               >
                 <ChevronLeft className="h-4 w-4" />
               </Button>
               <Button
                 variant="outline"
                 className="h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100"
-                onClick={() => {
-                  const nextMonth = new Date(currentMonth)
-                  nextMonth.setMonth(nextMonth.getMonth() + 1)
-                  setCurrentMonth(nextMonth)
-                  onDateChange(nextMonth)
-                }}
+                onClick={() => handleMonthChange(1)}
+                disabled={!canNavigateNext}
               >
                 <ChevronRight className="h-4 w-4" />
               </Button>
