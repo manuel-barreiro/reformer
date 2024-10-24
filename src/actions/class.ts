@@ -47,28 +47,38 @@ export async function createClass(data: ClassFormData) {
     const validatedData = classSchema.parse(data)
     const classInstances: Array<any> = []
 
-    // Parse base date and times
+    // Parse base date and create a Date object in the correct timezone
     const baseDate = parse(validatedData.date, "yyyy-MM-dd", new Date())
-    const [startHours, startMinutes] = validatedData.startTime
-      .split(":")
-      .map(Number)
-    const [endHours, endMinutes] = validatedData.endTime.split(":").map(Number)
+    const baseDateInZone = toZonedTime(baseDate, timeZone)
+
+    // Function to create a datetime in the correct timezone
+    const createZonedDateTime = (date: Date, timeString: string) => {
+      const [hours, minutes] = timeString.split(":").map(Number)
+      const dateTime = set(date, {
+        hours,
+        minutes,
+        seconds: 0,
+        milliseconds: 0,
+      })
+      return toZonedTime(dateTime, timeZone)
+    }
 
     // Calculate dates for horizontal repetition (within week)
     const horizontalDates: Date[] = []
     if (validatedData.repeatDaily && validatedData.repeatUntil) {
       const endDate = parse(validatedData.repeatUntil, "yyyy-MM-dd", new Date())
-      let currentDate = baseDate
+      const endDateInZone = toZonedTime(endDate, timeZone)
+      let currentDate = baseDateInZone
 
       while (
-        isBefore(currentDate, endDate) ||
-        currentDate.getTime() === endDate.getTime()
+        isBefore(currentDate, endDateInZone) ||
+        currentDate.getTime() === endDateInZone.getTime()
       ) {
         horizontalDates.push(currentDate)
-        currentDate = addDays(currentDate, 1)
+        currentDate = toZonedTime(addDays(currentDate, 1), timeZone)
       }
     } else {
-      horizontalDates.push(baseDate)
+      horizontalDates.push(baseDateInZone)
     }
 
     // Calculate vertical repetition (weeks)
@@ -79,32 +89,24 @@ export async function createClass(data: ClassFormData) {
     // Generate all class instances
     for (let week = 0; week < numberOfWeeks; week++) {
       for (const date of horizontalDates) {
-        const weeklyDate = addWeeks(date, week)
+        const weeklyDate = toZonedTime(addWeeks(date, week), timeZone)
 
         // Don't schedule classes more than 3 months in advance
         if (isAfter(weeklyDate, addWeeks(new Date(), 12))) continue
 
-        // Get the date parts
-        const year = weeklyDate.getFullYear()
-        const month = weeklyDate.getMonth()
-        const day = weeklyDate.getDate()
-
-        // Create the dates in the correct timezone
-        const dateString = `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`
-        const startTimeString = `${dateString}T${validatedData.startTime}:00`
-        const endTimeString = `${dateString}T${validatedData.endTime}:00`
-
-        // Parse the dates as if they were in the target timezone
-        const zonedDate = new Date(`${dateString}T00:00:00`)
-        const zonedStartTime = new Date(startTimeString)
-        const zonedEndTime = new Date(endTimeString)
+        // Create start and end times in the correct timezone
+        const startTime = createZonedDateTime(
+          weeklyDate,
+          validatedData.startTime
+        )
+        const endTime = createZonedDateTime(weeklyDate, validatedData.endTime)
 
         const classData = {
           category: validatedData.category,
           type: validatedData.type,
-          date: zonedDate,
-          startTime: zonedStartTime,
-          endTime: zonedEndTime,
+          date: weeklyDate,
+          startTime,
+          endTime,
           instructor: validatedData.instructor,
           maxCapacity: validatedData.maxCapacity,
         }
@@ -251,10 +253,24 @@ export async function toggleClassLock(classId: string) {
 }
 
 export async function updateClass(classId: string, data: Partial<Class>) {
+  const timeZone = "America/Argentina/Buenos_Aires"
+
   try {
+    // Convertir las fechas a la zona horaria correcta si están presentes en los datos
+    const updatedData = { ...data }
+    if (data.date) {
+      updatedData.date = toZonedTime(new Date(data.date), timeZone)
+    }
+    if (data.startTime) {
+      updatedData.startTime = toZonedTime(new Date(data.startTime), timeZone)
+    }
+    if (data.endTime) {
+      updatedData.endTime = toZonedTime(new Date(data.endTime), timeZone)
+    }
+
     const updatedClass = await prisma.class.update({
       where: { id: classId },
-      data,
+      data: updatedData,
       include: {
         bookings: true,
       },

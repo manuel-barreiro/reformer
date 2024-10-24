@@ -49,8 +49,8 @@ export function useClassesData(
       const monthKey = format(date, "yyyy-MM")
 
       try {
-        const monthStart = startOfMonth(date)
-        const monthEnd = endOfMonth(date)
+        const monthStart = toZonedTime(startOfMonth(date), TIMEZONE)
+        const monthEnd = toZonedTime(endOfMonth(date), TIMEZONE)
         const newClasses = await getClasses(monthStart, monthEnd)
 
         const parsedClasses = newClasses.map((cls) => ({
