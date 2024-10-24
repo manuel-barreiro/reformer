@@ -5,6 +5,7 @@ import LogoutButtonMobile from "@/components/modules/auth/logout-button-mobile"
 import SideMenuButton from "@/components/modules/roles/common/SideMenuButton"
 import { auth } from "@/auth"
 import Image from "next/image"
+import { cn } from "@/lib/utils"
 
 const adminMenuItems = [
   {
@@ -46,7 +47,7 @@ export default async function SideMenu() {
   const menuItems = userRole === "admin" ? adminMenuItems : userMenuItems
 
   return (
-    <div className="flex h-full w-full flex-col items-start justify-center gap-6 pt-5 text-sm md:items-start xl:w-[90%] xl:gap-10 xl:pt-0">
+    <div className="flex w-full flex-col items-start justify-center gap-6 pt-5 text-sm md:items-start xl:gap-10 xl:pt-0">
       <div className="flex w-full items-center justify-between gap-12 xl:flex-col">
         <span className="hidden self-start font-marcellus text-4xl font-medium text-grey_pebble xl:block">
           {userRole === "admin" ? "Admin" : "Mi Perfil"}
@@ -79,7 +80,12 @@ export default async function SideMenu() {
         <LogoutButtonMobile />
       </div>
 
-      <div className="grid w-full grid-cols-2 gap-2 xl:flex xl:flex-col">
+      <div
+        className={cn(
+          "grid w-full gap-2 xl:flex xl:flex-col",
+          userRole === "admin" ? "grid-cols-3" : "grid-cols-2"
+        )}
+      >
         {menuItems.map((item) => (
           <SideMenuButton key={item.href} title={item.title} href={item.href} />
         ))}

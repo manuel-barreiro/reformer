@@ -125,24 +125,25 @@ export function PaymentsTable({ initialPayments }: PaymentsTableProps) {
   }
 
   return (
-    <div className="w-full max-w-4xl space-y-4">
-      <div className="flex items-center justify-between">
+    <div className="h-auto min-h-[86dvh] w-full space-y-4 lg:min-h-0 lg:pl-10">
+      <div className="flex w-full flex-col items-start justify-between gap-3 lg:flex-row">
         <h2 className="font-marcellus text-2xl font-bold uppercase">Pagos</h2>
-        <div className="flex items-center gap-2">
-          <div className="relative">
+        <div className="flex w-full items-center gap-2 lg:w-auto">
+          <div className="relative w-full">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-gray-400" />
             <Input
               value={globalFilter}
               onChange={(e) => setGlobalFilter(e.target.value)}
-              className="w-80 rounded-lg border border-rust/50 bg-pearlVariant pl-10 font-semibold text-grey_pebble/60 shadow-md"
+              className="w-full rounded-lg border border-rust/50 bg-pearlVariant pl-10 font-semibold text-grey_pebble/60 shadow-md lg:w-80"
               placeholder="Buscar..."
             />
           </div>
           <Button
             onClick={() => setIsAddModalOpen(true)}
-            className="bg-midnight font-dm_mono"
+            className="flex items-center justify-center bg-midnight font-dm_mono"
           >
-            <Plus className="mr-2 h-4 w-4" /> Agregar pago
+            <Plus className="h-4 w-4" />
+            <span className="hidden lg:block">Agregar pago</span>
           </Button>
         </div>
       </div>

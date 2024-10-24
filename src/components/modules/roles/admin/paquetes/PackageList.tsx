@@ -14,7 +14,7 @@ export default function PackageList({
   onPackageDelete,
 }: PackageListProps) {
   return (
-    <div className="grid grid-cols-1 gap-3 py-5 sm:max-w-[600px] sm:grid-cols-2 md:max-w-[1000px] md:grid-cols-3 md:p-10">
+    <div className="flex flex-col items-center gap-3 py-5 sm:grid sm:max-w-[600px] sm:grid-cols-2 sm:p-10 md:max-w-[1000px] md:grid-cols-3">
       {packages.map((pack) => (
         <AdminPackageCard
           key={pack.id}

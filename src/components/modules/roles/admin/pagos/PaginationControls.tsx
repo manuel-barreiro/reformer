@@ -10,20 +10,7 @@ interface PaginationControlsProps {
 export function PaginationControls({ table }: PaginationControlsProps) {
   return (
     <div className="flex items-center justify-between px-2 text-midnight">
-      {/* <div className="text-muted-foreground flex-1 text-sm">
-        Mostrando{" "}
-        {table.getState().pagination.pageIndex *
-          table.getState().pagination.pageSize +
-          1}{" "}
-        al{" "}
-        {Math.min(
-          (table.getState().pagination.pageIndex + 1) *
-            table.getState().pagination.pageSize,
-          table.getFilteredRowModel().rows.length
-        )}{" "}
-        de {table.getFilteredRowModel().rows.length} registros
-      </div> */}
-      <div className="flex items-center space-x-6 lg:space-x-8">
+      <div className="flex w-full flex-col items-center gap-5 lg:flex-row lg:items-center lg:space-x-8">
         <div className="flex items-center space-x-2">
           <p className="text-sm font-medium">Filas por página</p>
           <select

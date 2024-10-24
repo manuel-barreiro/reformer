@@ -22,6 +22,7 @@ model User {
   accounts         Account[]
   payments         Payment[]
   purchasedPackages PurchasedPackage[]
+  bookings Booking[]
 }
 
 model Account {
@@ -97,6 +98,57 @@ model PurchasedPackage {
   classPackage     ClassPackage @relation(fields: [classPackageId], references: [id])
   payment          Payment?     @relation(fields: [paymentId], references: [id])
   paymentId        String?      @unique
+  bookings Booking[]
+}
+
+model Class {
+  id           String        @id @default(cuid())
+  category     ClassCategory
+  type         ClassType
+  date         DateTime
+  startTime    DateTime
+  endTime      DateTime
+  instructor   String
+  maxCapacity  Int
+  isActive     Boolean       @default(true)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  bookings     Booking[]
+}
+
+model Booking {
+  id                 String           @id @default(cuid())
+  userId             String
+  classId            String
+  purchasedPackageId String
+  status             BookingStatus    @default(confirmed)
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+  user               User             @relation(fields: [userId], references: [id])
+  class              Class            @relation(fields: [classId], references: [id])
+  purchasedPackage   PurchasedPackage @relation(fields: [purchasedPackageId], references: [id])
+}
+
+enum ClassCategory {
+  YOGA
+  PILATES
+}
+
+enum ClassType {
+  // Yoga types
+  VINYASA
+  HATHA
+  BALANCE
+  // Pilates types
+  STRENGTH_CORE
+  LOWER_BODY
+  FULL_BODY
+}
+
+enum BookingStatus {
+  confirmed
+  cancelled
+  attended
 }
 
 enum Role {
