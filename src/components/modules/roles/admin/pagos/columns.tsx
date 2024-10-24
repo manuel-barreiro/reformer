@@ -47,7 +47,8 @@ export const createColumns = (
   {
     accessorKey: "dateCreated",
     header: "FECHA",
-    cell: ({ row }) => new Date(row.original.dateCreated).toLocaleDateString(),
+    cell: ({ row }) =>
+      new Date(row.original.dateCreated).toLocaleDateString("es-ES"),
   },
   {
     accessorKey: "purchasedPackage.classPackage.name",

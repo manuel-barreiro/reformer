@@ -35,12 +35,12 @@ export default function PackageCard({
         <p className="mb-2 text-xs">
           Expira:{" "}
           <span className="font-dm_mono font-bold">
-            {pack.expirationDate.toLocaleDateString("es-AR")}
+            {pack.expirationDate.toLocaleDateString("es-ES")}
           </span>
         </p>
         <p className="mt-auto w-full border-t border-dashed border-grey_pebble pt-3 text-right font-dm_mono text-sm sm:text-base md:text-lg">
           <span className="font-semibold">total</span>
-          {` $${pack.classPackage.price.toLocaleString("es-AR")}`}
+          {` $${pack.classPackage.price.toLocaleString("es-ES")}`}
         </p>
       </div>
     </div>

@@ -614,7 +614,7 @@ export const ClassFormDialog = React.forwardRef<
                               key={index}
                               className="rounded bg-pearlVariant px-2 py-1 text-sm"
                             >
-                              {date.toLocaleDateString("es-AR", {
+                              {date.toLocaleDateString("es-ES", {
                                 weekday: "long",
                                 year: "numeric",
                                 month: "long",

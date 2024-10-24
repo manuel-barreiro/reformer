@@ -41,6 +41,7 @@ export default function ReformerCalendar({
     () =>
       new Set(
         monthClasses
+          .filter((item) => userRole === "admin" || item.isActive)
           .map((item) => {
             const itemDate = new Date(item.date)
             const localDate = toZonedTime(
