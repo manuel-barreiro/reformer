@@ -76,41 +76,47 @@ export async function POST(request: Request) {
           })
           console.log("Payment updated in database:", savedPayment)
         } else {
-          // Payment doesn't exist, create a new entry and a PurchasedPackage
-          const classPackage = await prisma.classPackage.findUnique({
-            where: { id: pago.metadata.class_package_id },
-          })
+          // Only create PurchasedPackage if payment status is "approved"
+          const paymentCreateData: any = { ...paymentData }
 
-          if (!classPackage) {
-            throw new Error("ClassPackage not found")
+          if (pago.status === "approved") {
+            const classPackage = await prisma.classPackage.findUnique({
+              where: { id: pago.metadata.class_package_id },
+            })
+
+            if (!classPackage) {
+              throw new Error("ClassPackage not found")
+            }
+
+            // Calculate expiration date based on class package duration and current date
+            const expirationDate = new Date()
+            expirationDate.setMonth(
+              expirationDate.getMonth() + classPackage.durationMonths
+            )
+
+            // Add purchasedPackage creation to payment data
+            paymentCreateData.purchasedPackage = {
+              create: {
+                userId: pago.metadata.user_id,
+                classPackageId: classPackage.id,
+                remainingClasses: classPackage.classCount,
+                expirationDate: expirationDate,
+                status: PackageStatus.active,
+              },
+            }
           }
 
-          // Calculate expiration date based on class package duration and current date
-          const expirationDate = new Date()
-          expirationDate.setMonth(
-            expirationDate.getMonth() + classPackage.durationMonths
-          )
-
-          // Create the payment and purchasedPackage entries
+          // Create the payment (and purchasedPackage if status is approved)
           savedPayment = await prisma.payment.create({
-            data: {
-              ...paymentData,
-              purchasedPackage: {
-                create: {
-                  userId: pago.metadata.user_id,
-                  classPackageId: classPackage.id,
-                  remainingClasses: classPackage.classCount,
-                  expirationDate: expirationDate,
-                  status: PackageStatus.active,
-                },
-              },
-            },
+            data: paymentCreateData,
             include: {
               purchasedPackage: true,
             },
           })
           console.log(
-            "New payment and PurchasedPackage saved to database:",
+            "New payment" +
+              (pago.status === "approved" ? " and PurchasedPackage" : "") +
+              " saved to database:",
             savedPayment
           )
         }
