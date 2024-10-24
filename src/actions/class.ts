@@ -47,7 +47,7 @@ export async function createClass(data: ClassFormData) {
     const validatedData = classSchema.parse(data)
     const classInstances: Array<any> = []
 
-    // Parse base date and times
+    // Parse base date and times ensuring proper timezone handling
     const baseDate = parse(validatedData.date, "yyyy-MM-dd", new Date())
     const [startHours, startMinutes] = validatedData.startTime
       .split(":")
@@ -84,24 +84,28 @@ export async function createClass(data: ClassFormData) {
         // Don't schedule classes more than 3 months in advance
         if (isAfter(weeklyDate, addWeeks(new Date(), 12))) continue
 
-        let startTime = set(weeklyDate, {
-          hours: startHours,
-          minutes: startMinutes,
-        })
-        let endTime = set(weeklyDate, {
-          hours: endHours,
-          minutes: endMinutes,
-        })
+        // Create a new date object for the specific date
+        const classDate = new Date(weeklyDate)
+        classDate.setHours(0, 0, 0, 0)
 
-        startTime = toZonedTime(startTime, timeZone)
-        endTime = toZonedTime(endTime, timeZone)
+        // Create specific datetime objects for start and end times
+        const startTime = new Date(classDate)
+        startTime.setHours(startHours, startMinutes, 0, 0)
+
+        const endTime = new Date(classDate)
+        endTime.setHours(endHours, endMinutes, 0, 0)
+
+        // Convert to the desired timezone
+        const zonedDate = toZonedTime(classDate, timeZone)
+        const zonedStartTime = toZonedTime(startTime, timeZone)
+        const zonedEndTime = toZonedTime(endTime, timeZone)
 
         const classData = {
           category: validatedData.category,
           type: validatedData.type,
-          date: toZonedTime(weeklyDate, timeZone),
-          startTime,
-          endTime,
+          date: zonedDate,
+          startTime: zonedStartTime,
+          endTime: zonedEndTime,
           instructor: validatedData.instructor,
           maxCapacity: validatedData.maxCapacity,
         }
