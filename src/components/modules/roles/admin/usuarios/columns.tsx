@@ -14,10 +14,11 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { CheckIcon, ChevronDownIcon } from "lucide-react"
+import { CheckIcon, ChevronDownIcon, Package } from "lucide-react"
 
 export const createColumns = (
   onOpenDetailModal: (user: User) => void,
+  onOpenPackagesModal: (user: User) => void,
   roleFilter: Role | "all",
   setRoleFilter: (role: Role | "all") => void
 ): ColumnDef<User>[] => [
@@ -109,12 +110,12 @@ export const createColumns = (
       </div>
     ),
   },
-  {
-    accessorKey: "createdAt",
-    header: "FECHA REGISTRO",
-    cell: ({ row }) =>
-      new Date(row.original.createdAt).toLocaleDateString("es-ES"),
-  },
+  // {
+  //   accessorKey: "createdAt",
+  //   header: "FECHA REGISTRO",
+  //   cell: ({ row }) =>
+  //     new Date(row.original.createdAt).toLocaleDateString("es-ES"),
+  // },
   {
     accessorKey: "detail",
     header: "DETALLE",
@@ -122,6 +123,20 @@ export const createColumns = (
       <div className="flex justify-center">
         <Button variant="ghost" onClick={() => onOpenDetailModal(row.original)}>
           <UserCog className="w-6" />
+        </Button>
+      </div>
+    ),
+  },
+  {
+    accessorKey: "packages",
+    header: "PAQUETES",
+    cell: ({ row }) => (
+      <div className="flex justify-center">
+        <Button
+          variant="ghost"
+          onClick={() => onOpenPackagesModal(row.original)}
+        >
+          <Package className="w-6" />
         </Button>
       </div>
     ),

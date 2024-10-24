@@ -20,20 +20,71 @@ import { Search } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { createColumns } from "./columns"
 import { PaginationControls } from "./PaginationControls"
-import { User, Role } from "@prisma/client"
+import { User, Role, PurchasedPackage } from "@prisma/client"
 import { UserDetailModal } from "./UserDetailModal"
-import { updateUser } from "@/actions/users"
+import {
+  updatePackage,
+  getUserPackages,
+  updateUser,
+  UpdatePackageInput,
+} from "@/actions/users"
+import { PackagesModal } from "./PackagesModal"
 
 interface UsersTableProps {
   initialUsers: User[]
 }
 
-export function UsersTable({ initialUsers }: UsersTableProps) {
-  const [data, setData] = useState<User[]>(initialUsers)
+interface ExtendedPurchasedPackage extends PurchasedPackage {
+  classPackage: {
+    name: string
+    classCount: number
+    durationMonths: number
+  }
+  payment: {
+    total: number
+    status: string
+    dateCreated: Date
+  } | null
+}
+
+export function UsersTable({ initialUsers }: { initialUsers: User[] }) {
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false)
   const [selectedUser, setSelectedUser] = useState<User | null>(null)
   const [globalFilter, setGlobalFilter] = useState("")
   const [roleFilter, setRoleFilter] = useState<Role | "all">("all")
+  const [isPackagesModalOpen, setIsPackagesModalOpen] = useState(false)
+  const [selectedUserPackages, setSelectedUserPackages] = useState<
+    ExtendedPurchasedPackage[]
+  >([])
+
+  // Capitalize and sort users by name initially
+  const capitalizeAndSortUsers = (users: User[]) => {
+    return users
+      .map((user) => ({
+        ...user,
+        name:
+          user.name.charAt(0).toUpperCase() + user.name.slice(1).toLowerCase(),
+        surname: user.surname
+          ? user.surname.charAt(0).toUpperCase() +
+            user.surname.slice(1).toLowerCase()
+          : user.surname,
+      }))
+      .sort((a, b) => {
+        const nameA = `${a.name} ${a.surname || ""}`.trim().toLowerCase()
+        const nameB = `${b.name} ${b.surname || ""}`.trim().toLowerCase()
+        return nameA.localeCompare(nameB)
+      })
+  }
+
+  const [data, setData] = useState<User[]>(capitalizeAndSortUsers(initialUsers))
+
+  const handleOpenPackagesModal = useCallback(async (user: User) => {
+    // Fetch user's packages with classPackage info
+    const packages = await getUserPackages(user.id)
+    setSelectedUser(user)
+    setSelectedUserPackages(packages)
+    setIsPackagesModalOpen(true)
+  }, [])
 
   const handleOpenDetailModal = useCallback((user: User) => {
     setSelectedUser(user)
@@ -41,9 +92,32 @@ export function UsersTable({ initialUsers }: UsersTableProps) {
   }, [])
 
   const columns = useMemo(
-    () => createColumns(handleOpenDetailModal, roleFilter, setRoleFilter),
-    [handleOpenDetailModal, roleFilter]
+    () =>
+      createColumns(
+        handleOpenDetailModal,
+        handleOpenPackagesModal, // Add this
+        roleFilter,
+        setRoleFilter
+      ),
+    [handleOpenDetailModal, handleOpenPackagesModal, roleFilter]
   )
+
+  const handleUpdatePackage = async (
+    packageId: string,
+    packageData: UpdatePackageInput
+  ) => {
+    try {
+      const updatedPackage = await updatePackage(packageId, packageData)
+      setSelectedUserPackages((prev) =>
+        prev.map((pkg) =>
+          pkg.id === packageId ? { ...pkg, ...updatedPackage } : pkg
+        )
+      )
+    } catch (error) {
+      console.error("Failed to update package:", error)
+      throw error
+    }
+  }
 
   const filteredData = useMemo(() => {
     return roleFilter === "all"
@@ -75,24 +149,37 @@ export function UsersTable({ initialUsers }: UsersTableProps) {
       pagination: {
         pageSize: 5,
       },
+      sorting: [{ id: "name", desc: false }], // Add default sorting
     },
   })
 
   const handleUpdateUser = async (userId: string, userData: Partial<User>) => {
     try {
-      // You'll need to implement this action
+      const capitalizedData = {
+        ...userData,
+        name: userData.name
+          ? userData.name.charAt(0).toUpperCase() +
+            userData.name.slice(1).toLowerCase()
+          : userData.name,
+        surname: userData.surname
+          ? userData.surname.charAt(0).toUpperCase() +
+            userData.surname.slice(1).toLowerCase()
+          : userData.surname,
+      }
+
       const updatedUser = await updateUser(userId, {
-        name: userData.name!,
-        email: userData.email!,
+        name: capitalizedData.name!,
         role: userData.role!,
-        surname: userData.surname,
+        surname: capitalizedData.surname,
         phone: userData.phone,
       })
-      setData((prevData) =>
-        prevData.map((user) =>
+
+      setData((prevData) => {
+        const newData = prevData.map((user) =>
           user.id === userId ? { ...user, ...updatedUser } : user
         )
-      )
+        return capitalizeAndSortUsers(newData)
+      })
       setIsDetailModalOpen(false)
     } catch (error) {
       console.error("Failed to update user:", error)
@@ -175,12 +262,21 @@ export function UsersTable({ initialUsers }: UsersTableProps) {
       </div>
       <PaginationControls table={table} />
       {selectedUser && (
-        <UserDetailModal
-          isOpen={isDetailModalOpen}
-          onClose={() => setIsDetailModalOpen(false)}
-          user={selectedUser}
-          onUpdateUser={handleUpdateUser}
-        />
+        <>
+          <UserDetailModal
+            isOpen={isDetailModalOpen}
+            onClose={() => setIsDetailModalOpen(false)}
+            user={selectedUser}
+            onUpdateUser={handleUpdateUser}
+          />
+          <PackagesModal
+            isOpen={isPackagesModalOpen}
+            onClose={() => setIsPackagesModalOpen(false)}
+            user={selectedUser}
+            packages={selectedUserPackages}
+            onUpdatePackage={handleUpdatePackage}
+          />
+        </>
       )}
     </div>
   )
