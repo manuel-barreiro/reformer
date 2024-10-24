@@ -20,6 +20,10 @@ const adminMenuItems = [
     title: "CALENDARIO",
     href: "/admin/calendario",
   },
+  {
+    title: "USUARIOS",
+    href: "/admin/usuarios",
+  },
 ]
 
 const userMenuItems = [
@@ -83,7 +87,8 @@ export default async function SideMenu() {
       <div
         className={cn(
           "grid w-full gap-2 xl:flex xl:flex-col",
-          userRole === "admin" ? "grid-cols-3" : "grid-cols-2"
+          // userRole === "admin" ? "grid-cols-3" : "grid-cols-2"
+          "grid-cols-2"
         )}
       >
         {menuItems.map((item) => (
