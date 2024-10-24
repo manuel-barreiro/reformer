@@ -44,7 +44,11 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion"
-import { formatLocalDate, formatLocalTime } from "@/lib/timezone-utils"
+import {
+  formatLocalDate,
+  formatLocalTime,
+  localToUTC,
+} from "@/lib/timezone-utils"
 
 const yogaTypes = ["VINYASA", "HATHA", "BALANCE"]
 const pilatesTypes = ["STRENGTH_CORE", "LOWER_BODY", "FULL_BODY"]
@@ -164,23 +168,12 @@ export const ClassFormDialog = React.forwardRef<
     setIsSubmitting(true)
     try {
       if (classToEdit) {
-        // Parse the date and create the date strings
-        const baseDate = parse(values.date, "yyyy-MM-dd", new Date())
-        const year = baseDate.getFullYear()
-        const month = baseDate.getMonth()
-        const day = baseDate.getDate()
-
-        const dateString = `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`
-        const startTimeString = `${dateString}T${values.startTime}:00`
-        const endTimeString = `${dateString}T${values.endTime}:00`
-
-        // Create the dates
-        const zonedDate = new Date(`${dateString}T00:00:00`)
-        const startTime = new Date(startTimeString)
-        const endTime = new Date(endTimeString)
+        const baseDate = localToUTC(values.date, "00:00")
+        const startTime = localToUTC(values.date, values.startTime)
+        const endTime = localToUTC(values.date, values.endTime)
 
         const result = await updateClass(classToEdit.id, {
-          date: zonedDate,
+          date: baseDate,
           startTime,
           endTime,
           instructor: values.instructor,

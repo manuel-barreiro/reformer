@@ -233,29 +233,18 @@ export async function toggleClassLock(classId: string) {
 }
 
 export async function updateClass(classId: string, data: Partial<Class>) {
-  const timeZone = "America/Argentina/Buenos_Aires"
-
   try {
-    // Convertir las fechas a la zona horaria correcta si están presentes en los datos
-    const updatedData = { ...data }
-    if (data.date) {
-      updatedData.date = toZonedTime(new Date(data.date), timeZone)
-    }
-    if (data.startTime) {
-      updatedData.startTime = toZonedTime(new Date(data.startTime), timeZone)
-    }
-    if (data.endTime) {
-      updatedData.endTime = toZonedTime(new Date(data.endTime), timeZone)
-    }
-
     const updatedClass = await prisma.class.update({
       where: { id: classId },
-      data: updatedData,
+      data: {
+        ...data,
+      },
       include: {
         bookings: true,
       },
     })
 
+    revalidatePath("/admin/calendario")
     return { success: true, data: updatedClass }
   } catch (error) {
     console.error("Error updating class:", error)
