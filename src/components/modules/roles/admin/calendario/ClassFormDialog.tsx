@@ -114,7 +114,7 @@ export const ClassFormDialog = React.forwardRef<
 
   const generateWeekDates = (startDate: Date) => {
     const dates = []
-    for (let i = 0; i < 6; i++) {
+    for (let i = 1; i < 7; i++) {
       const date = addDays(startDate, i)
       dates.push({
         value: format(date, "yyyy-MM-dd"),
@@ -171,28 +171,20 @@ export const ClassFormDialog = React.forwardRef<
     setIsSubmitting(true)
     try {
       if (classToEdit) {
-        // Parse the date and times
+        // Parse the date and create the date strings
         const baseDate = parse(values.date, "yyyy-MM-dd", new Date())
-        const [startHours, startMinutes] = values.startTime
-          .split(":")
-          .map(Number)
-        const [endHours, endMinutes] = values.endTime.split(":").map(Number)
+        const year = baseDate.getFullYear()
+        const month = baseDate.getMonth()
+        const day = baseDate.getDate()
 
-        // Set the hours and minutes on the base date
-        let startTime = set(baseDate, {
-          hours: startHours,
-          minutes: startMinutes,
-        })
-        let endTime = set(baseDate, {
-          hours: endHours,
-          minutes: endMinutes,
-        })
+        const dateString = `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`
+        const startTimeString = `${dateString}T${values.startTime}:00`
+        const endTimeString = `${dateString}T${values.endTime}:00`
 
-        // Convert to timezone
-        const timeZone = "America/Argentina/Buenos_Aires"
-        const zonedDate = toZonedTime(baseDate, timeZone)
-        startTime = toZonedTime(startTime, timeZone)
-        endTime = toZonedTime(endTime, timeZone)
+        // Create the dates
+        const zonedDate = new Date(`${dateString}T00:00:00`)
+        const startTime = new Date(startTimeString)
+        const endTime = new Date(endTimeString)
 
         const result = await updateClass(classToEdit.id, {
           date: zonedDate,

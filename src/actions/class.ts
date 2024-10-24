@@ -47,7 +47,7 @@ export async function createClass(data: ClassFormData) {
     const validatedData = classSchema.parse(data)
     const classInstances: Array<any> = []
 
-    // Parse base date and times ensuring proper timezone handling
+    // Parse base date and times
     const baseDate = parse(validatedData.date, "yyyy-MM-dd", new Date())
     const [startHours, startMinutes] = validatedData.startTime
       .split(":")
@@ -84,21 +84,20 @@ export async function createClass(data: ClassFormData) {
         // Don't schedule classes more than 3 months in advance
         if (isAfter(weeklyDate, addWeeks(new Date(), 12))) continue
 
-        // Create a new date object for the specific date
-        const classDate = new Date(weeklyDate)
-        classDate.setHours(0, 0, 0, 0)
+        // Get the date parts
+        const year = weeklyDate.getFullYear()
+        const month = weeklyDate.getMonth()
+        const day = weeklyDate.getDate()
 
-        // Create specific datetime objects for start and end times
-        const startTime = new Date(classDate)
-        startTime.setHours(startHours, startMinutes, 0, 0)
+        // Create the dates in the correct timezone
+        const dateString = `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`
+        const startTimeString = `${dateString}T${validatedData.startTime}:00`
+        const endTimeString = `${dateString}T${validatedData.endTime}:00`
 
-        const endTime = new Date(classDate)
-        endTime.setHours(endHours, endMinutes, 0, 0)
-
-        // Convert to the desired timezone
-        const zonedDate = toZonedTime(classDate, timeZone)
-        const zonedStartTime = toZonedTime(startTime, timeZone)
-        const zonedEndTime = toZonedTime(endTime, timeZone)
+        // Parse the dates as if they were in the target timezone
+        const zonedDate = new Date(`${dateString}T00:00:00`)
+        const zonedStartTime = new Date(startTimeString)
+        const zonedEndTime = new Date(endTimeString)
 
         const classData = {
           category: validatedData.category,
