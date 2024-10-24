@@ -1,6 +1,5 @@
 "use client"
 import React, { useState, useTransition } from "react"
-import { UserInfo } from "@/components/modules/roles/user/perfil/utils/mockUserInfo"
 import { Button } from "@/components/ui/button"
 import {
   Form,
@@ -15,19 +14,36 @@ import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
-import { userInfoSchema } from "@/lib/zod-schemas"
+import { updateProfile } from "@/actions/profile"
+import { useToast } from "@/components/ui/use-toast"
+
+const userInfoSchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  surname: z.string().optional(),
+  phone: z.string().optional(),
+  email: z.string().email(),
+})
+
+interface UserInfo {
+  name: string
+  surname: string
+  phone: string
+  email: string
+  id: string
+}
 
 export default function UserInfoForm({ userInfo }: { userInfo: UserInfo }) {
   const [error, setError] = useState<string | null>("")
   const [isPending, startTransition] = useTransition()
+  const { toast } = useToast()
   const router = useRouter()
 
   const form = useForm<z.infer<typeof userInfoSchema>>({
     resolver: zodResolver(userInfoSchema),
     defaultValues: {
       name: userInfo.name,
-      surname: userInfo.surname,
-      phone: userInfo.phone,
+      surname: userInfo?.surname,
+      phone: userInfo?.phone,
       email: userInfo.email,
     },
   })
@@ -35,7 +51,28 @@ export default function UserInfoForm({ userInfo }: { userInfo: UserInfo }) {
   function onSubmitUserInfo(values: z.infer<typeof userInfoSchema>) {
     setError(null)
     startTransition(async () => {
-      console.log(values)
+      const { name, surname, phone } = values
+      const result = await updateProfile(userInfo.id, {
+        name,
+        surname,
+        phone,
+      })
+
+      if (result.success) {
+        toast({
+          title: "Perfil actualizado :)",
+          description: "Tu perfil ha sido actualizado correctamente.",
+          variant: "reformer",
+        })
+        router.refresh()
+      } else {
+        setError(result.error ?? "Unknown error")
+        toast({
+          title: "Error al actualizar el perfil",
+          description: error,
+          variant: "destructive",
+        })
+      }
     })
   }
 
@@ -55,7 +92,7 @@ export default function UserInfoForm({ userInfo }: { userInfo: UserInfo }) {
                   <FormLabel className="sr-only">Nombre</FormLabel>
                   <FormControl>
                     <Input
-                      className="w-full border-rust bg-pearlVariant py-6 font-dm_mono uppercase text-grey_pebble/50 ring-rust ring-offset-rust placeholder:text-grey_pebble/50"
+                      className="w-full border-rust bg-pearlVariant py-6 font-dm_mono font-bold uppercase text-grey_pebble/50 ring-rust ring-offset-rust placeholder:text-grey_pebble/50"
                       type="text"
                       placeholder="NOMBRE"
                       {...field}
@@ -74,7 +111,7 @@ export default function UserInfoForm({ userInfo }: { userInfo: UserInfo }) {
                   <FormLabel className="sr-only">Surname</FormLabel>
                   <FormControl>
                     <Input
-                      className="w-full border-rust bg-pearlVariant py-6 font-dm_mono uppercase text-grey_pebble/50 ring-rust ring-offset-rust placeholder:text-grey_pebble/50"
+                      className="w-full border-rust bg-pearlVariant py-6 font-dm_mono font-bold uppercase text-grey_pebble/50 ring-rust ring-offset-rust placeholder:text-grey_pebble/50"
                       type="text"
                       placeholder="APELLIDO"
                       {...field}
@@ -97,6 +134,7 @@ export default function UserInfoForm({ userInfo }: { userInfo: UserInfo }) {
                     className="border-rust bg-pearlVariant py-6 font-dm_mono uppercase text-grey_pebble/50 ring-rust ring-offset-rust placeholder:text-grey_pebble/50"
                     type="email"
                     placeholder="EMAIL"
+                    disabled
                     {...field}
                   />
                 </FormControl>
@@ -113,8 +151,8 @@ export default function UserInfoForm({ userInfo }: { userInfo: UserInfo }) {
                 <FormLabel className="sr-only">Celular</FormLabel>
                 <FormControl>
                   <Input
-                    className="border-rust bg-pearlVariant py-6 font-dm_mono uppercase text-grey_pebble/50 ring-rust ring-offset-rust placeholder:text-grey_pebble/50"
-                    type="phone"
+                    className="border-rust bg-pearlVariant py-6 font-dm_mono font-bold uppercase text-grey_pebble/50 ring-rust ring-offset-rust placeholder:text-grey_pebble/50"
+                    type="tel"
                     placeholder="CELULAR"
                     {...field}
                   />
@@ -126,11 +164,13 @@ export default function UserInfoForm({ userInfo }: { userInfo: UserInfo }) {
 
           <Button
             type="submit"
-            className="w-full bg-midnight py-6 font-dm_mono text-pearl duration-300 ease-in-out hover:bg-rust"
+            className="w-full bg-midnight py-6 font-dm_mono text-pearl duration-300 ease-in-out hover:bg-rust disabled:opacity-50"
             disabled={isPending}
           >
-            GUARDAR
+            {isPending ? "ACTUALIZANDO..." : "GUARDAR"}
           </Button>
+
+          {error && <p className="text-center text-red-500">{error}</p>}
         </form>
       </Form>
     </section>
