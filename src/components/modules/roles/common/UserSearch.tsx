@@ -76,7 +76,7 @@ export function UserSearch({ onSelectUser, selectedUser }: UserSearchProps) {
           </Button>
         </div>
       ) : (
-        <Command className="rounded-lg border border-rust/50 bg-pearlVariant font-semibold text-grey_pebble/60 shadow-md">
+        <Command className="rounded-lg border border-rust/50 bg-pearlVariant font-semibold text-grey_pebble/60">
           <CommandInput
             placeholder="Buscar usuario..."
             className="placeholder:!text-grey_pebble/60"

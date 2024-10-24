@@ -134,7 +134,7 @@ export function PaymentsTable({ initialPayments }: PaymentsTableProps) {
             <Input
               value={globalFilter}
               onChange={(e) => setGlobalFilter(e.target.value)}
-              className="w-full rounded-lg border border-rust/50 bg-pearlVariant pl-10 font-semibold text-grey_pebble/60 shadow-md lg:w-80"
+              className="w-full rounded-lg border border-rust/50 bg-pearlVariant pl-10 font-semibold text-grey_pebble/60 lg:w-80"
               placeholder="Buscar..."
             />
           </div>

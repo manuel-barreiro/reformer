@@ -7,7 +7,9 @@ export default async function PaymentsPage() {
   const initialPayments = await getPayments()
 
   return (
-    <Suspense fallback={<Skeleton className="h-96 w-full lg:pl-10" />}>
+    <Suspense
+      fallback={<Skeleton className="h-96 w-full bg-pearlVariant lg:pl-10" />}
+    >
       <PaymentsTable initialPayments={initialPayments} />
     </Suspense>
   )
