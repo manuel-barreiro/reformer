@@ -7,6 +7,7 @@ import { revalidatePath } from "next/cache"
 import { z } from "zod"
 import { addDays, isBefore, parse, addWeeks, isAfter, set } from "date-fns"
 import { toZonedTime } from "date-fns-tz"
+import { formatLocalDate, localToUTC } from "@/lib/timezone-utils"
 
 const classSchema = z.object({
   category: z.enum(["YOGA", "PILATES"]),
@@ -41,65 +42,48 @@ async function validateAdmin() {
 
 export async function createClass(data: ClassFormData) {
   await validateAdmin()
-  const timeZone = "America/Argentina/Buenos_Aires"
 
   try {
     const validatedData = classSchema.parse(data)
     const classInstances: Array<any> = []
 
-    // Parse base date and create a Date object in the correct timezone
-    const baseDate = parse(validatedData.date, "yyyy-MM-dd", new Date())
-    const baseDateInZone = toZonedTime(baseDate, timeZone)
+    // Convert the base date to UTC while preserving local time
+    const baseDate = localToUTC(validatedData.date, "00:00")
 
-    // Function to create a datetime in the correct timezone
-    const createZonedDateTime = (date: Date, timeString: string) => {
-      const [hours, minutes] = timeString.split(":").map(Number)
-      const dateTime = set(date, {
-        hours,
-        minutes,
-        seconds: 0,
-        milliseconds: 0,
-      })
-      return toZonedTime(dateTime, timeZone)
-    }
-
-    // Calculate dates for horizontal repetition (within week)
+    // Calculate dates for horizontal repetition
     const horizontalDates: Date[] = []
     if (validatedData.repeatDaily && validatedData.repeatUntil) {
-      const endDate = parse(validatedData.repeatUntil, "yyyy-MM-dd", new Date())
-      const endDateInZone = toZonedTime(endDate, timeZone)
-      let currentDate = baseDateInZone
+      const endDate = localToUTC(validatedData.repeatUntil, "00:00")
+      let currentDate = baseDate
 
-      while (
-        isBefore(currentDate, endDateInZone) ||
-        currentDate.getTime() === endDateInZone.getTime()
-      ) {
+      while (currentDate <= endDate) {
         horizontalDates.push(currentDate)
-        currentDate = toZonedTime(addDays(currentDate, 1), timeZone)
+        currentDate = addDays(currentDate, 1)
       }
     } else {
-      horizontalDates.push(baseDateInZone)
+      horizontalDates.push(baseDate)
     }
 
-    // Calculate vertical repetition (weeks)
-    const numberOfWeeks = validatedData.repeatWeekly
-      ? validatedData.repeatWeeks || 1
-      : 1
-
     // Generate all class instances
-    for (let week = 0; week < numberOfWeeks; week++) {
+    for (
+      let week = 0;
+      week < (validatedData.repeatWeekly ? validatedData.repeatWeeks || 1 : 1);
+      week++
+    ) {
       for (const date of horizontalDates) {
-        const weeklyDate = toZonedTime(addWeeks(date, week), timeZone)
+        const weeklyDate = addWeeks(date, week)
 
         // Don't schedule classes more than 3 months in advance
         if (isAfter(weeklyDate, addWeeks(new Date(), 12))) continue
 
-        // Create start and end times in the correct timezone
-        const startTime = createZonedDateTime(
-          weeklyDate,
+        const startTime = localToUTC(
+          formatLocalDate(weeklyDate),
           validatedData.startTime
         )
-        const endTime = createZonedDateTime(weeklyDate, validatedData.endTime)
+        const endTime = localToUTC(
+          formatLocalDate(weeklyDate),
+          validatedData.endTime
+        )
 
         const classData = {
           category: validatedData.category,
@@ -120,11 +104,7 @@ export async function createClass(data: ClassFormData) {
     }
 
     revalidatePath("/admin/calendario")
-    return {
-      success: true,
-      data: classInstances,
-      count: classInstances.length,
-    }
+    return { success: true, data: classInstances, count: classInstances.length }
   } catch (error) {
     console.error("Error creating classes:", error)
     if (error instanceof z.ZodError) {

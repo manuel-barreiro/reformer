@@ -44,6 +44,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion"
+import { formatLocalDate, formatLocalTime } from "@/lib/timezone-utils"
 
 const yogaTypes = ["VINYASA", "HATHA", "BALANCE"]
 const pilatesTypes = ["STRENGTH_CORE", "LOWER_BODY", "FULL_BODY"]
@@ -130,17 +131,9 @@ export const ClassFormDialog = React.forwardRef<
       ? {
           category: classToEdit.category,
           type: classToEdit.type,
-          date: classToEdit.date.toISOString().split("T")[0],
-          startTime: new Date(classToEdit.startTime).toLocaleTimeString([], {
-            hour: "2-digit",
-            minute: "2-digit",
-            hour12: false,
-          }),
-          endTime: new Date(classToEdit.endTime).toLocaleTimeString([], {
-            hour: "2-digit",
-            minute: "2-digit",
-            hour12: false,
-          }),
+          date: formatLocalDate(classToEdit.date),
+          startTime: formatLocalTime(classToEdit.startTime),
+          endTime: formatLocalTime(classToEdit.endTime),
           instructor: classToEdit.instructor,
           maxCapacity: classToEdit.maxCapacity,
           repeatDaily: false,

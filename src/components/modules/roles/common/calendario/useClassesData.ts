@@ -12,6 +12,7 @@ import { getClasses } from "@/actions/class"
 import { ClassWithBookings } from "@/components/modules/roles/common/calendario/types"
 import { BookingWithClass } from "@/components/modules/roles/user/reservas/ReservasPage"
 import { getUserBookingsInRange } from "@/actions/booking-actions"
+import { localToUTC, utcToLocal } from "@/lib/timezone-utils"
 
 interface ClassesCache {
   [key: string]: ClassWithBookings[]
@@ -33,14 +34,10 @@ export function useClassesData(
 
   const parseDate = (date: Date | string): Date => {
     if (date instanceof Date) {
-      return isValid(date)
-        ? toZonedTime(date, TIMEZONE)
-        : toZonedTime(new Date(), TIMEZONE)
+      return utcToLocal(date)
     }
     const parsedDate = parseISO(date)
-    return isValid(parsedDate)
-      ? toZonedTime(parsedDate, TIMEZONE)
-      : toZonedTime(new Date(), TIMEZONE)
+    return isValid(parsedDate) ? utcToLocal(parsedDate) : utcToLocal(new Date())
   }
 
   const fetchClasses = useCallback(
@@ -49,8 +46,14 @@ export function useClassesData(
       const monthKey = format(date, "yyyy-MM")
 
       try {
-        const monthStart = toZonedTime(startOfMonth(date), TIMEZONE)
-        const monthEnd = toZonedTime(endOfMonth(date), TIMEZONE)
+        const monthStart = localToUTC(
+          format(startOfMonth(date), "yyyy-MM-dd"),
+          "00:00"
+        )
+        const monthEnd = localToUTC(
+          format(endOfMonth(date), "yyyy-MM-dd"),
+          "23:59"
+        )
         const newClasses = await getClasses(monthStart, monthEnd)
 
         const parsedClasses = newClasses.map((cls) => ({
