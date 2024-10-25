@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  transpilePackages: ["date-fns", "date-fns-tz"],
   webpack(config) {
     // Existing configurations (if any) go here
 

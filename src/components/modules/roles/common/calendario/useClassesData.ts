@@ -7,7 +7,7 @@ import {
   isValid,
   format,
 } from "date-fns"
-import { toZonedTime } from "date-fns-tz"
+import { utcToZonedTime } from "date-fns-tz"
 import { getClasses } from "@/actions/class"
 import { ClassWithBookings } from "@/components/modules/roles/common/calendario/types"
 import { BookingWithClass } from "@/components/modules/roles/user/reservas/ReservasPage"
@@ -95,8 +95,8 @@ export function useClassesData(
 
   const selectedDayClasses = useMemo(() => {
     return classes.filter((cls) => {
-      const classDate = toZonedTime(new Date(cls.date), TIMEZONE)
-      const currentDateInZone = toZonedTime(currentDate, TIMEZONE)
+      const classDate = utcToZonedTime(new Date(cls.date), TIMEZONE)
+      const currentDateInZone = utcToZonedTime(currentDate, TIMEZONE)
       return (
         format(classDate, "yyyy-MM-dd") ===
         format(currentDateInZone, "yyyy-MM-dd")

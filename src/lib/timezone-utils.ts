@@ -1,5 +1,5 @@
 import { parse, format, set } from "date-fns"
-import { fromZonedTime, toZonedTime } from "date-fns-tz"
+import { zonedTimeToUtc, utcToZonedTime } from "date-fns-tz"
 
 export const TIMEZONE = "America/Argentina/Buenos_Aires"
 
@@ -17,13 +17,13 @@ export function localToUTC(dateString: string, timeString: string): Date {
   })
 
   // Convert local time to UTC while preserving the intended local time
-  const utcDate = fromZonedTime(localDateTime, TIMEZONE)
+  const utcDate = zonedTimeToUtc(localDateTime, TIMEZONE)
 
   return utcDate
 }
 
 export function utcToLocal(date: Date): Date {
-  return toZonedTime(date, TIMEZONE)
+  return utcToZonedTime(date, TIMEZONE)
 }
 
 export function formatLocalDate(date: Date): string {

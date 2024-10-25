@@ -15,7 +15,7 @@ import {
   endOfMonth,
   startOfMonth,
 } from "date-fns"
-import { toZonedTime } from "date-fns-tz"
+import { utcToZonedTime } from "date-fns-tz"
 import { BookingWithClass } from "@/components/modules/roles/user/reservas/ReservasPage"
 
 interface ReformerCalendarProps {
@@ -44,7 +44,7 @@ export default function ReformerCalendar({
           .filter((item) => userRole === "admin" || item.isActive)
           .map((item) => {
             const itemDate = new Date(item.date)
-            const localDate = toZonedTime(
+            const localDate = utcToZonedTime(
               itemDate,
               "America/Argentina/Buenos_Aires"
             )
@@ -62,7 +62,7 @@ export default function ReformerCalendar({
         monthBookings
           .map((booking) => {
             const itemDate = new Date(booking.class.date)
-            const localDate = toZonedTime(
+            const localDate = utcToZonedTime(
               itemDate,
               "America/Argentina/Buenos_Aires"
             )
