@@ -11,6 +11,11 @@ import { ClassWithBookings } from "@/components/modules/roles/common/calendario/
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Skeleton } from "@/components/ui/skeleton"
 import ClassCard from "@/components/modules/roles/common/calendario/ClassCard"
+import { Category, Subcategory } from "@prisma/client"
+
+interface ClassWithCategory extends ClassWithBookings {
+  category: Category
+}
 
 interface ClassesScheduleProps {
   date: Date
@@ -32,29 +37,25 @@ export default function ClassesSchedule({
   userRole,
 }: ClassesScheduleProps) {
   const [timeOfDay, setTimeOfDay] = useState("AM")
-  const [category, setCategory] = useState("PILATES")
+  const [category, setCategory] = useState("pilates")
 
   const filteredClasses = Array.isArray(classes)
     ? classes.filter((class_) => {
         const hour = new Date(class_.startTime).getHours()
         const isAM = hour < 12
         const matchesTime = timeOfDay === "AM" ? isAM : !isAM
-        const matchesCategory = class_.category === category
+        const matchesCategory =
+          class_.category.name.toLowerCase() === category.toLowerCase()
 
-        // Check if the current user has a confirmed booking for this class
         const userHasConfirmedBooking = class_.bookings.some(
           (booking) =>
             booking.userId === currentUserId && booking.status === "confirmed"
         )
 
-        // For admin, show all classes
         if (userRole === "admin") {
           return matchesTime && matchesCategory
         }
 
-        // For users:
-        // 1. Show active classes (isActive === true)
-        // 2. Show inactive classes (isActive === false) ONLY if user has a confirmed booking
         return (
           matchesTime &&
           matchesCategory &&
@@ -68,8 +69,8 @@ export default function ClassesSchedule({
       const result = await deleteClass(classId)
       if (result.success) {
         toast({
-          title: "Class deleted",
-          description: "The class has been deleted successfully.",
+          title: "Clase eliminada",
+          description: "La clase ha sido eliminada exitosamente.",
           variant: "reformer",
         })
         await onClassChange() // Refetch classes after deletion
@@ -79,7 +80,7 @@ export default function ClassesSchedule({
     } catch (error) {
       toast({
         title: "Error",
-        description: "Failed to delete class. Please try again.",
+        description: "Error al eliminar la clase.",
         variant: "destructive",
       })
     }
@@ -116,8 +117,8 @@ export default function ClassesSchedule({
 
         <Tabs value={category} onValueChange={setCategory} className="w-full">
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="PILATES">Pilates</TabsTrigger>
-            <TabsTrigger value="YOGA">Yoga</TabsTrigger>
+            <TabsTrigger value="pilates">Pilates</TabsTrigger>
+            <TabsTrigger value="yoga">Yoga</TabsTrigger>
           </TabsList>
         </Tabs>
       </div>

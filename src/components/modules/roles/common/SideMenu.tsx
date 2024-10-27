@@ -6,6 +6,7 @@ import SideMenuButton from "@/components/modules/roles/common/SideMenuButton"
 import { auth } from "@/auth"
 import Image from "next/image"
 import { cn } from "@/lib/utils"
+import { ReformerDropdownMenu } from "@/components/modules/roles/common/ReformerDropdownMenu"
 
 const adminMenuItems = [
   {
@@ -23,6 +24,10 @@ const adminMenuItems = [
   {
     title: "USUARIOS",
     href: "/admin/usuarios",
+  },
+  {
+    title: "CATEGORÍAS",
+    href: "/admin/categorias",
   },
 ]
 
@@ -81,14 +86,15 @@ export default async function SideMenu() {
             </p>
           </div>
         </div>
-        <LogoutButtonMobile />
+        {/* <LogoutButtonMobile /> */}
+        <ReformerDropdownMenu items={menuItems} />
       </div>
 
       <div
         className={cn(
-          "grid w-full gap-2 xl:flex xl:flex-col",
+          "grid w-full gap-2 xl:flex-col",
           // userRole === "admin" ? "grid-cols-3" : "grid-cols-2"
-          "grid-cols-2"
+          "hidden grid-cols-2 xl:flex"
         )}
       >
         {menuItems.map((item) => (

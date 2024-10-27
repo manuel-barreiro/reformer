@@ -28,7 +28,7 @@ import {
 } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
 import { toast } from "@/components/ui/use-toast"
-import { Class } from "@prisma/client"
+import { Category, Class, Subcategory } from "@prisma/client"
 import { createClass, updateClass } from "@/actions/class"
 import { parse, set, addWeeks, addDays, format, isAfter } from "date-fns"
 import { ca, es } from "date-fns/locale"
@@ -48,20 +48,16 @@ import {
   formatLocalTime,
   localToUTC,
 } from "@/lib/timezone-utils"
+import { getActiveClassCategories } from "@/actions/category"
+import { ScrollArea } from "@/components/ui/scroll-area"
 
-const yogaTypes = ["VINYASA", "HATHA", "BALANCE"]
-const pilatesTypes = ["STRENGTH_CORE", "LOWER_BODY", "FULL_BODY"]
+interface CategoryWithSubcategories extends Category {
+  subcategories: Subcategory[]
+}
 
 const formSchema = z.object({
-  category: z.enum(["YOGA", "PILATES"]),
-  type: z.enum([
-    "VINYASA",
-    "HATHA",
-    "BALANCE",
-    "STRENGTH_CORE",
-    "LOWER_BODY",
-    "FULL_BODY",
-  ]),
+  categoryId: z.string().min(1, "Category is required"),
+  subcategoryId: z.string().min(1, "Subcategory is required"),
   date: z.string(),
   startTime: z.string(),
   endTime: z.string(),
@@ -70,7 +66,7 @@ const formSchema = z.object({
   repeatDaily: z.boolean().default(false),
   repeatUntil: z.string().optional(),
   repeatWeekly: z.boolean().default(false),
-  repeatWeeks: z.number().min(1).max(12).optional(),
+  repeatWeeks: z.number().min(1).max(12).default(4),
 })
 
 type FormValues = z.infer<typeof formSchema>
@@ -92,28 +88,50 @@ export const ClassFormDialog = React.forwardRef<
 >(({ selectedDate, classToEdit, trigger, onSuccess, currentFilters }, ref) => {
   const [isOpen, setIsOpen] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [categories, setCategories] = useState<CategoryWithSubcategories[]>([])
+  const [loading, setLoading] = useState(true)
 
-  const getDefaultCategory = (): "YOGA" | "PILATES" => {
-    if (
-      currentFilters?.category === "YOGA" ||
-      currentFilters?.category === "PILATES"
-    ) {
-      return currentFilters.category
+  // Fetch categories on component mount
+  useEffect(() => {
+    const fetchCategories = async () => {
+      const result = await getActiveClassCategories()
+      if (result.success) {
+        setCategories(result?.data as CategoryWithSubcategories[])
+      }
+      setLoading(false)
     }
-    return "YOGA"
+
+    fetchCategories()
+  }, [])
+
+  // Get default category based on current filter
+  const getDefaultCategory = () => {
+    if (!categories.length) return ""
+
+    if (currentFilters?.category) {
+      const matchingCategory = categories.find(
+        (cat) =>
+          cat.name.toLowerCase() === currentFilters.category.toLowerCase()
+      )
+      if (matchingCategory) return matchingCategory.id
+    }
+
+    return categories[0].id
   }
 
-  const getDefaultType = (
-    category: "YOGA" | "PILATES"
-  ):
-    | "VINYASA"
-    | "STRENGTH_CORE"
-    | "HATHA"
-    | "BALANCE"
-    | "LOWER_BODY"
-    | "FULL_BODY" => {
-    if (category === "YOGA") return "VINYASA"
-    return "STRENGTH_CORE"
+  // Get default subcategory based on selected category
+  const getDefaultSubcategory = (categoryId: string) => {
+    const category = categories.find((cat) => cat.id === categoryId)
+    return category?.subcategories[0]?.id || ""
+  }
+
+  // Get default times based on timeOfDay
+  const getDefaultTimes = () => {
+    const isAM = currentFilters?.timeOfDay === "AM"
+    return {
+      startTime: isAM ? "09:00" : "13:00",
+      endTime: isAM ? "10:00" : "14:00",
+    }
   }
 
   const generateWeekDates = (startDate: Date) => {
@@ -132,32 +150,56 @@ export const ClassFormDialog = React.forwardRef<
     resolver: zodResolver(formSchema),
     defaultValues: classToEdit
       ? {
-          category: classToEdit.category,
-          type: classToEdit.type,
-          date: formatLocalDate(classToEdit.date),
-          startTime: formatLocalTime(classToEdit.startTime),
-          endTime: formatLocalTime(classToEdit.endTime),
+          categoryId: classToEdit.categoryId,
+          subcategoryId: classToEdit.subcategoryId,
+          date: classToEdit.date.toISOString().split("T")[0],
+          startTime: new Date(classToEdit.startTime).toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: false,
+          }),
+          endTime: new Date(classToEdit.endTime).toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: false,
+          }),
           instructor: classToEdit.instructor,
           maxCapacity: classToEdit.maxCapacity,
           repeatDaily: false,
-          repeatUntil: undefined,
           repeatWeekly: false,
-          repeatWeeks: 4,
         }
       : {
-          category: getDefaultCategory(),
-          type: getDefaultType(getDefaultCategory()),
-          date: selectedDate.toISOString().split("T")[0],
-          startTime: currentFilters?.timeOfDay === "AM" ? "09:00" : "13:00",
-          endTime: currentFilters?.timeOfDay === "AM" ? "10:00" : "14:00",
+          categoryId: getDefaultCategory(),
+          subcategoryId: "",
+          date: format(selectedDate, "yyyy-MM-dd"),
+          ...getDefaultTimes(),
           instructor: "",
           maxCapacity: 8,
           repeatDaily: false,
-          repeatUntil: undefined,
           repeatWeekly: false,
           repeatWeeks: 4,
         },
   })
+
+  // Watch for category changes to update subcategories
+  const selectedCategoryId = form.watch("categoryId")
+  const selectedCategory = categories.find(
+    (cat) => cat.id === selectedCategoryId
+  )
+
+  // Este efecto se ejecuta cuando cambia la categoría
+  useEffect(() => {
+    if (selectedCategoryId && selectedCategory) {
+      // Asegurarse de que hay subcategorías disponibles
+      if (selectedCategory.subcategories.length > 0) {
+        // Forzar la actualización de la subcategoría al primer elemento
+        form.setValue("subcategoryId", selectedCategory.subcategories[0].id, {
+          shouldValidate: true,
+          shouldDirty: true,
+        })
+      }
+    }
+  }, [selectedCategoryId, selectedCategory, form])
 
   const weekDates = generateWeekDates(
     parse(form.watch("date"), "yyyy-MM-dd", new Date())
@@ -177,8 +219,8 @@ export const ClassFormDialog = React.forwardRef<
           endTime,
           instructor: values.instructor,
           maxCapacity: values.maxCapacity,
-          category: values.category,
-          type: values.type,
+          categoryId: values.categoryId,
+          subcategoryId: values.subcategoryId,
         })
 
         if (result.success) {
@@ -214,7 +256,6 @@ export const ClassFormDialog = React.forwardRef<
     }
   }
 
-  const selectedCategory = form.watch("category")
   const repeatDaily = form.watch("repeatDaily")
   const repeatWeekly = form.watch("repeatWeekly")
 
@@ -246,50 +287,68 @@ export const ClassFormDialog = React.forwardRef<
     return dates
   }
 
+  // Reset form when dialog closes
   useEffect(() => {
-    if (isOpen) {
-      form.reset(
-        classToEdit
-          ? {
-              category: classToEdit.category,
-              type: classToEdit.type,
-              date: classToEdit.date.toISOString().split("T")[0],
-              startTime: new Date(classToEdit.startTime).toLocaleTimeString(
-                [],
-                {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                  hour12: false,
-                }
-              ),
-              endTime: new Date(classToEdit.endTime).toLocaleTimeString([], {
-                hour: "2-digit",
-                minute: "2-digit",
-                hour12: false,
-              }),
-              instructor: classToEdit.instructor,
-              maxCapacity: classToEdit.maxCapacity,
-              repeatDaily: false,
-              repeatUntil: undefined,
-              repeatWeekly: false,
-              repeatWeeks: 4,
-            }
-          : {
-              category: getDefaultCategory(),
-              type: getDefaultType(getDefaultCategory()),
-              date: selectedDate.toISOString().split("T")[0],
-              startTime: currentFilters?.timeOfDay === "AM" ? "09:00" : "13:00",
-              endTime: currentFilters?.timeOfDay === "AM" ? "10:00" : "14:00",
-              instructor: "",
-              maxCapacity: 8,
-              repeatDaily: false,
-              repeatUntil: undefined,
-              repeatWeekly: false,
-              repeatWeeks: 4,
-            }
-      )
+    if (!isOpen) {
+      const defaultValues = classToEdit
+        ? {
+            categoryId: classToEdit.categoryId,
+            subcategoryId: classToEdit.subcategoryId,
+            date: classToEdit.date.toISOString().split("T")[0],
+            startTime: new Date(classToEdit.startTime).toLocaleTimeString([], {
+              hour: "2-digit",
+              minute: "2-digit",
+              hour12: false,
+            }),
+            endTime: new Date(classToEdit.endTime).toLocaleTimeString([], {
+              hour: "2-digit",
+              minute: "2-digit",
+              hour12: false,
+            }),
+            instructor: classToEdit.instructor,
+            maxCapacity: classToEdit.maxCapacity,
+            repeatDaily: false,
+            repeatWeekly: false,
+          }
+        : {
+            categoryId: getDefaultCategory(),
+            subcategoryId: getDefaultSubcategory(getDefaultCategory()),
+            date: format(selectedDate, "yyyy-MM-dd"),
+            ...getDefaultTimes(),
+            instructor: "",
+            maxCapacity: 8,
+            repeatDaily: false,
+            repeatWeekly: false,
+          }
+      form.reset(defaultValues)
     }
-  }, [isOpen, classToEdit, selectedDate, form, currentFilters])
+  }, [isOpen, classToEdit, selectedDate, form, categories])
+
+  // Initialize form values when dialog opens
+  useEffect(() => {
+    if (isOpen && !classToEdit && categories.length > 0) {
+      const defaultCategory = getDefaultCategory()
+      const defaultSubcategory = getDefaultSubcategory(defaultCategory)
+      const defaultTimes = getDefaultTimes()
+
+      form.reset({
+        ...form.getValues(),
+        categoryId: defaultCategory,
+        subcategoryId: defaultSubcategory,
+        startTime: defaultTimes.startTime,
+        endTime: defaultTimes.endTime,
+        instructor: "",
+        repeatDaily: false,
+        repeatWeekly: false,
+      })
+    }
+  }, [isOpen, categories, classToEdit, form, currentFilters])
+
+  useEffect(() => {
+    if (!classToEdit && selectedDate) {
+      form.setValue("date", format(selectedDate, "yyyy-MM-dd"))
+    }
+  }, [selectedDate, form, classToEdit])
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -312,7 +371,7 @@ export const ClassFormDialog = React.forwardRef<
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <FormField
                 control={form.control}
-                name="category"
+                name="categoryId"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Categoría</FormLabel>
@@ -322,63 +381,55 @@ export const ClassFormDialog = React.forwardRef<
                     >
                       <FormControl>
                         <SelectTrigger className="border-rust/50 bg-pearlVariant font-semibold text-grey_pebble/60">
-                          <SelectValue placeholder="Select category" />
+                          <SelectValue placeholder="Seleccionar categoría" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent className="bg-grey_pebble text-pearl">
-                        <SelectItem
-                          className="border-b border-pearl/50 uppercase hover:!bg-pearlVariant3"
-                          value="YOGA"
-                        >
-                          Yoga
-                        </SelectItem>
-                        <SelectItem
-                          className="border-b border-pearl/50 uppercase hover:!bg-pearlVariant3"
-                          value="PILATES"
-                        >
-                          Pilates
-                        </SelectItem>
+                        {categories.map((category) => (
+                          <SelectItem
+                            className="border-b border-pearl/50 capitalize hover:!bg-pearlVariant3"
+                            key={category.id}
+                            value={category.id}
+                          >
+                            {category.name}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                     <FormMessage />
                   </FormItem>
                 )}
               />
+
               <FormField
                 control={form.control}
-                name="type"
+                name="subcategoryId"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Subcategoría</FormLabel>
                     <Select
                       onValueChange={field.onChange}
+                      value={
+                        field.value ||
+                        (selectedCategory?.subcategories[0]?.id ?? "")
+                      }
                       defaultValue={field.value}
                     >
                       <FormControl>
                         <SelectTrigger className="border-rust/50 bg-pearlVariant font-semibold text-grey_pebble/60">
-                          <SelectValue placeholder="Select type" />
+                          <SelectValue placeholder="Seleccionar subcategoría" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent className="bg-grey_pebble text-pearl">
-                        {selectedCategory === "YOGA"
-                          ? yogaTypes.map((type) => (
-                              <SelectItem
-                                key={type}
-                                value={type}
-                                className="border-b border-pearl/50 uppercase hover:!bg-pearlVariant3"
-                              >
-                                {type.replace("_", " ")}
-                              </SelectItem>
-                            ))
-                          : pilatesTypes.map((type) => (
-                              <SelectItem
-                                key={type}
-                                value={type}
-                                className="border-b border-pearl/50 uppercase hover:!bg-pearlVariant3"
-                              >
-                                {type.replace("_", " ")}
-                              </SelectItem>
-                            ))}
+                        {selectedCategory?.subcategories.map((subcategory) => (
+                          <SelectItem
+                            key={subcategory.id}
+                            value={subcategory.id}
+                            className="border-b border-pearl/50 capitalize hover:!bg-pearlVariant3"
+                          >
+                            {subcategory.name}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -544,8 +595,11 @@ export const ClassFormDialog = React.forwardRef<
                           checked={field.value}
                           onCheckedChange={(checked) => {
                             field.onChange(checked)
-                            if (!checked) {
-                              form.setValue("repeatWeeks", 4)
+                            // Si se activa, asegurarse de que repeatWeeks tenga un valor
+                            if (checked) {
+                              form.setValue("repeatWeeks", 4, {
+                                shouldValidate: true,
+                              })
                             }
                           }}
                         />
@@ -565,7 +619,7 @@ export const ClassFormDialog = React.forwardRef<
                         </div>
                         <FormControl>
                           <NumberInput
-                            value={field.value || 4}
+                            value={field.value ?? 4}
                             onChange={(value) => field.onChange(value)}
                             min={1}
                             max={12}

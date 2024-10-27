@@ -9,15 +9,8 @@ import { addDays, addWeeks, isAfter } from "date-fns"
 import { formatLocalDate, localToUTC } from "@/lib/timezone-utils"
 
 const classSchema = z.object({
-  category: z.enum(["YOGA", "PILATES"]),
-  type: z.enum([
-    "VINYASA",
-    "HATHA",
-    "BALANCE",
-    "STRENGTH_CORE",
-    "LOWER_BODY",
-    "FULL_BODY",
-  ]),
+  categoryId: z.string().min(1, "Category is required"),
+  subcategoryId: z.string().min(1, "Subcategory is required"),
   date: z.string(),
   startTime: z.string(),
   endTime: z.string(),
@@ -73,7 +66,7 @@ export async function createClass(data: ClassFormData) {
         const weeklyDate = addWeeks(date, week)
 
         // Don't schedule classes more than 3 months in advance
-        if (isAfter(weeklyDate, addWeeks(new Date(), 12))) continue
+        // if (isAfter(weeklyDate, addWeeks(new Date(), 12))) continue
 
         const startTime = localToUTC(
           formatLocalDate(weeklyDate),
@@ -85,8 +78,8 @@ export async function createClass(data: ClassFormData) {
         )
 
         const classData = {
-          category: validatedData.category,
-          type: validatedData.type,
+          categoryId: validatedData.categoryId,
+          subcategoryId: validatedData.subcategoryId,
           date: weeklyDate,
           startTime,
           endTime,
@@ -127,6 +120,8 @@ export async function getClasses(startDate: Date, endDate: Date) {
         AND: [{ startTime: { gte: startDate } }, { endTime: { lte: endDate } }],
       },
       include: {
+        category: true,
+        subcategory: true,
         bookings: {
           include: {
             user: {

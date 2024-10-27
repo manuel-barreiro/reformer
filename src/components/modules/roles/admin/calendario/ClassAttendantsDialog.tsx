@@ -147,7 +147,7 @@ export default function ClassAttendantsDialog({
               </span>
             </p>
             <h3 className="font-semibold text-grey_pebble">
-              {class_.category} - {class_.type.replace("_", " ")}
+              {class_.category.name} - {class_.subcategory.name}
             </h3>
             <div className="flex items-baseline gap-2 font-dm_sans text-sm text-gray-500">
               <span className="font-semibold capitalize">

@@ -46,8 +46,8 @@ export default function ClassCard({
   const [isPending, startTransition] = useTransition()
 
   const classDetails = [
-    { label: "Categoría", value: class_.category },
-    { label: "Subcategoría", value: class_.type.replace("_", " ") },
+    { label: "Categoría", value: class_.category.name },
+    { label: "Subcategoría", value: class_.subcategory.name },
     {
       label: "Fecha",
       value: class_.date.toLocaleDateString("es-ES", {
@@ -187,12 +187,12 @@ export default function ClassCard({
             </p>
           )}
           <h3
-            className={`flex items-center gap-2 font-dm_sans font-semibold ${userBooking ? "text-pearl" : "text-grey_pebble"}`}
+            className={`flex items-center gap-2 font-dm_sans font-semibold uppercase ${userBooking ? "text-pearl" : "text-grey_pebble"}`}
           >
             {!class_.isActive && userRole === "admin" && (
               <LockIcon className="h-4 w-4 text-midnight" />
             )}{" "}
-            {class_.category} - {class_.type.replace("_", " ")}
+            {class_.category.name} - {class_.subcategory.name}
           </h3>
           <div
             className={`flex flex-col items-start gap-1 text-sm ${userBooking ? "text-pearl/80" : "text-gray-500"}`}

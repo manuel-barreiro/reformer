@@ -96,7 +96,7 @@ export async function softDeletePackage(id: string) {
     revalidatePath("/admin/paquetes")
     return { success: true, package: deletedPackage, isDeleted: true }
   } catch (error) {
-    return { error: "Failed to delete package" }
+    return { error: "Error al eliminar paquete" }
   }
 }
 

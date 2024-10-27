@@ -22,7 +22,7 @@ model User {
   accounts         Account[]
   payments         Payment[]
   purchasedPackages PurchasedPackage[]
-  bookings Booking[]
+  bookings         Booking[]
 }
 
 model Account {
@@ -44,6 +44,52 @@ model Account {
   @@id([provider, providerAccountId])
 }
 
+model Category {
+  id            String          @id @default(cuid())
+  name          String
+  slug          String          @unique
+  subcategories Subcategory[]
+  classes       Class[]
+  isActive      Boolean         @default(true)
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+}
+
+model Subcategory {
+  id         String    @id @default(cuid())
+  name       String
+  slug       String    @unique
+  categoryId String
+  category   Category  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  classes    Class[]
+  isActive   Boolean   @default(true)
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  @@index([categoryId])
+}
+
+model Class {
+  id            String       @id @default(cuid())
+  categoryId    String
+  category      Category     @relation(fields: [categoryId], references: [id])
+  subcategoryId String
+  subcategory   Subcategory  @relation(fields: [subcategoryId], references: [id])
+  date          DateTime
+  startTime     DateTime
+  endTime       DateTime
+  instructor    String
+  maxCapacity   Int
+  isActive      Boolean      @default(true)
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  bookings      Booking[]
+
+  @@index([categoryId])
+  @@index([subcategoryId])
+}
+
+// Rest of your models remain the same
 model VerificationToken {
   identifier String   @unique
   token      String
@@ -98,22 +144,7 @@ model PurchasedPackage {
   classPackage     ClassPackage @relation(fields: [classPackageId], references: [id])
   payment          Payment?     @relation(fields: [paymentId], references: [id])
   paymentId        String?      @unique
-  bookings Booking[]
-}
-
-model Class {
-  id           String        @id @default(cuid())
-  category     ClassCategory
-  type         ClassType
-  date         DateTime
-  startTime    DateTime
-  endTime      DateTime
-  instructor   String
-  maxCapacity  Int
-  isActive     Boolean       @default(true)
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-  bookings     Booking[]
+  bookings         Booking[]
 }
 
 model Booking {
@@ -129,31 +160,15 @@ model Booking {
   purchasedPackage   PurchasedPackage @relation(fields: [purchasedPackageId], references: [id])
 }
 
-enum ClassCategory {
-  YOGA
-  PILATES
-}
-
-enum ClassType {
-  // Yoga types
-  VINYASA
-  HATHA
-  BALANCE
-  // Pilates types
-  STRENGTH_CORE
-  LOWER_BODY
-  FULL_BODY
+enum Role {
+  user
+  admin
 }
 
 enum BookingStatus {
   confirmed
   cancelled
   attended
-}
-
-enum Role {
-  user
-  admin
 }
 
 enum PackageStatus {
