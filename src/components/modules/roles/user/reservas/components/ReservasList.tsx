@@ -16,7 +16,7 @@ export default function ReservasList({
         "h-full py-5 xl:max-w-[1000px]",
         bookings.length === 0 && "flex items-center justify-center",
         bookings.length > 0 &&
-          "grid grid-cols-2 gap-3 md:grid-cols-3 md:p-10 lg:grid-cols-4"
+          "grid grid-cols-1 gap-3 md:grid-cols-3 md:p-10 lg:grid-cols-4"
       )}
     >
       {bookings.length > 0 ? (

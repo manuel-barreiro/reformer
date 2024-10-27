@@ -36,7 +36,7 @@ export default function ReformerCalendar({
   const [currentMonth, setCurrentMonth] = useState(date)
   const today = startOfDay(new Date())
 
-  // Available class days for both users and admin
+  // Available class days logic remains the same
   const availableClassDays = useMemo(
     () =>
       new Set(
@@ -55,7 +55,7 @@ export default function ReformerCalendar({
     [monthClasses]
   )
 
-  // User's booked class days
+  // Booked class days logic remains the same
   const bookedClassDays = useMemo(
     () =>
       new Set(
@@ -111,31 +111,32 @@ export default function ReformerCalendar({
 
     return (
       <div
-        className={`relative h-full w-full rounded-md ${
+        className={`group relative flex aspect-square w-full items-center justify-center rounded-md transition-all duration-200 ${
           isSelected
             ? "bg-grey_pebble text-pearl"
             : (isBookedClass && isSelectedMonth) ||
                 (userRole === "admin" && isAvailableClass)
               ? "!bg-rust/80 text-pearl"
-              : ""
+              : "hover:bg-pearlVariant3"
         } ${userRole === "admin" && isPastDay ? "opacity-40" : ""}`}
       >
         <span
-          className={`absolute inset-0 flex items-center justify-center ${isPastDay && "line-through"}`}
+          className={`text-center text-sm font-normal sm:text-base ${
+            isPastDay ? "line-through" : ""
+          }`}
         >
           {dayDate.getDate()}
         </span>
         {isSelected && (
-          <span className="absolute bottom-2 left-1/2 h-1 w-1 -translate-x-1/2 rounded-full bg-pearl"></span>
+          <span className="absolute bottom-1 left-1/2 h-1 w-1 -translate-x-1/2 rounded-full bg-pearl"></span>
         )}
-        {/* Show dot for available classes for users */}
         {userRole !== "admin" &&
           isAvailableClass &&
           !isBookedClass &&
           !isSelected &&
           isSelectedMonth &&
           !isPastDay && (
-            <span className="absolute bottom-2 left-1/2 h-1 w-1 -translate-x-1/2 rounded-full bg-grey_pebble"></span>
+            <span className="absolute bottom-1 left-1/2 h-1 w-1 -translate-x-1/2 rounded-full bg-grey_pebble"></span>
           )}
       </div>
     )
@@ -176,20 +177,20 @@ export default function ReformerCalendar({
       disabled={disabledDays}
       fromMonth={fromMonth}
       toMonth={toMonth}
-      className="p-0 md:border-r-[1px] md:border-grey_pebble md:pr-10"
+      className="w-full p-0 lg:border-r-[1px] lg:border-grey_pebble lg:pr-10"
       classNames={{
-        months: "space-y-4",
+        months: "space-y-6",
         month: "space-y-4",
-        caption: "flex justify-between pt-1 relative items-center",
-        caption_label: "text-lg font-semibold text-3xl!",
+        caption: "flex justify-between pt-1 relative items-center mb-6",
+        caption_label: "text-lg font-semibold text-3xl",
         nav: "space-x-1 flex items-center",
         nav_button: "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100",
         table: "w-full border-collapse",
-        head_row: "flex w-full",
-        head_cell: "text-gray-500 w-full font-normal text-sm mb-2",
-        row: "flex w-full gap-1 mb-1",
-        cell: "relative p-0 text-center text-sm focus-within:relative focus-within:z-20",
-        day: "h-10 w-10 md:h-12 md:w-12 lg:h-14 lg:w-14 xl:w-16 xl:h-16 p-0 hover:bg-pearlVariant3 bg-pearlVariant rounded-md",
+        head_row: "grid w-full grid-cols-7 gap-1",
+        head_cell: "text-gray-500 font-normal text-sm text-center mb-2",
+        row: "grid w-full grid-cols-7 gap-1 mb-1",
+        cell: "relative p-0 text-center focus-within:relative focus-within:z-20",
+        day: "aspect-square w-full p-0 font-normal hover:bg-pearlVariant3 bg-pearlVariant rounded-md",
         day_selected: "",
         day_today: "bg-accent text-accent-foreground",
         day_outside: "opacity-50 bg-transparent",
@@ -197,8 +198,8 @@ export default function ReformerCalendar({
       }}
       components={{
         Caption: ({ displayMonth }: CaptionProps) => (
-          <div className="mb-4 flex items-center gap-2 text-grey_pebble sm:justify-between">
-            <p className="font-dm_sans text-2xl font-medium">
+          <div className="flex items-center justify-between text-grey_pebble">
+            <p className="font-dm_sans text-xl font-medium sm:text-2xl">
               <span className="font-semibold capitalize">
                 {displayMonth.toLocaleString("es-ES", { month: "long" })}{" "}
               </span>
@@ -207,7 +208,7 @@ export default function ReformerCalendar({
             <nav className="flex space-x-2">
               <Button
                 variant="outline"
-                className="h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100"
+                className="h-8 w-8 bg-transparent p-0 opacity-50 hover:opacity-100"
                 onClick={() => handleMonthChange(-1)}
                 disabled={!canNavigatePrev}
               >
@@ -215,7 +216,7 @@ export default function ReformerCalendar({
               </Button>
               <Button
                 variant="outline"
-                className="h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100"
+                className="h-8 w-8 bg-transparent p-0 opacity-50 hover:opacity-100"
                 onClick={() => handleMonthChange(1)}
                 disabled={!canNavigateNext}
               >
