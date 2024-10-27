@@ -43,8 +43,10 @@ export default function ReservasCard({
       <div className="flex h-full w-full flex-col items-start justify-evenly p-5">
         <p>{format(classTime, "dd/MM/yyyy")}</p>
         <span className="my-1 w-full border border-dashed border-pearl" />
-        <p className="text-md">{booking.class.category}</p>
-        <p className="font-dm_sans text-xs font-thin">{booking.class.type}</p>
+        <p className="text-md uppercase">{booking.class.category.name}</p>
+        <p className="font-dm_sans text-xs font-thin uppercase">
+          {booking.class.subcategory.name}
+        </p>
         <p className="mt-1">{format(classTime, "HH:mm")}</p>
       </div>
 

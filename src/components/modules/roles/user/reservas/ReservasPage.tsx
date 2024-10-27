@@ -5,12 +5,23 @@ import HeaderToggle from "@/components/modules/roles/common/HeaderToggle"
 import ReservasList from "@/components/modules/roles/user/reservas/components/ReservasList"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { getUserBookings } from "@/actions/booking-actions"
-import { Booking, Class } from "@prisma/client"
 import { toast } from "@/components/ui/use-toast"
 import { Skeleton } from "@/components/ui/skeleton"
+import { Booking, Class, Category } from "@prisma/client"
+
+interface ExtendedClass extends Class {
+  category: {
+    id: string
+    name: string
+  }
+  subcategory: {
+    id: string
+    name: string
+  }
+}
 
 export interface BookingWithClass extends Booking {
-  class: Class
+  class: ExtendedClass
 }
 
 export default function ReservasPage({
@@ -19,7 +30,8 @@ export default function ReservasPage({
   initialReservations: BookingWithClass[]
 }) {
   const [filter, setFilter] = useState<string>("TODOS")
-  const [bookings, setBookings] = useState<BookingWithClass[]>([])
+  const [bookings, setBookings] =
+    useState<BookingWithClass[]>(initialReservations)
   const [isLoading, setIsLoading] = useState(true)
 
   const fetchBookings = async () => {
@@ -45,7 +57,7 @@ export default function ReservasPage({
 
   const filteredBookings = useMemo(() => {
     if (filter === "TODOS") return bookings
-    return bookings.filter((booking) => booking.class.category === filter)
+    return bookings.filter((booking) => booking.class.category.name === filter)
   }, [bookings, filter])
 
   const handleCancelSuccess = () => {

@@ -115,7 +115,12 @@ export async function getUserBookings() {
       status: "confirmed",
     },
     include: {
-      class: true,
+      class: {
+        include: {
+          category: true,
+          subcategory: true,
+        },
+      },
     },
     orderBy: {
       class: {
@@ -145,7 +150,12 @@ export async function getUserBookingsInRange(startDate: Date, endDate: Date) {
       },
     },
     include: {
-      class: true,
+      class: {
+        include: {
+          category: true,
+          subcategory: true,
+        },
+      },
     },
     orderBy: {
       class: {

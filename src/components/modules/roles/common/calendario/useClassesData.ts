@@ -61,6 +61,8 @@ export function useClassesData(
           date: parseDate(cls.date),
           startTime: parseDate(cls.startTime),
           endTime: parseDate(cls.endTime),
+          category: cls.category, // Ensure category is included
+          subcategory: cls.subcategory, // Ensure subcategory is included
         }))
 
         setClasses(parsedClasses)
