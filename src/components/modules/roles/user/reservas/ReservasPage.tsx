@@ -57,7 +57,10 @@ export default function ReservasPage({
 
   const filteredBookings = useMemo(() => {
     if (filter === "TODOS") return bookings
-    return bookings.filter((booking) => booking.class.category.name === filter)
+    return bookings.filter(
+      (booking) =>
+        booking.class.category.name.toLowerCase() === filter.toLowerCase()
+    )
   }, [bookings, filter])
 
   const handleCancelSuccess = () => {
