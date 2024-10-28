@@ -7,7 +7,7 @@ const publicRoutes = ["/", "/api/notify"]
 const authRoutes = ["/sign-in", "/sign-up"]
 const apiAuthPrefix = "/api/auth"
 const apiRoutes = ["/api/create_preference", "/api/packages"] // Add other API routes as needed
-
+const passwordRoutes = ["/forgot-password", "/reset-password"]
 const adminRoutes = ["/admin/pagos", "/admin/paquetes", "/admin/calendario"]
 const userRoutes = ["/paquetes", "/reservas", "/calendario", "/perfil"]
 
@@ -17,6 +17,25 @@ export default auth((req) => {
   const isLoggedIn = !!req.auth
 
   // console.log("MIDDLEWARE", req.auth?.user)
+
+  // If user is logged in, redirect them away from password reset routes
+  if (passwordRoutes.includes(nextUrl.pathname)) {
+    if (isLoggedIn) {
+      return NextResponse.redirect(
+        new URL(userRole === "admin" ? "/admin/pagos" : "/paquetes", nextUrl)
+      )
+    }
+
+    // Only check for token on reset-password page
+    if (nextUrl.pathname === "/reset-password") {
+      const token = nextUrl.searchParams.get("token")
+      if (!token) {
+        return NextResponse.redirect(new URL("/forgot-password", nextUrl))
+      }
+    }
+
+    return NextResponse.next()
+  }
 
   // Allow all authentication API routes
   if (nextUrl.pathname.startsWith(apiAuthPrefix)) {
