@@ -33,6 +33,7 @@ export default function SignUpForm() {
       phone: "",
       email: "",
       password: "",
+      confirmPassword: "", // Add this line
     },
   })
 
@@ -144,6 +145,25 @@ export default function SignUpForm() {
                     className="border-rust bg-inputBg py-6 font-dm_mono text-midnight ring-rust ring-offset-rust placeholder:text-midnight"
                     type="password"
                     placeholder="CONTRASEÑA"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="confirmPassword"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="sr-only">Confirmar Contraseña</FormLabel>
+                <FormControl>
+                  <Input
+                    className="border-rust bg-inputBg py-6 font-dm_mono text-midnight ring-rust ring-offset-rust placeholder:text-midnight"
+                    type="password"
+                    placeholder="CONFIRMAR CONTRASEÑA"
                     {...field}
                   />
                 </FormControl>

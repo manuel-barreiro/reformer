@@ -8,10 +8,11 @@ import { ArrowLeft } from "lucide-react"
 export default function SignIn({
   searchParams,
 }: {
-  searchParams: { verified: string; error: string }
+  searchParams: { verified: string; error: string; reset: string }
 }) {
   const isVerified = searchParams.verified === "true"
   const OAuthAccountNotLinked = searchParams.error === "OAuthAccountNotLinked"
+  const passwordReset = searchParams.reset === "true"
 
   return (
     <div className="h-auto w-full text-pearl lg:grid lg:grid-cols-2">
@@ -47,6 +48,7 @@ export default function SignIn({
           <LoginForm
             isVerified={isVerified}
             OAuthAccountNotLinked={OAuthAccountNotLinked}
+            passwordReset={passwordReset}
           />
           <div className="flex w-full flex-col gap-2 text-center text-sm text-midnight">
             <span>
@@ -61,7 +63,7 @@ export default function SignIn({
 
             <span>
               <Link
-                href={"/sign-up"}
+                href={"/forgot-password"}
                 className="font-semibold text-midnight duration-300 ease-in-out hover:underline"
               >
                 Olvidé mi contraseña

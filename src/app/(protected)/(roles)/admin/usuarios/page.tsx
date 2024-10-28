@@ -4,7 +4,13 @@ import { UsersTable } from "@/components/modules/roles/admin/usuarios/UsersTable
 import { prisma } from "@/lib/prisma"
 
 export default async function PaymentsPage() {
-  const users = await prisma.user.findMany()
+  const users = await prisma.user.findMany({
+    where: {
+      emailVerified: {
+        not: null,
+      },
+    },
+  })
 
   return (
     <Suspense fallback={<Skeleton className="h-96 w-full lg:pl-10" />}>

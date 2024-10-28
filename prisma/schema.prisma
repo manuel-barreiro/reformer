@@ -160,6 +160,13 @@ model Booking {
   purchasedPackage   PurchasedPackage @relation(fields: [purchasedPackageId], references: [id])
 }
 
+model PasswordResetToken {
+  identifier String   @id
+  token      String   @unique
+  expires    DateTime
+  createdAt  DateTime @default(now())
+}
+
 enum Role {
   user
   admin

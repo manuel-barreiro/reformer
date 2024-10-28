@@ -22,10 +22,12 @@ import { Separator } from "@radix-ui/react-separator"
 interface FormLoginProps {
   isVerified: boolean
   OAuthAccountNotLinked: boolean
+  passwordReset: boolean
 }
 export default function SignInForm({
   isVerified,
   OAuthAccountNotLinked,
+  passwordReset,
 }: FormLoginProps) {
   const [error, setError] = useState<string | null>("")
   const [isPending, startTransition] = useTransition()
@@ -60,6 +62,11 @@ export default function SignInForm({
           onSubmit={form.handleSubmit(onLogin)}
           className="w-auto min-w-96 space-y-6 rounded-lg px-10"
         >
+          {passwordReset && (
+            <p className="text-green-500">
+              Tu contraseña ha sido actualizada. Por favor, inicia sesión.
+            </p>
+          )}
           {isVerified && (
             <p className="text-green-500">
               Email verified, log into your account.
