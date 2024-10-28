@@ -1,47 +1,60 @@
 import { Resend } from "resend"
+import { VerifyEmail } from "../../emails/VerifyEmail"
+import { ResetPassword } from "../../emails/ResetPassword"
+import { render } from "@react-email/render"
 
 const resend = new Resend(process.env.AUTH_RESEND_KEY)
 
-export const sendEmailVerification = async (email: string, token: string) => {
-  console.log("Sending email verification to", email)
+export const sendEmailVerification = async (
+  email: string,
+  name: string,
+  token: string
+) => {
+  const verificationUrl = `${process.env.NEXT_PUBLIC_URL}/api/auth/verify-email?token=${token}`
+
   try {
+    const html = render(
+      VerifyEmail({
+        name: name,
+        verificationUrl,
+      })
+    )
+
     const send = await resend.emails.send({
       from: "Reformer | Wellness Club <welcome@reformer.com.ar>",
       to: email,
       subject: "Verifica tu correo electrónico",
-      html: `
-        <p>Clickea el siguiente enlace para verificar tu cuenta</p>
-        <a href="${process.env.NEXT_PUBLIC_URL}/api/auth/verify-email?token=${token}">Verify email</a>
-      `,
+      html: html,
     })
-    // ${process.env.NEXTAUTH_URL}
-    console.log("Confirmation email sent to", email)
 
-    return {
-      success: true,
-    }
+    console.log("Confirmation email sent to", email)
+    return { success: true }
   } catch (error) {
     console.log(error)
-    return {
-      error: true,
-    }
+    return { error: true }
   }
 }
 
-export const sendPasswordResetEmail = async (email: string, token: string) => {
+export const sendPasswordResetEmail = async (
+  email: string,
+  name: string,
+  token: string
+) => {
+  const resetUrl = `${process.env.NEXT_PUBLIC_URL}/reset-password?token=${token}`
+
   try {
+    const html = render(
+      ResetPassword({
+        name,
+        resetUrl,
+      })
+    )
+
     await resend.emails.send({
       from: "Reformer | Wellness Club <welcome@reformer.com.ar>",
       to: email,
       subject: "Restablecer contraseña",
-      html: `
-        <p>Has solicitado restablecer tu contraseña.</p>
-        <p>Haz clic en el siguiente enlace para crear una nueva contraseña:</p>
-        <a href="${process.env.NEXT_PUBLIC_URL}/reset-password?token=${token}">
-          Restablecer contraseña
-        </a>
-        <p>Este enlace expirará en 1 hora.</p>
-      `,
+      html: html,
     })
     return { success: true }
   } catch (error) {

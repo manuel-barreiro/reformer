@@ -134,7 +134,7 @@ export async function forgotPasswordAction(
     })
 
     // Send reset email
-    await sendPasswordResetEmail(email, token)
+    await sendPasswordResetEmail(email, user.name, token)
 
     return { success: true }
   } catch (error: any) {

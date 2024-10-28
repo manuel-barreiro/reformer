@@ -67,7 +67,7 @@ export default {
           })
 
           // enviar email de verificación
-          await sendEmailVerification(user.email, token)
+          await sendEmailVerification(user.email, user.name, token)
 
           throw new Error("Please check your email to verify your account")
         }
