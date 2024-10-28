@@ -103,6 +103,23 @@ export async function forgotPasswordAction(
       )
     }
 
+    // Check if there's an existing valid token
+    const existingToken = await prisma.passwordResetToken.findUnique({
+      where: { identifier: email },
+    })
+
+    if (existingToken) {
+      if (existingToken.expires > new Date()) {
+        throw new Error(
+          "Ya te enviamos un correo para restablecer tu contraseña. Por favor, revisa tu bandeja de entrada y carpeta de spam."
+        )
+      }
+      // If token exists but is expired, delete it
+      await prisma.passwordResetToken.delete({
+        where: { identifier: email },
+      })
+    }
+
     // Generate reset token
     const token = nanoid()
     const expires = new Date(Date.now() + 1000 * 60 * 60) // 1 hour
@@ -124,7 +141,6 @@ export async function forgotPasswordAction(
     return { error: error.message }
   }
 }
-
 export async function resetPasswordAction(
   token: string,
   values: z.infer<typeof resetPasswordSchema>
