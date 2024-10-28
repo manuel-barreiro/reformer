@@ -176,6 +176,7 @@ const CategoryManagement = () => {
     <div className="space-y-6">
       <div className="flex justify-between">
         <h1 className="text-2xl font-bold">Panel de Categorías</h1>
+        {/* Para crear nuevas categorias */}
         {/* <Dialog
           open={isDialogOpen}
           onOpenChange={(open) => {
@@ -266,7 +267,7 @@ const CategoryManagement = () => {
           </DialogContent>
         </Dialog> */}
       </div>
-      <ScrollArea className="h-96">
+      <ScrollArea className="lg:h-[420px]">
         <div className="grid gap-6 md:grid-cols-2">
           {isLoading && (
             <>
@@ -294,7 +295,8 @@ const CategoryManagement = () => {
                   </div>
                 </CardTitle>
                 <div className="flex space-x-2">
-                  <Button
+                  {/* Estos botones permiten editar o eliminar categorias */}
+                  {/* <Button
                     variant="ghost"
                     size="icon"
                     onClick={() => handleEditCategory(category)}
@@ -313,7 +315,14 @@ const CategoryManagement = () => {
                     buttonText="Eliminar"
                     icon={<Trash2 className="h-4 w-4" />}
                     buttons={true}
-                  />
+                  /> */}
+                  <Button
+                    onClick={() => handleAddSubcategory(category.id)}
+                    className="mt-2 flex w-full items-center gap-4 bg-rust hover:bg-rust/90"
+                  >
+                    <Plus className="h-4 w-4" />
+                    {/* <span className="hidden lg:block">Nueva Subcategoría</span> */}
+                  </Button>
                 </div>
               </CardHeader>
               <CardContent>
@@ -354,13 +363,6 @@ const CategoryManagement = () => {
                     </div>
                   ))}
                 </div>
-                <Button
-                  onClick={() => handleAddSubcategory(category.id)}
-                  className="mt-2 flex w-full items-center gap-4 bg-rust hover:bg-rust/90"
-                >
-                  <Plus className="h-4 w-4" />
-                  Nueva Subcategoría
-                </Button>
               </CardContent>
             </Card>
           ))}
@@ -419,7 +421,10 @@ const CategoryManagement = () => {
                   <FormItem>
                     <FormLabel>Name</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="Enter subcategory name" />
+                      <Input
+                        {...field}
+                        placeholder="Ingrese el nombre de la nueva subcategoría"
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
