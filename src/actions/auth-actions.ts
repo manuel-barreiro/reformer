@@ -81,6 +81,8 @@ export const registerAction = async (
   }
 }
 
+
+
 export async function forgotPasswordAction(
   values: z.infer<typeof forgotPasswordSchema>
 ) {
@@ -134,13 +136,18 @@ export async function forgotPasswordAction(
     })
 
     // Send reset email
-    await sendPasswordResetEmail(email, user.name, token)
+    const emailResult = await sendPasswordResetEmail(email, user.name, token)
+    
+    if (emailResult.error) {
+      throw new Error("Error al enviar el email. Por favor, intenta nuevamente.")
+    }
 
     return { success: true }
   } catch (error: any) {
     return { error: error.message }
   }
 }
+
 export async function resetPasswordAction(
   token: string,
   values: z.infer<typeof resetPasswordSchema>
