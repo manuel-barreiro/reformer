@@ -41,6 +41,7 @@ const nextConfig = {
       },
     ]
   },
+  unstable_allowDynamic: ["**/node_modules/@react-email*/**/*.mjs*"],
 }
 
 export default nextConfig
