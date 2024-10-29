@@ -1,6 +1,5 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  unstable_allowDynamic: ["**/node_modules/@react-email*/**/*.mjs*"],
   transpilePackages: ["date-fns", "date-fns-tz"],
   webpack(config) {
     // Existing configurations (if any) go here

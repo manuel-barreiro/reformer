@@ -113,9 +113,6 @@ export default auth((req) => {
 })
 
 export const config = {
-  matcher: [
-    "/((?!.*\\..*|_next).*)",
-    "/",
-    "/(api|trpc)(.*)",
-  ],
+  matcher: ["/((?!.*\\..*|_next).*)", "/", "/(api|trpc)(.*)"],
+  unstable_allowDynamic: ["**/node_modules/@react-email*/**/*.mjs*"],
 }
