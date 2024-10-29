@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  unstable_allowDynamic: ["**/node_modules/@react-email*/**/*.mjs*"],
   transpilePackages: ["date-fns", "date-fns-tz"],
   webpack(config) {
     // Existing configurations (if any) go here
@@ -8,7 +9,6 @@ const nextConfig = {
     config.module.rules.push({
       test: /\.svg$/,
       use: ["@svgr/webpack"],
-      unstable_allowDynamic: ["**/node_modules/@react-email*/**/*.mjs*"],
     })
 
     return config
