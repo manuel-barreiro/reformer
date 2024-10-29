@@ -15,6 +15,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { CheckIcon, ChevronDownIcon, Package } from "lucide-react"
+import Link from "next/link"
 
 export const createColumns = (
   onOpenDetailModal: (user: User) => void,
@@ -128,17 +129,15 @@ export const createColumns = (
     ),
   },
   {
-    accessorKey: "packages",
-    header: "PAQUETES",
-    cell: ({ row }) => (
-      <div className="flex justify-center">
-        <Button
-          variant="ghost"
-          onClick={() => onOpenPackagesModal(row.original)}
-        >
-          <Package className="w-6" />
-        </Button>
-      </div>
-    ),
+    id: "packages",
+    header: "Paquetes",
+    cell: ({ row }) => {
+      const user = row.original
+      return (
+        <Link href={`/admin/usuarios/${user.id}`}>
+          <Package className="mx-auto h-4 w-4 text-grey_pebble hover:text-rust" />
+        </Link>
+      )
+    },
   },
 ]

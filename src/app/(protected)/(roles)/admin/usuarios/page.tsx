@@ -13,7 +13,9 @@ export default async function PaymentsPage() {
   })
 
   return (
-    <Suspense fallback={<Skeleton className="h-96 w-full lg:pl-10" />}>
+    <Suspense
+      fallback={<Skeleton className="h-96 w-full bg-pearlVariant3 lg:pl-10" />}
+    >
       <UsersTable initialUsers={users} />
     </Suspense>
   )

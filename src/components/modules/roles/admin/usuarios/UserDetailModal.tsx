@@ -71,7 +71,7 @@ export function UserDetailModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="bg-pearlVariant sm:max-w-md">
+      <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="font-marcellus text-xl text-grey_pebble">
             Detalles del Usuario
@@ -90,7 +90,7 @@ export function UserDetailModal({
                       <FormControl>
                         <Input
                           {...field}
-                          className="border-grey_pebble/20 bg-pearl"
+                          className="border border-rust/50 bg-pearlVariant font-semibold text-grey_pebble/60"
                         />
                       </FormControl>
                       <FormMessage />
@@ -108,7 +108,7 @@ export function UserDetailModal({
                       <FormControl>
                         <Input
                           {...field}
-                          className="border-grey_pebble/20 bg-pearl"
+                          className="border border-rust/50 bg-pearlVariant font-semibold text-grey_pebble/60"
                         />
                       </FormControl>
                       <FormMessage />
@@ -125,7 +125,7 @@ export function UserDetailModal({
                         <Input
                           disabled
                           {...field}
-                          className="border-grey_pebble/20 bg-pearl/50 text-grey_pebble/70"
+                          className="border border-rust/50 bg-pearlVariant font-semibold text-grey_pebble/60"
                         />
                       </FormControl>
                       <FormMessage />
@@ -143,7 +143,7 @@ export function UserDetailModal({
                       <FormControl>
                         <Input
                           {...field}
-                          className="border-grey_pebble/20 bg-pearl"
+                          className="border border-rust/50 bg-pearlVariant font-semibold text-grey_pebble/60"
                         />
                       </FormControl>
                       <FormMessage />
@@ -161,13 +161,23 @@ export function UserDetailModal({
                         defaultValue={field.value}
                       >
                         <FormControl>
-                          <SelectTrigger className="border-grey_pebble/20 bg-pearl">
+                          <SelectTrigger className="border-rust/50 bg-pearlVariant font-semibold text-grey_pebble/60">
                             <SelectValue placeholder="Seleccionar rol" />
                           </SelectTrigger>
                         </FormControl>
-                        <SelectContent>
-                          <SelectItem value="user">Usuario</SelectItem>
-                          <SelectItem value="admin">Administrador</SelectItem>
+                        <SelectContent className="bg-grey_pebble text-pearl">
+                          <SelectItem
+                            className="border-b border-pearl/50 capitalize hover:!bg-pearlVariant3"
+                            value="user"
+                          >
+                            Usuario
+                          </SelectItem>
+                          <SelectItem
+                            className="border-b border-pearl/50 capitalize hover:!bg-pearlVariant3"
+                            value="admin"
+                          >
+                            Administrador
+                          </SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />
