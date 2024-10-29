@@ -85,12 +85,15 @@ export const createColumns = (
                 <ChevronDownIcon className="ml-2 h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-[150px]">
+            <DropdownMenuContent
+              align="end"
+              className="w-[150px] bg-grey_pebble text-pearl"
+            >
               {roleOptions.map((option) => (
                 <DropdownMenuItem
                   key={option.value}
                   onClick={() => setRoleFilter(option.value as Role | "all")}
-                  className="cursor-pointer"
+                  className="cursor-pointer border-b border-pearl/50 capitalize hover:!bg-pearlVariant3"
                 >
                   <span className="flex-1">{option.label}</span>
                   {roleFilter === option.value && (
@@ -130,12 +133,14 @@ export const createColumns = (
   },
   {
     id: "packages",
-    header: "Paquetes",
+    header: "PAQUETES",
     cell: ({ row }) => {
       const user = row.original
       return (
         <Link href={`/admin/usuarios/${user.id}`}>
-          <Package className="mx-auto h-4 w-4 text-grey_pebble hover:text-rust" />
+          <Button variant="ghost">
+            <Package className="mx-auto w-6" />
+          </Button>
         </Link>
       )
     },
