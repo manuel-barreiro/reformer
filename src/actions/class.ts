@@ -140,7 +140,7 @@ export async function getClasses(startDate: Date, endDate: Date) {
 
     return classes
   } catch (error) {
-    console.error("Error fetching classes:", error)
+    console.error("Error al buscar clases:", error)
     return []
   }
 }
@@ -218,10 +218,13 @@ export async function toggleClassLock(classId: string) {
     revalidatePath("/admin/calendario")
     return { success: true, data: updatedClass }
   } catch (error) {
-    console.error("Error toggling class lock:", error)
+    console.error("Error al cambiar el status de la clase:", error)
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Error desconocido",
+      error:
+        error instanceof Error
+          ? error.message
+          : "Error al cambiar el status de la clase",
     }
   }
 }
@@ -241,7 +244,7 @@ export async function updateClass(classId: string, data: Partial<Class>) {
     revalidatePath("/admin/calendario")
     return { success: true, data: updatedClass }
   } catch (error) {
-    console.error("Error updating class:", error)
-    return { success: false, error: "Failed to update class" }
+    console.error("Error actualizando clase:", error)
+    return { success: false, error: "Error al actualizar clase" }
   }
 }

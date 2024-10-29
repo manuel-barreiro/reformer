@@ -60,22 +60,22 @@ export async function createManualPayment(
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         // Handle known Prisma errors
-        throw new Error(`Prisma error: ${error.message}`)
+        throw new Error(`Error de Prisma: ${error.message}`)
       } else if (error instanceof Prisma.PrismaClientUnknownRequestError) {
         // Handle unknown Prisma errors
-        throw new Error(`Unknown Prisma error: ${error.message}`)
+        throw new Error(`Error desconocido de Prisma: ${error.message}`)
       } else if (error instanceof Prisma.PrismaClientRustPanicError) {
         // Handle Prisma Rust panic errors
-        throw new Error(`Prisma Rust panic error: ${error.message}`)
+        throw new Error(`Error de pánico de Prisma Rust: ${error.message}`)
       } else if (error instanceof Prisma.PrismaClientInitializationError) {
         // Handle Prisma initialization errors
-        throw new Error(`Prisma initialization error: ${error.message}`)
+        throw new Error(`Error de inicialización de Prisma: ${error.message}`)
       } else if (error instanceof Prisma.PrismaClientValidationError) {
         // Handle Prisma validation errors
-        throw new Error(`Prisma validation error: ${error.message}`)
+        throw new Error(`Error de validación de Prisma: ${error.message}`)
       } else {
         // Handle any other errors
-        throw new Error(`Unexpected error: ${(error as any).message}`)
+        throw new Error(`Error inesperado: ${(error as any).message}`)
       }
     }
   })

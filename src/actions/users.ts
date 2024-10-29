@@ -85,14 +85,14 @@ export async function updatePackage(
   } catch (error) {
     if (error instanceof z.ZodError) {
       const errorMessages = error.errors.map((err) => err.message).join(", ")
-      throw new Error(`Validation error: ${errorMessages}`)
+      throw new Error(`Error de validación: ${errorMessages}`)
     }
 
     if (error instanceof Error) {
-      throw new Error(`Error updating package: ${error.message}`)
+      throw new Error(`Error actualizando paquete: ${error.message}`)
     }
 
-    throw new Error("Unexpected error updating package")
+    throw new Error("Error inesperado actualizando paquete")
   }
 }
 

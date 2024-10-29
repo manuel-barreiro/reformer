@@ -30,9 +30,9 @@ export async function updateProfile(
     return { success: true, data: updatedUser }
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return { success: false, error: "Invalid data provided" }
+      return { success: false, error: "Datos inválidos" }
     }
-    return { success: false, error: "Failed to update profile" }
+    return { success: false, error: "Error al actualizar perfil" }
   }
 }
 

@@ -9,13 +9,13 @@ export async function bookClass(classId: string, adminSelectedUserId?: string) {
   try {
     const session = await auth()
     if (!session || !session.user) {
-      throw new Error("User not authenticated")
+      throw new Error("Usuario no autenticado")
     }
 
     // For admin bookings, use the provided userId, otherwise use the authenticated user's ID
     const userId = adminSelectedUserId || session.user.id
     if (!userId) {
-      throw new Error("User ID is undefined")
+      throw new Error("ID de usuario no encontrado")
     }
 
     // Check if the user has already booked this class
@@ -28,7 +28,7 @@ export async function bookClass(classId: string, adminSelectedUserId?: string) {
     })
 
     if (existingBooking) {
-      throw new Error("User has already booked this class")
+      throw new Error("Ya tienes una reserva confirmada para esta clase")
     }
 
     // Check if the class is full
@@ -38,7 +38,7 @@ export async function bookClass(classId: string, adminSelectedUserId?: string) {
     })
 
     if (!classDetails) {
-      throw new Error("Class not found")
+      throw new Error("Clase no encontrada")
     }
 
     const confirmedBookings = classDetails.bookings.filter(
@@ -46,7 +46,7 @@ export async function bookClass(classId: string, adminSelectedUserId?: string) {
     )
 
     if (confirmedBookings.length >= classDetails.maxCapacity) {
-      throw new Error("This class is already full")
+      throw new Error("La clase no tiene lugares disponibles")
     }
 
     // Find an active purchased package with remaining classes
@@ -63,7 +63,7 @@ export async function bookClass(classId: string, adminSelectedUserId?: string) {
     console.log("activePurchasedPackage", activePurchasedPackage)
 
     if (!activePurchasedPackage) {
-      throw new Error("No active package with remaining classes found")
+      throw new Error("No tienes un paquete activo con clases disponibles")
     }
 
     // Create the booking
@@ -97,14 +97,14 @@ export async function bookClass(classId: string, adminSelectedUserId?: string) {
     if (error instanceof Error) {
       return { success: false, error: error.message }
     }
-    return { success: false, error: "An unknown error occurred" }
+    return { success: false, error: "Ocurrió un error desconocido" }
   }
 }
 
 export async function getUserBookings() {
   const session = await auth()
   if (!session || !session.user) {
-    throw new Error("User not authenticated")
+    throw new Error("Usuario no autenticado")
   }
 
   const userId = session.user.id
@@ -135,7 +135,7 @@ export async function getUserBookings() {
 export async function getUserBookingsInRange(startDate: Date, endDate: Date) {
   const session = await auth()
   if (!session || !session.user) {
-    throw new Error("User not authenticated")
+    throw new Error("Usuario no autenticado")
   }
 
   const userId = session.user.id
@@ -171,7 +171,7 @@ export async function cancelBooking(bookingId: string) {
   try {
     const session = await auth()
     if (!session || !session.user) {
-      throw new Error("User not authenticated")
+      throw new Error("Usuario no autenticado")
     }
 
     const userId = session.user.id
@@ -182,11 +182,11 @@ export async function cancelBooking(bookingId: string) {
     })
 
     if (!booking) {
-      throw new Error("Booking not found")
+      throw new Error("Reserva no encontrada")
     }
 
     if (booking.userId !== userId) {
-      throw new Error("Unauthorized to cancel this booking")
+      throw new Error("No tienes permiso para cancelar esta reserva")
     }
 
     const now = new Date()
@@ -195,7 +195,7 @@ export async function cancelBooking(bookingId: string) {
 
     if (isBefore(twentyFourHoursBeforeClass, now)) {
       throw new Error(
-        "Cannot cancel bookings less than 24 hours before the class"
+        "No puedes cancelar la reserva con menos de 24 horas de anticipación"
       )
     }
 
@@ -219,7 +219,7 @@ export async function cancelBooking(bookingId: string) {
     if (error instanceof Error) {
       return { success: false, error: error.message }
     }
-    return { success: false, error: "An unknown error occurred" }
+    return { success: false, error: "Ocurrió un error desconocido" }
   }
 }
 

@@ -38,8 +38,8 @@ export async function updatePayment(
     revalidatePath("/admin/pagos")
     return updatedPayment
   } catch (error) {
-    console.error("Error updating payment:", error)
-    throw new Error("Failed to update payment")
+    console.error("Error actualizando pago:", error)
+    throw new Error("Error al actualizar pago")
   }
 }
 
@@ -67,7 +67,7 @@ export async function deletePayment(paymentId: string): Promise<void> {
 
     revalidatePath("/admin/pagos")
   } catch (error) {
-    console.error("Error deleting payment:", error)
-    throw new Error("Failed to delete payment")
+    console.error("Error borrando pago:", error)
+    throw new Error("Error al borrar pago")
   }
 }

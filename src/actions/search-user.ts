@@ -23,7 +23,7 @@ export async function searchUsers(searchTerm: string): Promise<User[]> {
     // console.log(searchTerm, users)
     return users
   } catch (error) {
-    console.error("Error in searchUsers:", error)
+    console.error("Error en searchUsers:", error)
     return [] // Return an empty array instead of undefinedA
   }
 }

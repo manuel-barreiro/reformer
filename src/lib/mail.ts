@@ -15,7 +15,7 @@ export const sendEmailVerification = async (
     const html = render(VerifyEmail({ name, verificationUrl }))
 
     await resend.emails.send({
-      from: "Reformer | Wellness Club <welcome@reformer.com.ar>",
+      from: "Reformer Club <welcome@reformer.com.ar>",
       to: email,
       subject: "Verifica tu correo electrónico",
       html,
@@ -38,7 +38,7 @@ export const sendPasswordResetEmail = async (
     const html = render(ResetPassword({ name, resetUrl }))
 
     await resend.emails.send({
-      from: "Reformer | Wellness Club <welcome@reformer.com.ar>",
+      from: "Reformer Club <reset-password@reformer.com.ar>",
       to: email,
       subject: "Restablecer contraseña",
       html,

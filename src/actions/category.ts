@@ -15,8 +15,8 @@ export async function getCategories() {
     })
     return { success: true, data: categories }
   } catch (error) {
-    console.error("Error fetching categories:", error)
-    return { success: false, error: "Failed to fetch categories" }
+    console.error("Error al obtener categorías:", error)
+    return { success: false, error: "Error al obtener categorías" }
   }
 }
 
@@ -39,8 +39,8 @@ export async function getActiveClassCategories() {
     })
     return { success: true, data: categories }
   } catch (error) {
-    console.error("Error fetching class categories:", error)
-    return { success: false, error: "Failed to fetch categories" }
+    console.error("Error al obtener categorías activas:", error)
+    return { success: false, error: "Error al obtener categorías activas" }
   }
 }
 
@@ -60,8 +60,8 @@ export async function createCategory(data: {
     revalidatePath("/admin/categorias")
     return { success: true, data: category }
   } catch (error) {
-    console.error("Error creating category:", error)
-    return { success: false, error: "Failed to create category" }
+    console.error("Error al crear categoría:", error)
+    return { success: false, error: "Error al crear categoría" }
   }
 }
 
@@ -82,8 +82,8 @@ export async function updateCategory(
     revalidatePath("/admin/categorias")
     return { success: true, data: category }
   } catch (error) {
-    console.error("Error updating category:", error)
-    return { success: false, error: "Failed to update category" }
+    console.error("Error al actualizar categoría:", error)
+    return { success: false, error: "Error al actualizar categoría" }
   }
 }
 
@@ -95,8 +95,8 @@ export async function deleteCategory(id: string) {
     revalidatePath("/admin/categorias")
     return { success: true }
   } catch (error) {
-    console.error("Error deleting category:", error)
-    return { success: false, error: "Failed to delete category" }
+    console.error("Error al eliminar categoría:", error)
+    return { success: false, error: "Error al eliminar categoría" }
   }
 }
 
@@ -118,8 +118,8 @@ export async function createSubcategory(data: {
     revalidatePath("/admin/categorias")
     return { success: true, data: subcategory }
   } catch (error) {
-    console.error("Error creating subcategory:", error)
-    return { success: false, error: "Failed to create subcategory" }
+    console.error("Error al crear subcategoría:", error)
+    return { success: false, error: "Error al crear subcategoría" }
   }
 }
 
@@ -145,8 +145,8 @@ export async function updateSubcategory(
     revalidatePath("/admin/categorias")
     return { success: true, data: subcategory }
   } catch (error) {
-    console.error("Error updating subcategory:", error)
-    return { success: false, error: "Failed to update subcategory" }
+    console.error("Error al actualizar subcategoría:", error)
+    return { success: false, error: "Error al actualizar subcategoría" }
   }
 }
 
@@ -158,7 +158,7 @@ export async function deleteSubcategory(id: string) {
     revalidatePath("/admin/categorias")
     return { success: true }
   } catch (error) {
-    console.error("Error deleting subcategory:", error)
-    return { success: false, error: "Failed to delete subcategory" }
+    console.error("Error al eliminar subcategoría:", error)
+    return { success: false, error: "Error al eliminar subcategoría" }
   }
 }

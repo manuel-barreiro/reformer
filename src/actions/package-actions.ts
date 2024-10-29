@@ -55,7 +55,7 @@ export async function createPackage(formData: FormData) {
     revalidatePath("/admin/paquetes")
     return { success: true, package: newPackage }
   } catch (error) {
-    return { error: "Failed to create package" }
+    return { error: "Error al crear paquete" }
   }
 }
 
@@ -104,7 +104,7 @@ export async function togglePackageStatus(id: string) {
   try {
     const classPackage = await prisma.classPackage.findUnique({ where: { id } })
     if (!classPackage) {
-      return { error: "Package not found" }
+      return { error: "Paquete no encontrado" }
     }
     const updatedPackage = await prisma.classPackage.update({
       where: { id },
@@ -113,6 +113,6 @@ export async function togglePackageStatus(id: string) {
     revalidatePath("/admin/paquetes")
     return { success: true, package: updatedPackage }
   } catch (error) {
-    return { error: "Failed to toggle package status" }
+    return { error: "Error al cambiar el status del paquete" }
   }
 }
