@@ -237,6 +237,7 @@ export function UserPackagesView({
             <h2 className="font-marcellus text-2xl font-bold">
               Paquetes de {user.name} {user.surname}
             </h2>
+            <h3 className="font-dm_mono">[{user.email}]</h3>
           </div>
           <Dialog open={isAssignModalOpen} onOpenChange={setIsAssignModalOpen}>
             <DialogTrigger asChild>
