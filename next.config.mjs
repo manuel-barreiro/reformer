@@ -8,6 +8,7 @@ const nextConfig = {
     config.module.rules.push({
       test: /\.svg$/,
       use: ["@svgr/webpack"],
+      unstable_allowDynamic: ["**/node_modules/@react-email*/**/*.mjs*"],
     })
 
     return config
@@ -41,7 +42,6 @@ const nextConfig = {
       },
     ]
   },
-  unstable_allowDynamic: ["**/node_modules/@react-email*/**/*.mjs*"],
 }
 
 export default nextConfig
