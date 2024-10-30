@@ -6,6 +6,7 @@ import {
   PackageStatus,
   PaymentType,
 } from "@prisma/client"
+import { sendPurchaseConfirmation } from "@/lib/mail"
 
 const prisma = new PrismaClient()
 
@@ -75,11 +76,18 @@ export async function POST(request: Request) {
             },
           })
           console.log("Payment updated in database:", savedPayment)
-        } else {
-          // Only create PurchasedPackage if payment status is "approved"
+          // Only create PurchasedPackage if payment status is updated to "approved"
           const paymentCreateData: any = { ...paymentData }
-
           if (pago.status === "approved") {
+            // Get user and package data for email
+            const user = await prisma.user.findUnique({
+              where: { id: pago.metadata.user_id },
+            })
+
+            if (!user) {
+              throw new Error("User not found")
+            }
+            // Get class package data
             const classPackage = await prisma.classPackage.findUnique({
               where: { id: pago.metadata.class_package_id },
             })
@@ -104,6 +112,67 @@ export async function POST(request: Request) {
                 status: PackageStatus.active,
               },
             }
+
+            // Send purchase confirmation email
+            await sendPurchaseConfirmation(
+              user.email,
+              user.name,
+              classPackage.name,
+              classPackage.classCount,
+              classPackage.durationMonths,
+              pago.transaction_amount || 0
+            )
+            console.log("Email sent to user:", user.email)
+          }
+        } else {
+          // Only create PurchasedPackage if payment status is "approved"
+          const paymentCreateData: any = { ...paymentData }
+
+          if (pago.status === "approved") {
+            // Get user and package data for email
+            const user = await prisma.user.findUnique({
+              where: { id: pago.metadata.user_id },
+            })
+
+            if (!user) {
+              throw new Error("User not found")
+            }
+            // Get class package data
+            const classPackage = await prisma.classPackage.findUnique({
+              where: { id: pago.metadata.class_package_id },
+            })
+
+            if (!classPackage) {
+              throw new Error("ClassPackage not found")
+            }
+
+            // Calculate expiration date based on class package duration and current date
+            const expirationDate = new Date()
+            expirationDate.setMonth(
+              expirationDate.getMonth() + classPackage.durationMonths
+            )
+
+            // Add purchasedPackage creation to payment data
+            paymentCreateData.purchasedPackage = {
+              create: {
+                userId: pago.metadata.user_id,
+                classPackageId: classPackage.id,
+                remainingClasses: classPackage.classCount,
+                expirationDate: expirationDate,
+                status: PackageStatus.active,
+              },
+            }
+
+            // Send purchase confirmation email
+            await sendPurchaseConfirmation(
+              user.email,
+              user.name,
+              classPackage.name,
+              classPackage.classCount,
+              classPackage.durationMonths,
+              pago.transaction_amount || 0
+            )
+            console.log("Email sent to user:", user.email)
           }
 
           // Create the payment (and purchasedPackage if status is approved)

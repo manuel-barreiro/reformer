@@ -57,7 +57,6 @@ export function UsersTable({ initialUsers }: { initialUsers: User[] }) {
     ExtendedPurchasedPackage[]
   >([])
 
-  // Capitalize and sort users by name initially
   const capitalizeAndSortUsers = (users: User[]) => {
     return users
       .map((user) => ({
@@ -69,11 +68,10 @@ export function UsersTable({ initialUsers }: { initialUsers: User[] }) {
             user.surname.slice(1).toLowerCase()
           : user.surname,
       }))
-      .sort((a, b) => {
-        const nameA = `${a.name} ${a.surname || ""}`.trim().toLowerCase()
-        const nameB = `${b.name} ${b.surname || ""}`.trim().toLowerCase()
-        return nameA.localeCompare(nameB)
-      })
+      .sort(
+        (a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      )
   }
 
   const [data, setData] = useState<User[]>(capitalizeAndSortUsers(initialUsers))
