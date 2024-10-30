@@ -63,7 +63,7 @@ export async function POST(request: Request) {
         pending: `${process.env.NEXT_PUBLIC_URL}/checkout/pending`,
         failure: `${process.env.NEXT_PUBLIC_URL}/checkout/failure`,
       },
-      // auto_return: "approved",
+      auto_return: "all",
       notification_url: `${process.env.NEXT_PUBLIC_URL}/api/notify`,
       metadata: {
         user_id: session.user.id,
