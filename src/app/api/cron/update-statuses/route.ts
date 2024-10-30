@@ -3,8 +3,14 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 
-export async function GET() {
-  console.log("Cron job started at:", new Date().toISOString())
+export async function GET(request: Request) {
+  // Check authorization
+  if (
+    request.headers.get("Authorization") !== `Bearer ${process.env.CRON_SECRET}`
+  ) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  }
+
   try {
     // Update bookings to "attended"
     const updatedBookings = await prisma.booking.updateMany({
@@ -20,7 +26,6 @@ export async function GET() {
         status: "attended",
       },
     })
-    console.log(`Updated ${updatedBookings.count} bookings to attended`)
 
     // Update expired packages
     const updatedPackages = await prisma.purchasedPackage.updateMany({
@@ -36,21 +41,14 @@ export async function GET() {
         status: "expired",
       },
     })
-    console.log(`Updated ${updatedPackages.count} packages to expired`)
 
-    console.log("Cron job completed at:", new Date().toISOString())
     return NextResponse.json({
       message: "Status updates completed",
       updatedBookings: updatedBookings.count,
       updatedPackages: updatedPackages.count,
     })
   } catch (error) {
-    console.error(
-      "Cron job failed at:",
-      new Date().toISOString(),
-      "Error:",
-      error
-    )
+    console.error("Cron job failed:", error)
     return NextResponse.json(
       { error: "Internal Server Error" },
       { status: 500 }
