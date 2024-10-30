@@ -37,7 +37,7 @@ export const registerAction = async (
     // Validate the data server-side
     const { data, success } = await registerSchema.safeParse(values)
     if (!success) {
-      throw new Error("Invalid credentials")
+      throw new Error("Credenciales inválidas")
     }
 
     // Check if the user already exists
@@ -48,7 +48,7 @@ export const registerAction = async (
     })
 
     if (user) {
-      throw new Error("Email already in use")
+      throw new Error("Este email ya está registrado")
     }
 
     // logic to salt and hash password
@@ -80,8 +80,6 @@ export const registerAction = async (
     return { error: error.message }
   }
 }
-
-
 
 export async function forgotPasswordAction(
   values: z.infer<typeof forgotPasswordSchema>
@@ -137,9 +135,11 @@ export async function forgotPasswordAction(
 
     // Send reset email
     const emailResult = await sendPasswordResetEmail(email, user.name, token)
-    
+
     if (emailResult.error) {
-      throw new Error("Error al enviar el email. Por favor, intenta nuevamente.")
+      throw new Error(
+        "Error al enviar el email. Por favor, intenta nuevamente."
+      )
     }
 
     return { success: true }

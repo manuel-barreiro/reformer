@@ -5,6 +5,7 @@ import { cancelBooking } from "@/actions/booking-actions"
 import { toast } from "@/components/ui/use-toast"
 import { addHours, isBefore, format } from "date-fns"
 import { BookingWithClass } from "@/components/modules/roles/user/reservas/ReservasPage"
+import { utcToLocal } from "@/lib/timezone-utils"
 
 interface ReservasCardProps {
   booking: BookingWithClass
@@ -34,7 +35,7 @@ export default function ReservasCard({
   }
 
   const now = new Date()
-  const classTime = new Date(booking.class.startTime)
+  const classTime = utcToLocal(booking.class.startTime)
   const twentyFourHoursBeforeClass = addHours(classTime, -24)
   const canCancel = isBefore(now, twentyFourHoursBeforeClass)
 

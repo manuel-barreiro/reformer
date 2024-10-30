@@ -27,16 +27,16 @@ export default {
         })
 
         if (!user) {
-          throw new Error("No user found")
+          throw new Error("Usuario no encontrado")
         } else if (!user.password) {
-          throw new Error("Log in wih Google")
+          throw new Error("Inicia sesión con Google")
         }
 
         // verificar si la contraseña es correcta
         const isValid = await bcrypt.compare(data.password, user.password)
 
         if (!isValid) {
-          throw new Error("Incorrect password")
+          throw new Error("Contraseña incorrecta")
         }
 
         // verificación de email
@@ -69,7 +69,9 @@ export default {
           // enviar email de verificación
           await sendEmailVerification(user.email, user.name, token)
 
-          throw new Error("Please check your email to verify your account")
+          throw new Error(
+            "Por favor, revisa tu correo para verificar tu cuenta"
+          )
         }
 
         return user

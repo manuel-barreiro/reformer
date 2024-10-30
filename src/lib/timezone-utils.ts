@@ -35,3 +35,8 @@ export function formatLocalTime(date: Date): string {
   const localDate = utcToLocal(date)
   return format(localDate, "HH:mm")
 }
+
+export function isExpired(date: Date): boolean {
+  const now = utcToLocal(new Date())
+  return date < now
+}
