@@ -92,7 +92,7 @@ export default function UserInfoForm({ userInfo }: { userInfo: UserInfo }) {
                   <FormLabel className="sr-only">Nombre</FormLabel>
                   <FormControl>
                     <Input
-                      className="w-full border-rust bg-pearlVariant py-6 font-dm_mono font-bold uppercase text-grey_pebble/50 ring-rust ring-offset-rust placeholder:text-grey_pebble/50"
+                      className="w-full border-rust bg-pearlVariant py-6 font-dm_mono font-bold text-grey_pebble/50 ring-rust ring-offset-rust placeholder:text-grey_pebble/50"
                       type="text"
                       placeholder="NOMBRE"
                       {...field}
@@ -111,7 +111,7 @@ export default function UserInfoForm({ userInfo }: { userInfo: UserInfo }) {
                   <FormLabel className="sr-only">Surname</FormLabel>
                   <FormControl>
                     <Input
-                      className="w-full border-rust bg-pearlVariant py-6 font-dm_mono font-bold uppercase text-grey_pebble/50 ring-rust ring-offset-rust placeholder:text-grey_pebble/50"
+                      className="w-full border-rust bg-pearlVariant py-6 font-dm_mono font-bold text-grey_pebble/50 ring-rust ring-offset-rust placeholder:text-grey_pebble/50"
                       type="text"
                       placeholder="APELLIDO"
                       {...field}
@@ -131,7 +131,7 @@ export default function UserInfoForm({ userInfo }: { userInfo: UserInfo }) {
                 <FormLabel className="sr-only">Email</FormLabel>
                 <FormControl>
                   <Input
-                    className="border-rust bg-pearlVariant py-6 font-dm_mono uppercase text-grey_pebble/50 ring-rust ring-offset-rust placeholder:text-grey_pebble/50"
+                    className="border-rust bg-pearlVariant py-6 font-dm_mono text-grey_pebble/50 ring-rust ring-offset-rust placeholder:text-grey_pebble/50"
                     type="email"
                     placeholder="EMAIL"
                     disabled
@@ -151,7 +151,7 @@ export default function UserInfoForm({ userInfo }: { userInfo: UserInfo }) {
                 <FormLabel className="sr-only">Celular</FormLabel>
                 <FormControl>
                   <Input
-                    className="border-rust bg-pearlVariant py-6 font-dm_mono font-bold uppercase text-grey_pebble/50 ring-rust ring-offset-rust placeholder:text-grey_pebble/50"
+                    className="border-rust bg-pearlVariant py-6 font-dm_mono font-bold text-grey_pebble/50 ring-rust ring-offset-rust placeholder:text-grey_pebble/50"
                     type="tel"
                     placeholder="CELULAR"
                     {...field}
