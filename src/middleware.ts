@@ -1,12 +1,10 @@
-import NextAuth from "next-auth"
 import { NextResponse } from "next/server"
-import authConfig from "./auth.config"
 import { auth } from "./auth"
 
-const publicRoutes = ["/", "/api/notify"]
+const publicRoutes = ["/", "/api/notify", "/api/cron/update-statuses"]
 const authRoutes = ["/sign-in", "/sign-up"]
 const apiAuthPrefix = "/api/auth"
-const apiRoutes = ["/api/create_preference", "/api/packages"] // Add other API routes as needed
+const apiRoutes = ["/api/create_preference", "/api/packages"]
 const passwordRoutes = ["/forgot-password", "/reset-password"]
 const adminRoutes = ["/admin/pagos", "/admin/paquetes", "/admin/calendario"]
 const userRoutes = ["/paquetes", "/reservas", "/calendario", "/perfil"]
