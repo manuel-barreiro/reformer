@@ -2,9 +2,16 @@ import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { verifySignature } from "@upstash/qstash/nextjs"
 
-export const POST = verifySignature(async function POST() {
-  return handleStatusUpdates()
-})
+// Remove unused request parameter and fix typing
+export const POST = verifySignature(
+  async () => {
+    return handleStatusUpdates()
+  },
+  {
+    currentSigningKey: process.env.QSTASH_CURRENT_SIGNING_KEY!,
+    nextSigningKey: process.env.QSTASH_NEXT_SIGNING_KEY!,
+  }
+)
 
 async function handleStatusUpdates() {
   try {
