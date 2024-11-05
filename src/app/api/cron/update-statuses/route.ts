@@ -1,14 +1,12 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
+import { verifySignature } from "@upstash/qstash/nextjs"
 
-export async function GET(request: Request) {
-  // Check authorization
-  if (
-    request.headers.get("Authorization") !== `Bearer ${process.env.CRON_SECRET}`
-  ) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-  }
+export const POST = verifySignature(async function POST() {
+  return handleStatusUpdates()
+})
 
+async function handleStatusUpdates() {
   try {
     // Update bookings to "attended"
     const updatedBookings = await prisma.booking.updateMany({
@@ -58,16 +56,14 @@ export async function GET(request: Request) {
     console.log(`Updated ${updatedClasses.count} classes to inactive`)
 
     return NextResponse.json({
+      success: true,
       message: "Status updates completed",
       updatedBookings: updatedBookings.count,
       updatedPackages: updatedPackages.count,
       updatedClasses: updatedClasses.count,
     })
   } catch (error) {
-    console.error("Cron job failed:", error)
-    return NextResponse.json(
-      { error: "Internal Server Error" },
-      { status: 500 }
-    )
+    console.error("Status update failed:", error)
+    return NextResponse.json({ error: "Update failed" }, { status: 500 })
   }
 }
