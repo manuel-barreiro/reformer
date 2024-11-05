@@ -164,7 +164,7 @@ export default function ClassCard({
   )
 
   const confirmedBookings = class_.bookings.filter(
-    (booking) => booking.status === "confirmed"
+    (booking) => booking.status === "confirmed" || booking.status === "attended"
   )
 
   const isFull = confirmedBookings.length >= class_.maxCapacity
