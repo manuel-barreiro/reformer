@@ -1,17 +1,38 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
-import { verifySignature } from "@upstash/qstash/nextjs"
+import { Receiver } from "@upstash/qstash"
+import { headers } from "next/headers"
 
-// Remove unused request parameter and fix typing
-export const POST = verifySignature(
-  async () => {
-    return handleStatusUpdates()
-  },
-  {
+// Create an async function that handles the route
+async function POST(request: Request) {
+  const headersList = headers()
+  const signature = headersList.get("upstash-signature")
+
+  if (!signature) {
+    return NextResponse.json({ error: "Missing signature" }, { status: 401 })
+  }
+
+  // Create a new receiver instance
+  const receiver = new Receiver({
     currentSigningKey: process.env.QSTASH_CURRENT_SIGNING_KEY!,
     nextSigningKey: process.env.QSTASH_NEXT_SIGNING_KEY!,
+  })
+
+  // Get the raw body
+  const body = await request.text()
+
+  // Verify the signature
+  const isValid = await receiver.verify({
+    signature,
+    body,
+  })
+
+  if (!isValid) {
+    return NextResponse.json({ error: "Invalid signature" }, { status: 401 })
   }
-)
+
+  return handleStatusUpdates()
+}
 
 async function handleStatusUpdates() {
   try {
@@ -74,3 +95,5 @@ async function handleStatusUpdates() {
     return NextResponse.json({ error: "Update failed" }, { status: 500 })
   }
 }
+
+export { POST }
