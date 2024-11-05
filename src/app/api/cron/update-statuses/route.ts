@@ -42,10 +42,28 @@ export async function GET(request: Request) {
       },
     })
 
+    // Update past classes to inactive
+    const updatedClasses = await prisma.class.updateMany({
+      where: {
+        isActive: true,
+        startTime: {
+          lt: new Date(),
+        },
+      },
+      data: {
+        isActive: false,
+      },
+    })
+
+    console.log(`Updated ${updatedBookings.count} bookings to attended`)
+    console.log(`Updated ${updatedPackages.count} packages to expired`)
+    console.log(`Updated ${updatedClasses.count} classes to inactive`)
+
     return NextResponse.json({
       message: "Status updates completed",
       updatedBookings: updatedBookings.count,
       updatedPackages: updatedPackages.count,
+      updatedClasses: updatedClasses.count,
     })
   } catch (error) {
     console.error("Cron job failed:", error)
