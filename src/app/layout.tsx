@@ -4,6 +4,7 @@ import "./globals.css"
 import { Toaster } from "@/components/ui/toaster"
 import { auth } from "@/auth"
 import Header from "@/components/modules/landingPage/Header/Header"
+import { Analytics } from "@vercel/analytics/react"
 
 const marcellus = Marcellus({
   weight: "400",
@@ -70,6 +71,7 @@ export default async function RootLayout({
       >
         <Header />
         {children}
+        <Analytics />
         <Toaster />
       </body>
     </html>
