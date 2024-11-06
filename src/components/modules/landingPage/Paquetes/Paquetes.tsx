@@ -1,4 +1,4 @@
-// "use client"
+"use client"
 import { useRef } from "react"
 import marmolBg from "/public/images/marmolBg.webp"
 import Image from "next/image"
@@ -13,37 +13,37 @@ export default function Paquetes({
   activeClassPackages: ClassPackage[]
 }) {
   //Parallax
-  // const sectionRef = useRef(null)
-  // const { scrollYProgress } = useScroll({
-  //   target: sectionRef,
-  //   offset: ["start end", "end start"],
-  // })
-  // const y = useTransform(scrollYProgress, [0, 1], ["-10%", "10%"])
+  const sectionRef = useRef(null)
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start end", "end start"],
+  })
+  const y = useTransform(scrollYProgress, [0, 1], ["-10%", "10%"])
 
   return (
     <section
       id="paquetes"
-      // ref={sectionRef}
+      ref={sectionRef}
       className="relative flex h-auto min-h-[86vh] w-full flex-col items-center justify-center gap-10 overflow-hidden bg-black/80 px-10 py-20 font-dm_mono text-pearl lg:px-20 lg:py-40"
     >
       {/* style={{ top: y }} */}
-      {/* <motion.div className="absolute -z-10 h-[110%] w-full">
+      <motion.div className="absolute -z-10 h-[110%] w-full" style={{ top: y }}>
         <Image
           alt="Fondo de marmol"
           title="Fondo de marmol"
           className="inset-0 h-full w-full object-cover object-center"
           src={marmolBg}
         />
-      </motion.div> */}
+      </motion.div>
 
-      <div className="absolute -z-10 h-[110%] w-full">
+      {/* <div className="absolute -z-10 h-[110%] w-full">
         <Image
           alt="Fondo de marmol"
           title="Fondo de marmol"
           className="inset-0 h-full w-full object-cover object-center"
           src={marmolBg}
         />
-      </div>
+      </div> */}
 
       <h2 className="text-lg uppercase md:text-xl">Nuestros paquetes</h2>
 
