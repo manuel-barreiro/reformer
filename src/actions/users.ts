@@ -20,35 +20,27 @@ export async function updateUser(
   userData: UpdateUserInput
 ): Promise<User> {
   try {
-    // Validate input data
     const validatedData = updateUserSchema.parse(userData)
 
-    // Update user
     const updatedUser = await prisma.user.update({
-      where: {
-        id: userId,
-      },
+      where: { id: userId },
       data: {
         ...validatedData,
         updatedAt: new Date(),
       },
     })
 
-    // Revalidate the users page to show updated data
     revalidatePath("/admin/users")
-
     return updatedUser
   } catch (error) {
-    if (error instanceof z.ZodError) {
-      const errorMessages = error.errors.map((err) => err.message).join(", ")
-      throw new Error(`Error de validación: ${errorMessages}`)
-    }
+    const message =
+      error instanceof z.ZodError
+        ? error.errors.map((err) => err.message).join(", ")
+        : error instanceof Error
+          ? error.message
+          : "Error inesperado"
 
-    if (error instanceof Error) {
-      throw new Error(`Error actualizando usuario: ${error.message}`)
-    }
-
-    throw new Error("Error inesperado actualizando usuario")
+    throw new Error(`Error actualizando usuario: ${message}`)
   }
 }
 
@@ -66,42 +58,37 @@ export async function updatePackage(
 ): Promise<PurchasedPackage> {
   try {
     const validatedData = updatePackageSchema.parse(packageData)
-    // Convert the local date string to UTC Date object
     const utcDate = localToUTC(validatedData.expirationDate, "00:00")
 
-    const updatedPackage = await prisma.purchasedPackage.update({
-      where: {
-        id: packageId,
-      },
-      data: {
-        remainingClasses: validatedData.remainingClasses,
-        expirationDate: utcDate,
-        updatedAt: new Date(),
-      },
+    return await prisma.$transaction(async (tx) => {
+      const updatedPackage = await tx.purchasedPackage.update({
+        where: { id: packageId },
+        data: {
+          remainingClasses: validatedData.remainingClasses,
+          expirationDate: utcDate,
+          updatedAt: new Date(),
+        },
+      })
+
+      revalidatePath("/admin/users")
+      return updatedPackage
     })
-
-    revalidatePath("/admin/users")
-    return updatedPackage
   } catch (error) {
-    if (error instanceof z.ZodError) {
-      const errorMessages = error.errors.map((err) => err.message).join(", ")
-      throw new Error(`Error de validación: ${errorMessages}`)
-    }
+    const message =
+      error instanceof z.ZodError
+        ? error.errors.map((err) => err.message).join(", ")
+        : error instanceof Error
+          ? error.message
+          : "Error inesperado"
 
-    if (error instanceof Error) {
-      throw new Error(`Error actualizando paquete: ${error.message}`)
-    }
-
-    throw new Error("Error inesperado actualizando paquete")
+    throw new Error(`Error actualizando paquete: ${message}`)
   }
 }
 
 export async function getUserPackages(userId: string) {
   try {
-    const packages = await prisma.purchasedPackage.findMany({
-      where: {
-        userId: userId,
-      },
+    return await prisma.purchasedPackage.findMany({
+      where: { userId },
       include: {
         classPackage: {
           select: {
@@ -118,16 +105,10 @@ export async function getUserPackages(userId: string) {
           },
         },
       },
-      orderBy: {
-        createdAt: "desc",
-      },
+      orderBy: { createdAt: "desc" },
     })
-
-    return packages
   } catch (error) {
-    if (error instanceof Error) {
-      throw new Error(`Error obteniendo paquetes: ${error.message}`)
-    }
-    throw new Error("Error inesperado obteniendo paquetes")
+    const message = error instanceof Error ? error.message : "Error inesperado"
+    throw new Error(`Error obteniendo paquetes: ${message}`)
   }
 }

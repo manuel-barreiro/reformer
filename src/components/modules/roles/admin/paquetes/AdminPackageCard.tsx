@@ -31,6 +31,10 @@ import {
 } from "@/actions/package-actions"
 import { cn } from "@/lib/utils"
 
+const isErrorResponse = (response: any): response is { error: string } => {
+  return "error" in response
+}
+
 interface AdminPackageCardProps {
   pack: ClassPackage
   onPackageUpdate: (updatedPackage: ClassPackage) => void
@@ -53,17 +57,17 @@ export default function AdminPackageCard({
 
   const handleBlockPackage = async () => {
     const result = await togglePackageStatus(pack.id)
-    if (result.error) {
+    if (isErrorResponse(result)) {
       console.error("Error updating package status:", result.error)
     } else if (result.package) {
-      onPackageUpdate(result.package)
+      onPackageUpdate(result.package as ClassPackage)
     }
     setIsAlertOpen(false)
   }
 
   const handleDeletePackage = async () => {
     const result = await softDeletePackage(pack.id)
-    if (result.error) {
+    if (isErrorResponse(result)) {
       console.error("Error deleting package:", result.error)
     } else if (result.package && result.isDeleted) {
       onPackageDelete(pack.id)

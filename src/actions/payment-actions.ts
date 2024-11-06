@@ -45,21 +45,13 @@ export async function updatePayment(
 
 export async function deletePayment(paymentId: string): Promise<void> {
   try {
-    // Start a transaction to ensure both operations succeed or fail together
     await prisma.$transaction(async (tx) => {
-      // First, find and delete the associated PurchasedPackage if it exists
-      const payment = await tx.payment.findUnique({
+      // Delete the associated PurchasedPackage if it exists
+      await tx.purchasedPackage.deleteMany({
         where: { paymentId },
-        include: { purchasedPackage: true },
       })
 
-      if (payment?.purchasedPackage) {
-        await tx.purchasedPackage.delete({
-          where: { id: payment.purchasedPackage.id },
-        })
-      }
-
-      // Then delete the payment
+      // Delete the payment
       await tx.payment.delete({
         where: { paymentId },
       })
