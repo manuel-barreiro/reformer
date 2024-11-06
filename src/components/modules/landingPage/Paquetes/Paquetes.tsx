@@ -36,14 +36,14 @@ export default function Paquetes({
         />
       </motion.div> */}
 
-      <div className="absolute -z-10 h-[110%] w-full">
+      {/* <div className="absolute -z-10 h-[110%] w-full">
         <Image
           alt="Fondo de marmol"
           title="Fondo de marmol"
           className="inset-0 h-full w-full object-cover object-center"
           src={marmolBg}
         />
-      </div>
+      </div> */}
 
       <h2 className="text-lg uppercase md:text-xl">Nuestros paquetes</h2>
 

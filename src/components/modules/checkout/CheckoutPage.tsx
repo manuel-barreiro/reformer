@@ -39,7 +39,7 @@ export default function CheckoutPage({
         />
       </motion.div> */}
 
-      <div className="absolute -z-10 h-[110%] w-full">
+      {/* <div className="absolute -z-10 h-[110%] w-full">
         <Image
           alt="Fondo de marmol"
           title="Fondo de marmol"
@@ -47,7 +47,7 @@ export default function CheckoutPage({
           src={marmolBg}
           priority
         />
-      </div>
+      </div> */}
 
       <div className="grid h-auto w-auto max-w-[900px] grid-cols-1 justify-items-stretch gap-6 md:grid-cols-2 md:gap-2">
         <div className="flex flex-grow flex-col gap-2">
