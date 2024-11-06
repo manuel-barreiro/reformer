@@ -44,12 +44,23 @@ export async function updatePayment(
 }
 
 export async function deletePayment(paymentId: string): Promise<void> {
+  console.log("paymentId:", paymentId)
   try {
     await prisma.$transaction(async (tx) => {
-      // First, find the purchasedPackage associated with this payment
-      const purchasedPackage = await tx.purchasedPackage.findFirst({
-        where: { paymentId },
+      // Find the purchasedPackage using the payment's id, not paymentId
+      const payment = await tx.payment.findUnique({
+        where: { paymentId: paymentId },
       })
+
+      if (!payment) {
+        throw new Error("Payment not found")
+      }
+
+      const purchasedPackage = await tx.purchasedPackage.findUnique({
+        where: { paymentId: payment.id },
+      })
+
+      console.log("purchasedPackage:", purchasedPackage)
 
       if (purchasedPackage) {
         // Delete all associated bookings first
