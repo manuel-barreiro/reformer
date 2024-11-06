@@ -1,4 +1,4 @@
-// "use client"
+"use client"
 import Brand from "@/components/modules/landingPage/Brand/Brand"
 import ComingSoon from "@/components/modules/landingPage/ComingSoon"
 import Hero from "@/components/modules/landingPage/Hero/Hero"
@@ -17,16 +17,16 @@ export default function LandingPage({
 }: {
   activeClassPackages: ClassPackage[]
 }) {
-  //Lenis smooth scroll
-  // useEffect(() => {
-  //   const lenis = new Lenis()
-  //   function raf(time: any) {
-  //     lenis.raf(time)
-  //     requestAnimationFrame(raf)
-  //   }
+  // Lenis smooth scroll
+  useEffect(() => {
+    const lenis = new Lenis()
+    function raf(time: any) {
+      lenis.raf(time)
+      requestAnimationFrame(raf)
+    }
 
-  //   requestAnimationFrame(raf)
-  // }, [])
+    requestAnimationFrame(raf)
+  }, [])
 
   return (
     <>
