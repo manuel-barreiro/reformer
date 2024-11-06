@@ -62,7 +62,9 @@ export default function ClassAttendantsDialog({
         setIsDeleteDialogOpen(false)
         setSelectedBooking(null)
       } else {
-        throw new Error(result.error)
+        if ("error" in result) {
+          throw new Error("Unknown error occurred")
+        }
       }
     } catch (error) {
       toast({
@@ -109,7 +111,7 @@ export default function ClassAttendantsDialog({
 
         setSelectedUser(null)
       } else {
-        throw new Error(result.error)
+        throw new Error("Error al añadir usuario a la clase")
       }
     } catch (error) {
       toast({

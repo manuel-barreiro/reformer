@@ -14,7 +14,7 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { ClassPackage } from "@prisma/client"
-import { updatePackage } from "@/actions/package-actions"
+import { updatePackage, PackageResponse } from "@/actions/package-actions"
 
 const packageSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -29,6 +29,12 @@ type PackageFormValues = z.infer<typeof packageSchema>
 interface EditPackageFormProps {
   pack: ClassPackage
   onSuccess: (updatedPackage: ClassPackage) => void
+}
+
+const isErrorResponse = (
+  response: PackageResponse
+): response is { success: false; error: string | Record<string, string[]> } => {
+  return !response.success
 }
 
 export function EditPackageForm({ pack, onSuccess }: EditPackageFormProps) {
@@ -54,11 +60,11 @@ export function EditPackageForm({ pack, onSuccess }: EditPackageFormProps) {
 
     try {
       const result = await updatePackage(pack.id, formData)
-      if (result && result.package) {
+      if (!isErrorResponse(result)) {
         console.log("Package updated successfully:", result.package)
         onSuccess(result.package)
       } else {
-        throw new Error("Failed to update package")
+        console.error("Failed to update package:", result.error)
       }
     } catch (error) {
       console.error("Error updating package:", error)

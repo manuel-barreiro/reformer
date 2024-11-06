@@ -5,7 +5,23 @@ import { revalidatePath } from "next/cache"
 import { auth } from "@/auth"
 import { addHours, isBefore } from "date-fns"
 
-export async function bookClass(classId: string, adminSelectedUserId?: string) {
+type SuccessResponse<T = void> = {
+  success: true
+  data?: T
+  booking?: any // Add this if you need it for bookClass response
+}
+
+type ErrorResponse = {
+  success: false
+  error: string
+}
+
+type ActionResponse<T = void> = SuccessResponse<T> | ErrorResponse
+
+export async function bookClass(
+  classId: string,
+  adminSelectedUserId?: string
+): Promise<ActionResponse> {
   try {
     const session = await auth()
     if (!session || !session.user) {
@@ -156,7 +172,9 @@ export async function getUserBookingsInRange(startDate: Date, endDate: Date) {
   })
 }
 
-export async function cancelBooking(bookingId: string) {
+export async function cancelBooking(
+  bookingId: string
+): Promise<ActionResponse> {
   try {
     const session = await auth()
     if (!session || !session.user) {

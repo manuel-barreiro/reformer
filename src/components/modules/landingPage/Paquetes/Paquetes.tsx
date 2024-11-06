@@ -4,13 +4,13 @@ import marmolBg from "/public/images/marmolBg.png"
 import Image from "next/image"
 import { motion, useScroll, useTransform } from "framer-motion"
 import Link from "next/link"
-import { ClassPackage } from "@prisma/client"
 import { cn } from "@/lib/utils"
+import { ClassPackageProps } from "@/types"
 
 export default function Paquetes({
   activeClassPackages,
 }: {
-  activeClassPackages: ClassPackage[]
+  activeClassPackages: ClassPackageProps[]
 }) {
   //Parallax
   const sectionRef = useRef(null)
@@ -48,7 +48,7 @@ export default function Paquetes({
             "md:grid-cols-3 lg:grid-cols-3 lg:gap-3"
         )}
       >
-        {activeClassPackages?.map((pack: ClassPackage) => (
+        {activeClassPackages?.map((pack: ClassPackageProps) => (
           <Paquete key={pack.id} name={pack.name} />
         ))}
       </div>

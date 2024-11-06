@@ -8,6 +8,19 @@ import { z } from "zod"
 import { addDays, addWeeks, isAfter } from "date-fns"
 import { formatLocalDate, localToUTC } from "@/lib/timezone-utils"
 
+// Add these type definitions at the top of the file
+type SuccessResponse<T = void> = {
+  success: true
+  data?: T
+}
+
+type ErrorResponse = {
+  success: false
+  error: string
+}
+
+type ActionResponse<T = void> = SuccessResponse<T> | ErrorResponse
+
 const classSchema = z.object({
   categoryId: z.string().min(1, "Category is required"),
   subcategoryId: z.string().min(1, "Subcategory is required"),
@@ -139,7 +152,7 @@ export async function getClasses(startDate: Date, endDate: Date) {
   }
 }
 
-export async function deleteClass(classId: string) {
+export async function deleteClass(classId: string): Promise<ActionResponse> {
   try {
     return await prisma.$transaction(async (tx) => {
       const [confirmedBookings, deleteBookings, deleteClass] =
@@ -178,7 +191,7 @@ export async function deleteClass(classId: string) {
       }
 
       revalidatePath("/admin/calendario")
-      return { success: true }
+      return { success: true } as SuccessResponse
     })
   } catch (error) {
     console.error("Error al eliminar clase", error)
@@ -191,7 +204,9 @@ export async function deleteClass(classId: string) {
 }
 
 // New function to toggle class visibility
-export async function toggleClassLock(classId: string) {
+export async function toggleClassLock(
+  classId: string
+): Promise<ActionResponse<Class>> {
   try {
     const currentClass = await prisma.class.findUnique({
       where: { id: classId },
