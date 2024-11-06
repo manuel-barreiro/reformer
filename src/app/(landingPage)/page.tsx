@@ -1,6 +1,5 @@
 import LandingPage from "@/components/modules/landingPage/LandingPage"
 import { getActiveClassPackages } from "@/actions/package-actions"
-import { ClassPackage } from "@prisma/client"
 import { ClassPackageProps } from "@/types"
 
 export default async function Home() {

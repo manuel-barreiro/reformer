@@ -50,6 +50,9 @@ export async function getActiveClassPackages() {
         price: true,
         durationMonths: true,
         isActive: true,
+        deletedAt: true,
+        createdAt: true,
+        updatedAt: true,
       },
       orderBy: {
         classCount: "asc",
@@ -75,6 +78,9 @@ export async function getAllClassPackages() {
         price: true,
         durationMonths: true,
         isActive: true,
+        deletedAt: true,
+        createdAt: true,
+        updatedAt: true,
       },
       orderBy: {
         classCount: "asc",
