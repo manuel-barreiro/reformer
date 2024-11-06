@@ -14,6 +14,13 @@ import bcrypt from "bcryptjs"
 import { nanoid } from "nanoid"
 import { sendPasswordResetEmail } from "@/lib/mail"
 
+// Add these type definitions at the top of the file
+type ActionResult = { success: true } | { error: string }
+
+export function isError(result: ActionResult): result is { error: string } {
+  return "error" in result
+}
+
 export const loginAction = async (values: z.infer<typeof loginSchema>) => {
   try {
     await signIn("credentials", {
@@ -79,7 +86,7 @@ export const registerAction = async (
 
 export async function forgotPasswordAction(
   values: z.infer<typeof forgotPasswordSchema>
-) {
+): Promise<ActionResult> {
   try {
     const { email } = values
 
