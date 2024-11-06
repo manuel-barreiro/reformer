@@ -42,18 +42,6 @@ export async function getActiveClassPackages() {
         deletedAt: null,
         isActive: true,
       },
-      select: {
-        id: true,
-        name: true,
-        description: true,
-        classCount: true,
-        price: true,
-        durationMonths: true,
-        isActive: true,
-        deletedAt: true,
-        createdAt: true,
-        updatedAt: true,
-      },
       orderBy: {
         classCount: "asc",
       },
