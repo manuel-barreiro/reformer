@@ -38,7 +38,7 @@ export default function LandingPage({
         <ComingSoon />
         <ServiciosGrid />
         <Pilates />
-        {/* <Paquetes activeClassPackages={activeClassPackages} /> */}
+        <Paquetes activeClassPackages={activeClassPackages} />
         <ContactForm />
         <Footer />
       </main>
