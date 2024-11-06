@@ -3,48 +3,29 @@ import Brand from "@/components/modules/landingPage/Brand/Brand"
 import ComingSoon from "@/components/modules/landingPage/ComingSoon"
 import Hero from "@/components/modules/landingPage/Hero/Hero"
 import QuienesSomos from "@/components/modules/landingPage/QuienesSomos"
-import { Suspense, useEffect, useRef } from "react"
+import { useEffect } from "react"
 import Lenis from "lenis"
 import Footer from "@/components/modules/landingPage/Footer/Footer"
 import ServiciosGrid from "@/components/modules/landingPage/Servicios/ServiciosGrid"
 import ContactForm from "@/components/modules/landingPage/Footer/ContactForm"
 import Pilates from "@/components/modules/landingPage/Pilates"
 import Paquetes from "@/components/modules/landingPage/Paquetes/Paquetes"
-import { ClassPackageProps } from "@/types"
-
-const lenisOptions = {
-  duration: 0.8, // Reduced from 1.2
-  easing: (t: number) => t, // Simpler easing function
-  smoothWheel: true,
-  wheelMultiplier: 0.8, // Added to reduce scroll intensity
-  touchMultiplier: 1.5,
-  infinite: false,
-}
+import { ClassPackage } from "@prisma/client"
 
 export default function LandingPage({
   activeClassPackages,
 }: {
-  activeClassPackages: ClassPackageProps[]
+  activeClassPackages: ClassPackage[]
 }) {
   //Lenis smooth scroll
-  const lenisRef = useRef<any>(null)
-
   useEffect(() => {
-    if (typeof window === "undefined") return
-
-    lenisRef.current = new Lenis(lenisOptions)
-
-    const raf = (time: number) => {
-      lenisRef.current?.raf(time)
+    const lenis = new Lenis()
+    function raf(time: any) {
+      lenis.raf(time)
       requestAnimationFrame(raf)
     }
 
     requestAnimationFrame(raf)
-
-    return () => {
-      lenisRef.current?.destroy()
-      lenisRef.current = null
-    }
   }, [])
 
   return (
@@ -57,9 +38,7 @@ export default function LandingPage({
         <ComingSoon />
         <ServiciosGrid />
         <Pilates />
-        <Suspense fallback={null}>
-          <Paquetes activeClassPackages={activeClassPackages} />
-        </Suspense>{" "}
+        <Paquetes activeClassPackages={activeClassPackages} />
         <ContactForm />
         <Footer />
       </main>
