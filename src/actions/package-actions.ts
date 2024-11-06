@@ -5,7 +5,7 @@ import { revalidatePath } from "next/cache"
 import { z } from "zod"
 import { ClassPackage } from "@prisma/client"
 
-// Export the type definition
+// Export the type definitio
 export type PackageResponse =
   | {
       success: true
