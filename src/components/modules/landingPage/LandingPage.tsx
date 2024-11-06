@@ -3,7 +3,7 @@ import Brand from "@/components/modules/landingPage/Brand/Brand"
 import ComingSoon from "@/components/modules/landingPage/ComingSoon"
 import Hero from "@/components/modules/landingPage/Hero/Hero"
 import QuienesSomos from "@/components/modules/landingPage/QuienesSomos"
-import { useEffect } from "react"
+import { useEffect, useRef } from "react"
 import Lenis from "lenis"
 import Footer from "@/components/modules/landingPage/Footer/Footer"
 import ServiciosGrid from "@/components/modules/landingPage/Servicios/ServiciosGrid"
@@ -18,14 +18,26 @@ export default function LandingPage({
   activeClassPackages: ClassPackageProps[]
 }) {
   //Lenis smooth scroll
+  const lenisRef = useRef<any>(null)
+
   useEffect(() => {
-    const lenis = new Lenis()
-    function raf(time: any) {
-      lenis.raf(time)
+    lenisRef.current = new Lenis({
+      duration: 1.2,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      orientation: "vertical",
+      smoothWheel: true,
+    })
+
+    function raf(time: number) {
+      lenisRef.current?.raf(time)
       requestAnimationFrame(raf)
     }
 
     requestAnimationFrame(raf)
+
+    return () => {
+      lenisRef.current?.destroy()
+    }
   }, [])
 
   return (
