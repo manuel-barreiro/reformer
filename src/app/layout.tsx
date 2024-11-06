@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster"
 import { auth } from "@/auth"
 import Header from "@/components/modules/landingPage/Header/Header"
 import { Analytics } from "@vercel/analytics/react"
+import JsonLd from "@/components/JsonLd"
 
 const marcellus = Marcellus({
   weight: "400",
@@ -26,7 +27,12 @@ const dm_mono = DM_Mono({
 
 export const metadata: Metadata = {
   title: "Reformer | Wellness Club",
-  description: "Transformá tu cuerpo, y elevá tu mente",
+  description:
+    "Transformá tu cuerpo, y elevá tu mente en el mejor wellness club. Clases de pilates reformer, yoga, meditación y más.",
+  metadataBase: new URL("https://www.reformer.com.ar"),
+  alternates: {
+    canonical: "/",
+  },
   icons: {
     icon: [
       { url: "/icons/favicon-light.png" },
@@ -49,6 +55,30 @@ export const metadata: Metadata = {
       },
     ],
   },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  keywords: [
+    "pilates",
+    "reformer",
+    "wellness",
+    "yoga",
+    "meditación",
+    "buenos aires",
+    "argentina",
+  ],
+  authors: [{ name: "Reformer" }],
+  verification: {
+    google: "your-google-verification-code", // Add your Google Search Console verification code
+  },
 }
 
 export const viewport: Viewport = {
@@ -66,6 +96,9 @@ export default async function RootLayout({
   const session = await auth()
   return (
     <html lang="es" className="scrollbar-hide min-h-[100dvh] scroll-smooth">
+      <head>
+        <JsonLd />
+      </head>
       <body
         className={`${marcellus.variable} ${dm_sans.variable} ${dm_sans.className} ${dm_mono.variable} scrollbar-hide`}
       >
