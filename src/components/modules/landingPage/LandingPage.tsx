@@ -37,7 +37,7 @@ export default function LandingPage({
         <QuienesSomos />
         <ComingSoon />
         <ServiciosGrid />
-        <Pilates />
+        {/* <Pilates /> */}
         <Paquetes activeClassPackages={activeClassPackages} />
         <ContactForm />
         <Footer />
