@@ -1,3 +1,4 @@
+"use client"
 import { useRef, memo } from "react"
 import marmolBg from "/public/images/marmolBg.png"
 import Image from "next/image"
