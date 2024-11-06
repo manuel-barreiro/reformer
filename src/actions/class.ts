@@ -8,19 +8,6 @@ import { z } from "zod"
 import { addDays, addWeeks, isAfter } from "date-fns"
 import { formatLocalDate, localToUTC } from "@/lib/timezone-utils"
 
-// Add these type definitions at the top of the file
-type SuccessResponse<T = void> = {
-  success: true
-  data?: T
-}
-
-type ErrorResponse = {
-  success: false
-  error: string
-}
-
-type ActionResponse<T = void> = SuccessResponse<T> | ErrorResponse
-
 const classSchema = z.object({
   categoryId: z.string().min(1, "Category is required"),
   subcategoryId: z.string().min(1, "Subcategory is required"),
@@ -50,14 +37,17 @@ export async function createClass(data: ClassFormData) {
 
   try {
     const validatedData = classSchema.parse(data)
-    const classPromises: Promise<any>[] = []
+    const classInstances: Array<any> = []
 
+    // Convert the base date to UTC while preserving local time
     const baseDate = localToUTC(validatedData.date, "00:00")
-    const horizontalDates: Date[] = []
 
+    // Calculate dates for horizontal repetition
+    const horizontalDates: Date[] = []
     if (validatedData.repeatDaily && validatedData.repeatUntil) {
       const endDate = localToUTC(validatedData.repeatUntil, "00:00")
       let currentDate = baseDate
+
       while (currentDate <= endDate) {
         horizontalDates.push(currentDate)
         currentDate = addDays(currentDate, 1)
@@ -66,42 +56,44 @@ export async function createClass(data: ClassFormData) {
       horizontalDates.push(baseDate)
     }
 
-    const weeks = validatedData.repeatWeekly
-      ? validatedData.repeatWeeks || 1
-      : 1
+    // Generate all class instances
+    for (
+      let week = 0;
+      week < (validatedData.repeatWeekly ? validatedData.repeatWeeks || 1 : 1);
+      week++
+    ) {
+      for (const date of horizontalDates) {
+        const weeklyDate = addWeeks(date, week)
 
-    // Use transaction for bulk insert
-    const classInstances = await prisma.$transaction(async (tx) => {
-      const instances = []
+        // Don't schedule classes more than 3 months in advance
+        // if (isAfter(weeklyDate, addWeeks(new Date(), 12))) continue
 
-      for (let week = 0; week < weeks; week++) {
-        for (const date of horizontalDates) {
-          const weeklyDate = addWeeks(date, week)
-          const startTime = localToUTC(
-            formatLocalDate(weeklyDate),
-            validatedData.startTime
-          )
-          const endTime = localToUTC(
-            formatLocalDate(weeklyDate),
-            validatedData.endTime
-          )
+        const startTime = localToUTC(
+          formatLocalDate(weeklyDate),
+          validatedData.startTime
+        )
+        const endTime = localToUTC(
+          formatLocalDate(weeklyDate),
+          validatedData.endTime
+        )
 
-          const classData = {
-            categoryId: validatedData.categoryId,
-            subcategoryId: validatedData.subcategoryId,
-            date: weeklyDate,
-            startTime,
-            endTime,
-            instructor: validatedData.instructor,
-            maxCapacity: validatedData.maxCapacity,
-          }
-
-          instances.push(tx.class.create({ data: classData }))
+        const classData = {
+          categoryId: validatedData.categoryId,
+          subcategoryId: validatedData.subcategoryId,
+          date: weeklyDate,
+          startTime,
+          endTime,
+          instructor: validatedData.instructor,
+          maxCapacity: validatedData.maxCapacity,
         }
-      }
 
-      return await Promise.all(instances)
-    })
+        const newClass = await prisma.class.create({
+          data: classData,
+        })
+
+        classInstances.push(newClass)
+      }
+    }
 
     revalidatePath("/admin/calendario")
     return { success: true, data: classInstances, count: classInstances.length }
@@ -123,8 +115,7 @@ export async function createClass(data: ClassFormData) {
 
 export async function getClasses(startDate: Date, endDate: Date) {
   try {
-    // Single query with all includes
-    return await prisma.class.findMany({
+    const classes = await prisma.class.findMany({
       where: {
         AND: [{ startTime: { gte: startDate } }, { endTime: { lte: endDate } }],
       },
@@ -140,59 +131,64 @@ export async function getClasses(startDate: Date, endDate: Date) {
               },
             },
           },
-        },
+        }, // Include bookings to show capacity
       },
       orderBy: {
         startTime: "asc",
       },
     })
+
+    return classes
   } catch (error) {
     console.error("Error al buscar clases:", error)
     return []
   }
 }
 
-export async function deleteClass(classId: string): Promise<ActionResponse> {
+export async function deleteClass(classId: string) {
   try {
-    return await prisma.$transaction(async (tx) => {
-      const [confirmedBookings, deleteBookings, deleteClass] =
-        await Promise.all([
-          tx.booking.findMany({
-            where: {
-              classId: classId,
-              status: "confirmed",
-            },
-            include: {
-              purchasedPackage: true,
-            },
-          }),
-          tx.booking.deleteMany({
-            where: { classId: classId },
-          }),
-          tx.class.delete({
-            where: { id: classId },
-          }),
-        ])
+    // Start a transaction to handle both the class deletion and package refunds
+    await prisma.$transaction(async (tx) => {
+      // Get all confirmed bookings for this class to handle package refunds
+      const confirmedBookings = await tx.booking.findMany({
+        where: {
+          classId: classId,
+          status: "confirmed",
+        },
+        include: {
+          purchasedPackage: true,
+        },
+      })
 
-      // Process refunds if needed
-      if (confirmedBookings.length > 0) {
-        await Promise.all(
-          confirmedBookings
-            .map((booking) =>
-              booking.purchasedPackageId
-                ? tx.purchasedPackage.update({
-                    where: { id: booking.purchasedPackageId },
-                    data: { remainingClasses: { increment: 1 } },
-                  })
-                : null
-            )
-            .filter(Boolean)
-        )
+      // Refund classes back to active packages
+      for (const booking of confirmedBookings) {
+        if (booking.purchasedPackageId) {
+          await tx.purchasedPackage.update({
+            where: {
+              id: booking.purchasedPackageId,
+            },
+            data: {
+              remainingClasses: {
+                increment: 1,
+              },
+            },
+          })
+        }
       }
 
-      revalidatePath("/admin/calendario")
-      return { success: true } as SuccessResponse
+      // Delete all bookings associated with this class
+      await tx.booking.deleteMany({
+        where: { classId: classId },
+      })
+
+      // Delete the class
+      await tx.class.delete({
+        where: { id: classId },
+      })
     })
+
+    revalidatePath("/admin/calendario")
+    return { success: true }
   } catch (error) {
     console.error("Error al eliminar clase", error)
     return {
@@ -204,13 +200,10 @@ export async function deleteClass(classId: string): Promise<ActionResponse> {
 }
 
 // New function to toggle class visibility
-export async function toggleClassLock(
-  classId: string
-): Promise<ActionResponse<Class>> {
+export async function toggleClassLock(classId: string) {
   try {
     const currentClass = await prisma.class.findUnique({
       where: { id: classId },
-      select: { isActive: true },
     })
 
     if (!currentClass) {
@@ -219,9 +212,7 @@ export async function toggleClassLock(
 
     const updatedClass = await prisma.class.update({
       where: { id: classId },
-      data: {
-        isActive: !currentClass.isActive,
-      },
+      data: { isActive: !currentClass.isActive },
     })
 
     revalidatePath("/admin/calendario")

@@ -6,7 +6,6 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import { forgotPasswordSchema } from "@/lib/zod-schemas"
 import { forgotPasswordAction } from "@/actions/auth-actions"
-import { isError } from "@/types"
 import { Button } from "@/components/ui/button"
 import {
   Form,
@@ -34,7 +33,7 @@ export default function ForgotPasswordForm() {
     setError(null)
     startTransition(async () => {
       const result = await forgotPasswordAction(values)
-      if (isError(result)) {
+      if (result.error) {
         setError(result.error)
       } else {
         setSuccess(true)

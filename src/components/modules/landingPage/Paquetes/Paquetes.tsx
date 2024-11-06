@@ -1,11 +1,11 @@
 "use client"
 import { useRef } from "react"
 import marmolBg from "/public/images/marmolBg.png"
+import Image from "next/image"
 import { motion, useScroll, useTransform } from "framer-motion"
 import Link from "next/link"
 import { ClassPackage } from "@prisma/client"
 import { cn } from "@/lib/utils"
-import Image from "next/image"
 
 export default function Paquetes({
   activeClassPackages,

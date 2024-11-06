@@ -3,7 +3,6 @@
 import { prisma } from "@/lib/prisma"
 import { Payment, User } from "@prisma/client"
 import { revalidatePath } from "next/cache"
-import { deletePackage } from "./purchased-packages"
 
 export async function getPayments(): Promise<(Payment & { user: User })[]> {
   return await prisma.payment.findMany({
@@ -46,22 +45,21 @@ export async function updatePayment(
 
 export async function deletePayment(paymentId: string): Promise<void> {
   try {
+    // Start a transaction to ensure both operations succeed or fail together
     await prisma.$transaction(async (tx) => {
-      // First, find the purchasedPackage associated with this payment
-      const purchasedPackage = await tx.purchasedPackage.findFirst({
+      // First, find and delete the associated PurchasedPackage if it exists
+      const payment = await tx.payment.findUnique({
         where: { paymentId },
+        include: { purchasedPackage: true },
       })
 
-      if (purchasedPackage) {
-        console.log(`Found purchasedPackage: ${purchasedPackage.id}`)
-
-        // Use the deletePackage function to delete the package and its associated bookings
-        await deletePackage(purchasedPackage.id)
-      } else {
-        console.log(`No purchasedPackage found for paymentId: ${paymentId}`)
+      if (payment?.purchasedPackage) {
+        await tx.purchasedPackage.delete({
+          where: { id: payment.purchasedPackage.id },
+        })
       }
 
-      // Finally delete the payment
+      // Then delete the payment
       await tx.payment.delete({
         where: { paymentId },
       })
@@ -70,6 +68,6 @@ export async function deletePayment(paymentId: string): Promise<void> {
     revalidatePath("/admin/pagos")
   } catch (error) {
     console.error("Error borrando pago:", error)
-    throw new Error("Error al borrar pago y registros asociados")
+    throw new Error("Error al borrar pago")
   }
 }

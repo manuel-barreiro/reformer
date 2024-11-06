@@ -19,7 +19,7 @@ export default {
           throw new Error("Invalid credentials")
         }
 
-        // Get user with a single query
+        // verificar si existe el usuario en la base de datos
         const user = await prisma.user.findUnique({
           where: {
             email: data.email,
@@ -32,34 +32,43 @@ export default {
           throw new Error("Inicia sesión con Google")
         }
 
+        // verificar si la contraseña es correcta
         const isValid = await bcrypt.compare(data.password, user.password)
 
         if (!isValid) {
           throw new Error("Contraseña incorrecta")
         }
 
+        // verificación de email
         if (!user.emailVerified) {
-          // Use transaction for token operations
-          const token = nanoid()
+          const verifyTokenExits = await prisma.verificationToken.findFirst({
+            where: {
+              identifier: user.email,
+            },
+          })
 
-          await prisma.$transaction(async (tx) => {
-            // Delete existing token and create new one in a transaction
-            await tx.verificationToken.deleteMany({
+          // si existe un token, lo eliminamos
+          if (verifyTokenExits?.identifier) {
+            await prisma.verificationToken.delete({
               where: {
                 identifier: user.email,
               },
             })
+          }
 
-            await tx.verificationToken.create({
-              data: {
-                identifier: user.email,
-                token,
-                expires: new Date(Date.now() + 1000 * 60 * 60 * 24),
-              },
-            })
+          const token = nanoid()
+
+          await prisma.verificationToken.create({
+            data: {
+              identifier: user.email,
+              token,
+              expires: new Date(Date.now() + 1000 * 60 * 60 * 24),
+            },
           })
 
+          // enviar email de verificación
           await sendEmailVerification(user.email, user.name, token)
+
           throw new Error(
             "Por favor, revisa tu correo para verificar tu cuenta"
           )

@@ -13,7 +13,6 @@ import { z } from "zod"
 import bcrypt from "bcryptjs"
 import { nanoid } from "nanoid"
 import { sendPasswordResetEmail } from "@/lib/mail"
-import { ActionResult } from "@/types"
 
 export const loginAction = async (values: z.infer<typeof loginSchema>) => {
   try {
@@ -35,34 +34,38 @@ export const registerAction = async (
   values: z.infer<typeof registerSchema>
 ) => {
   try {
+    // Validate the data server-side
     const { data, success } = await registerSchema.safeParse(values)
     if (!success) {
       throw new Error("Credenciales inválidas")
     }
 
-    // Use transaction for user creation
-    const result = await prisma.$transaction(async (tx) => {
-      const existingUser = await tx.user.findUnique({
-        where: { email: data.email },
-      })
-
-      if (existingUser) {
-        throw new Error("Este email ya está registrado")
-      }
-
-      const hashedPassword = await bcrypt.hash(data.password, 10)
-
-      return await tx.user.create({
-        data: {
-          name: data.name,
-          surname: data.surname,
-          email: data.email,
-          phone: data.phone,
-          password: hashedPassword,
-        },
-      })
+    // Check if the user already exists
+    const user = await prisma.user.findUnique({
+      where: {
+        email: data.email,
+      },
     })
 
+    if (user) {
+      throw new Error("Este email ya está registrado")
+    }
+
+    // logic to salt and hash password
+    const hashedPassword = await bcrypt.hash(data.password, 10)
+
+    // Create the user in the database
+    await prisma.user.create({
+      data: {
+        name: data.name,
+        surname: data.surname,
+        email: data.email,
+        phone: data.phone,
+        password: hashedPassword,
+      },
+    })
+
+    // Log in the user
     await signIn("credentials", {
       email: data.email,
       password: data.password,
@@ -80,60 +83,66 @@ export const registerAction = async (
 
 export async function forgotPasswordAction(
   values: z.infer<typeof forgotPasswordSchema>
-): Promise<ActionResult> {
+) {
   try {
     const { email } = values
 
-    return await prisma.$transaction(async (tx) => {
-      const user = await tx.user.findUnique({
-        where: { email },
-      })
+    // Check if user exists
+    const user = await prisma.user.findUnique({
+      where: { email },
+    })
 
-      if (!user) {
-        throw new Error("No existe una cuenta con este email")
-      }
+    if (!user) {
+      throw new Error("No existe una cuenta con este email")
+    }
 
-      if (!user.password) {
+    // Check if user has a password (if not, they registered with Google)
+    if (!user.password) {
+      throw new Error(
+        "Esta cuenta fue creada con Google. Por favor, inicia sesión con Google."
+      )
+    }
+
+    // Check if there's an existing valid token
+    const existingToken = await prisma.passwordResetToken.findUnique({
+      where: { identifier: email },
+    })
+
+    if (existingToken) {
+      if (existingToken.expires > new Date()) {
         throw new Error(
-          "Esta cuenta fue creada con Google. Por favor, inicia sesión con Google."
+          "Ya te enviamos un correo para restablecer tu contraseña. Por favor, revisa tu bandeja de entrada y carpeta de spam."
         )
       }
-
-      const existingToken = await tx.passwordResetToken.findUnique({
+      // If token exists but is expired, delete it
+      await prisma.passwordResetToken.delete({
         where: { identifier: email },
       })
+    }
 
-      if (existingToken) {
-        if (existingToken.expires > new Date()) {
-          throw new Error(
-            "Ya te enviamos un correo para restablecer tu contraseña. Por favor, revisa tu bandeja de entrada y carpeta de spam."
-          )
-        }
-        await tx.passwordResetToken.delete({
-          where: { identifier: email },
-        })
-      }
+    // Generate reset token
+    const token = nanoid()
+    const expires = new Date(Date.now() + 1000 * 60 * 60) // 1 hour
 
-      const token = nanoid()
-      const expires = new Date(Date.now() + 1000 * 60 * 60)
-
-      await tx.passwordResetToken.create({
-        data: {
-          identifier: email,
-          token,
-          expires,
-        },
-      })
-
-      const emailResult = await sendPasswordResetEmail(email, user.name, token)
-      if (emailResult.error) {
-        throw new Error(
-          "Error al enviar el email. Por favor, intenta nuevamente."
-        )
-      }
-
-      return { success: true }
+    // Save token in database
+    await prisma.passwordResetToken.create({
+      data: {
+        identifier: email,
+        token,
+        expires,
+      },
     })
+
+    // Send reset email
+    const emailResult = await sendPasswordResetEmail(email, user.name, token)
+
+    if (emailResult.error) {
+      throw new Error(
+        "Error al enviar el email. Por favor, intenta nuevamente."
+      )
+    }
+
+    return { success: true }
   } catch (error: any) {
     return { error: error.message }
   }
@@ -144,6 +153,7 @@ export async function resetPasswordAction(
   values: z.infer<typeof resetPasswordSchema>
 ) {
   try {
+    // Validate token
     const resetToken = await prisma.passwordResetToken.findFirst({
       where: { token },
     })
@@ -156,20 +166,18 @@ export async function resetPasswordAction(
       throw new Error("Token expirado")
     }
 
+    // Hash new password
     const hashedPassword = await bcrypt.hash(values.password, 10)
 
-    // Use transaction for atomic operations
-    await prisma.$transaction(async (tx) => {
-      // Update user and delete token in parallel
-      await Promise.all([
-        tx.user.update({
-          where: { email: resetToken.identifier },
-          data: { password: hashedPassword },
-        }),
-        tx.passwordResetToken.delete({
-          where: { identifier: resetToken.identifier },
-        }),
-      ])
+    // Update user password
+    await prisma.user.update({
+      where: { email: resetToken.identifier },
+      data: { password: hashedPassword },
+    })
+
+    // Delete used token
+    await prisma.passwordResetToken.delete({
+      where: { identifier: resetToken.identifier },
     })
 
     return { success: true }

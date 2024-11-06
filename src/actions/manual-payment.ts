@@ -11,28 +11,23 @@ export async function createManualPayment(
 ): Promise<Payment> {
   return await prisma.$transaction(async (tx) => {
     try {
-      // Get only needed fields from classPackage
-      const classPackage = await tx.classPackage.findFirst({
+      // Find classPackage by ID
+      const classPackage = await tx.classPackage.findUnique({
         where: { id: classPackageId },
-        select: {
-          id: true,
-          name: true,
-          classCount: true,
-          durationMonths: true,
-        },
       })
 
       if (!classPackage) {
         throw new Error("Class package not found")
       }
 
+      // Calculate expiration date based on class package duration and current date
       const expirationDate = new Date()
       expirationDate.setMonth(
         expirationDate.getMonth() + classPackage.durationMonths
       )
 
-      // Create payment and purchasedPackage in a single operation
-      return await tx.payment.create({
+      // Create the payment and purchasedPackage entries
+      const paymentData = await tx.payment.create({
         data: {
           paymentType: PaymentType.manual,
           paymentId: `MANUAL_${Date.now()}`,
@@ -43,13 +38,15 @@ export async function createManualPayment(
           status: "approved",
           statusDetail: "Pago Manual",
           paymentTypeId,
-          user: { connect: { id: userId } },
+          user: {
+            connect: { id: userId },
+          },
           purchasedPackage: {
             create: {
-              userId,
+              userId: userId,
               classPackageId: classPackage.id,
               remainingClasses: classPackage.classCount,
-              expirationDate,
+              expirationDate: expirationDate,
               status: PackageStatus.active,
             },
           },
@@ -58,11 +55,28 @@ export async function createManualPayment(
           purchasedPackage: true,
         },
       })
+
+      return paymentData
     } catch (error) {
-      // Simplified error handling
-      const message =
-        error instanceof Error ? error.message : "Unknown error occurred"
-      throw new Error(`Payment creation failed: ${message}`)
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        // Handle known Prisma errors
+        throw new Error(`Error de Prisma: ${error.message}`)
+      } else if (error instanceof Prisma.PrismaClientUnknownRequestError) {
+        // Handle unknown Prisma errors
+        throw new Error(`Error desconocido de Prisma: ${error.message}`)
+      } else if (error instanceof Prisma.PrismaClientRustPanicError) {
+        // Handle Prisma Rust panic errors
+        throw new Error(`Error de pánico de Prisma Rust: ${error.message}`)
+      } else if (error instanceof Prisma.PrismaClientInitializationError) {
+        // Handle Prisma initialization errors
+        throw new Error(`Error de inicialización de Prisma: ${error.message}`)
+      } else if (error instanceof Prisma.PrismaClientValidationError) {
+        // Handle Prisma validation errors
+        throw new Error(`Error de validación de Prisma: ${error.message}`)
+      } else {
+        // Handle any other errors
+        throw new Error(`Error inesperado: ${(error as any).message}`)
+      }
     }
   })
 }

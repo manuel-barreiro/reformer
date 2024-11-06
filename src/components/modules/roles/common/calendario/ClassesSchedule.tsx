@@ -73,13 +73,9 @@ export default function ClassesSchedule({
           description: "La clase ha sido eliminada exitosamente.",
           variant: "reformer",
         })
-        await onClassChange()
+        await onClassChange() // Refetch classes after deletion
       } else {
-        toast({
-          title: "Error",
-          description: result.error,
-          variant: "destructive",
-        })
+        throw new Error(result.error)
       }
     } catch (error) {
       toast({
