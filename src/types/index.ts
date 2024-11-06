@@ -10,3 +10,9 @@ export type ClassPackageProps = Pick<
   | "durationMonths"
   | "isActive"
 >
+
+export type ActionResult = { success: true } | { error: string }
+
+export function isError(result: ActionResult): result is { error: string } {
+  return "error" in result
+}

@@ -5,7 +5,8 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import { forgotPasswordSchema } from "@/lib/zod-schemas"
-import { forgotPasswordAction, isError } from "@/actions/auth-actions"
+import { forgotPasswordAction } from "@/actions/auth-actions"
+import { isError } from "@/types"
 import { Button } from "@/components/ui/button"
 import {
   Form,
