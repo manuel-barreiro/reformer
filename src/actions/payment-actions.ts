@@ -46,12 +46,24 @@ export async function updatePayment(
 export async function deletePayment(paymentId: string): Promise<void> {
   try {
     await prisma.$transaction(async (tx) => {
-      // Delete the associated PurchasedPackage if it exists
-      await tx.purchasedPackage.deleteMany({
+      // First, find the purchasedPackage associated with this payment
+      const purchasedPackage = await tx.purchasedPackage.findFirst({
         where: { paymentId },
       })
 
-      // Delete the payment
+      if (purchasedPackage) {
+        // Delete all associated bookings first
+        await tx.booking.deleteMany({
+          where: { purchasedPackageId: purchasedPackage.id },
+        })
+
+        // Then delete the purchasedPackage
+        await tx.purchasedPackage.delete({
+          where: { id: purchasedPackage.id },
+        })
+      }
+
+      // Finally delete the payment
       await tx.payment.delete({
         where: { paymentId },
       })
@@ -60,6 +72,6 @@ export async function deletePayment(paymentId: string): Promise<void> {
     revalidatePath("/admin/pagos")
   } catch (error) {
     console.error("Error borrando pago:", error)
-    throw new Error("Error al borrar pago")
+    throw new Error("Error al borrar pago y registros asociados")
   }
 }
