@@ -1,9 +1,13 @@
 import LandingPage from "@/components/modules/landingPage/LandingPage"
 import { getActiveClassPackages } from "@/actions/package-actions"
-import { ClassPackage } from "@prisma/client"
+import { ClassPackageProps } from "@/types"
 
 export default async function Home() {
-  const activeClassPackages: ClassPackage[] = await getActiveClassPackages()
+  const activeClassPackages = await getActiveClassPackages()
 
-  return <LandingPage activeClassPackages={activeClassPackages} />
+  return (
+    <LandingPage
+      activeClassPackages={activeClassPackages as ClassPackageProps[]}
+    />
+  )
 }

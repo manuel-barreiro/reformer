@@ -3,96 +3,71 @@ import { prisma } from "@/lib/prisma"
 import { Receiver } from "@upstash/qstash"
 import { headers } from "next/headers"
 
-// Create an async function that handles the route
 async function POST(request: Request) {
-  const headersList = headers()
-  const signature = headersList.get("upstash-signature")
-
-  if (!signature) {
-    return NextResponse.json({ error: "Missing signature" }, { status: 401 })
-  }
-
-  // Create a new receiver instance
-  const receiver = new Receiver({
-    currentSigningKey: process.env.QSTASH_CURRENT_SIGNING_KEY!,
-    nextSigningKey: process.env.QSTASH_NEXT_SIGNING_KEY!,
-  })
-
-  // Get the raw body
-  const body = await request.text()
-
-  // Verify the signature
-  const isValid = await receiver.verify({
-    signature,
-    body,
-  })
-
-  if (!isValid) {
-    return NextResponse.json({ error: "Invalid signature" }, { status: 401 })
-  }
-
-  return handleStatusUpdates()
-}
-
-async function handleStatusUpdates() {
   try {
-    // Update bookings to "attended"
-    const updatedBookings = await prisma.booking.updateMany({
-      where: {
-        status: "confirmed",
-        class: {
-          startTime: {
-            lt: new Date(),
-          },
-        },
-      },
-      data: {
-        status: "attended",
-      },
+    const signature = headers().get("upstash-signature")
+
+    if (!signature) {
+      return NextResponse.json({ error: "Missing signature" }, { status: 401 })
+    }
+
+    const receiver = new Receiver({
+      currentSigningKey: process.env.QSTASH_CURRENT_SIGNING_KEY!,
+      nextSigningKey: process.env.QSTASH_NEXT_SIGNING_KEY!,
     })
 
-    // Update expired packages
-    const updatedPackages = await prisma.purchasedPackage.updateMany({
-      where: {
-        status: {
-          not: "expired",
-        },
-        expirationDate: {
-          lt: new Date(),
-        },
-      },
-      data: {
-        status: "expired",
-      },
+    const body = await request.text()
+    const isValid = await receiver.verify({ signature, body })
+
+    if (!isValid) {
+      return NextResponse.json({ error: "Invalid signature" }, { status: 401 })
+    }
+
+    const now = new Date()
+    const updates = await prisma.$transaction(async (tx) => {
+      const [updatedBookings, updatedPackages, updatedClasses] =
+        await Promise.all([
+          tx.booking.updateMany({
+            where: {
+              status: "confirmed",
+              class: { startTime: { lt: now } },
+            },
+            data: { status: "attended" },
+          }),
+          tx.purchasedPackage.updateMany({
+            where: {
+              status: { not: "expired" },
+              expirationDate: { lt: now },
+            },
+            data: { status: "expired" },
+          }),
+          tx.class.updateMany({
+            where: {
+              isActive: true,
+              startTime: { lt: now },
+            },
+            data: { isActive: false },
+          }),
+        ])
+
+      return { updatedBookings, updatedPackages, updatedClasses }
     })
 
-    // Update past classes to inactive
-    const updatedClasses = await prisma.class.updateMany({
-      where: {
-        isActive: true,
-        startTime: {
-          lt: new Date(),
-        },
-      },
-      data: {
-        isActive: false,
-      },
-    })
-
-    console.log(`Updated ${updatedBookings.count} bookings to attended`)
-    console.log(`Updated ${updatedPackages.count} packages to expired`)
-    console.log(`Updated ${updatedClasses.count} classes to inactive`)
-
+    console.log("Status updates completed successfully:", updates)
     return NextResponse.json({
       success: true,
       message: "Status updates completed",
-      updatedBookings: updatedBookings.count,
-      updatedPackages: updatedPackages.count,
-      updatedClasses: updatedClasses.count,
+      ...updates,
     })
   } catch (error) {
     console.error("Status update failed:", error)
-    return NextResponse.json({ error: "Update failed" }, { status: 500 })
+    return NextResponse.json(
+      {
+        error: "Update failed",
+        details: error instanceof Error ? error.message : "Unknown error",
+      },
+      { status: 500 }
+    )
   }
 }
 

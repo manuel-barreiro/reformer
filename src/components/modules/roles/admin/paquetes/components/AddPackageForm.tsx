@@ -14,7 +14,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form"
-import { createPackage } from "@/actions/package-actions"
+import { createPackage, PackageResponse } from "@/actions/package-actions"
 import { ClassPackage } from "@prisma/client"
 
 const packageSchema = z.object({
@@ -29,6 +29,12 @@ type PackageFormValues = z.infer<typeof packageSchema>
 
 interface AddPackageFormProps {
   onSuccess: (pack: ClassPackage) => void
+}
+
+const isErrorResponse = (
+  response: PackageResponse
+): response is { success: false; error: string | Record<string, string[]> } => {
+  return !response.success
 }
 
 export function AddPackageForm({ onSuccess }: AddPackageFormProps) {
@@ -54,12 +60,12 @@ export function AddPackageForm({ onSuccess }: AddPackageFormProps) {
 
     try {
       const result = await createPackage(formData)
-      if (result && result.package) {
+      if (!isErrorResponse(result)) {
         console.log("Package created successfully:", result.package)
         form.reset()
         onSuccess(result.package)
       } else {
-        throw new Error("Failed to create package")
+        console.error("Failed to create package:", result.error)
       }
     } catch (error) {
       console.error("Error creating package:", error)

@@ -3,6 +3,29 @@
 import { prisma } from "@/lib/prisma"
 import { revalidatePath } from "next/cache"
 import { z } from "zod"
+import { ClassPackage } from "@prisma/client"
+
+// Export the type definition
+export type PackageResponse =
+  | {
+      success: true
+      package: ClassPackage
+    }
+  | {
+      success: false
+      error: string | Record<string, string[]>
+    }
+
+export type SoftDeleteResponse =
+  | {
+      success: true
+      package: { id: string; isActive: boolean; deletedAt: Date | null }
+      isDeleted: true
+    }
+  | {
+      success: false
+      error: string
+    }
 
 const packageSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -13,29 +36,65 @@ const packageSchema = z.object({
 })
 
 export async function getActiveClassPackages() {
-  return await prisma.classPackage.findMany({
-    where: {
-      deletedAt: null,
-      isActive: true,
-    },
-    orderBy: {
-      classCount: "asc",
-    },
-  })
+  try {
+    return await prisma.classPackage.findMany({
+      where: {
+        deletedAt: null,
+        isActive: true,
+      },
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        classCount: true,
+        price: true,
+        durationMonths: true,
+        isActive: true,
+        deletedAt: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+      orderBy: {
+        classCount: "asc",
+      },
+    })
+  } catch (error) {
+    console.error("Error fetching active packages:", error)
+    return []
+  }
 }
 
 export async function getAllClassPackages() {
-  return await prisma.classPackage.findMany({
-    where: {
-      deletedAt: null,
-    },
-    orderBy: {
-      classCount: "asc",
-    },
-  })
+  try {
+    return await prisma.classPackage.findMany({
+      where: {
+        deletedAt: null,
+      },
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        classCount: true,
+        price: true,
+        durationMonths: true,
+        isActive: true,
+        deletedAt: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+      orderBy: {
+        classCount: "asc",
+      },
+    })
+  } catch (error) {
+    console.error("Error fetching packages:", error)
+    return []
+  }
 }
 
-export async function createPackage(formData: FormData) {
+export async function createPackage(
+  formData: FormData
+): Promise<PackageResponse> {
   const validatedFields = packageSchema.safeParse({
     name: formData.get("name"),
     description: formData.get("description"),
@@ -45,21 +104,29 @@ export async function createPackage(formData: FormData) {
   })
 
   if (!validatedFields.success) {
-    return { error: validatedFields.error.flatten().fieldErrors }
+    return {
+      success: false,
+      error: validatedFields.error.flatten().fieldErrors,
+    }
   }
 
   try {
     const newPackage = await prisma.classPackage.create({
       data: validatedFields.data,
     })
+
     revalidatePath("/admin/paquetes")
     return { success: true, package: newPackage }
   } catch (error) {
-    return { error: "Error al crear paquete" }
+    const message = error instanceof Error ? error.message : "Error desconocido"
+    return { success: false, error: `Error al crear paquete: ${message}` }
   }
 }
 
-export async function updatePackage(id: string, formData: FormData) {
+export async function updatePackage(
+  id: string,
+  formData: FormData
+): Promise<PackageResponse> {
   const validatedFields = packageSchema.safeParse({
     name: formData.get("name"),
     description: formData.get("description"),
@@ -69,7 +136,10 @@ export async function updatePackage(id: string, formData: FormData) {
   })
 
   if (!validatedFields.success) {
-    return { error: validatedFields.error.flatten().fieldErrors }
+    return {
+      success: false,
+      error: validatedFields.error.flatten().fieldErrors,
+    }
   }
 
   try {
@@ -77,42 +147,67 @@ export async function updatePackage(id: string, formData: FormData) {
       where: { id },
       data: validatedFields.data,
     })
+
     revalidatePath("/admin/paquetes")
     return { success: true, package: updatedPackage }
   } catch (error) {
-    return { error: "Failed to update package" }
+    const message = error instanceof Error ? error.message : "Error desconocido"
+    return { success: false, error: `Error al actualizar paquete: ${message}` }
   }
 }
 
-export async function softDeletePackage(id: string) {
+export async function softDeletePackage(
+  id: string
+): Promise<SoftDeleteResponse> {
   try {
-    const deletedPackage = await prisma.classPackage.update({
-      where: { id },
-      data: {
-        isActive: false,
-        deletedAt: new Date(),
-      },
+    return await prisma.$transaction(async (tx) => {
+      const deletedPackage = await tx.classPackage.update({
+        where: { id },
+        data: {
+          isActive: false,
+          deletedAt: new Date(),
+        },
+        select: {
+          id: true,
+          isActive: true,
+          deletedAt: true,
+        },
+      })
+
+      revalidatePath("/admin/paquetes")
+      return { success: true, package: deletedPackage, isDeleted: true }
     })
-    revalidatePath("/admin/paquetes")
-    return { success: true, package: deletedPackage, isDeleted: true }
   } catch (error) {
-    return { error: "Error al eliminar paquete" }
+    const message = error instanceof Error ? error.message : "Error desconocido"
+    return { success: false, error: `Error al eliminar paquete: ${message}` }
   }
 }
 
-export async function togglePackageStatus(id: string) {
+export async function togglePackageStatus(
+  id: string
+): Promise<PackageResponse> {
+  // Changed from ActionResponse to PackageResponse
   try {
-    const classPackage = await prisma.classPackage.findUnique({ where: { id } })
-    if (!classPackage) {
-      return { error: "Paquete no encontrado" }
+    const currentPackage = await prisma.classPackage.findUnique({
+      where: { id },
+      select: { isActive: true },
+    })
+
+    if (!currentPackage) {
+      return { success: false, error: "Package not found" }
     }
+
     const updatedPackage = await prisma.classPackage.update({
       where: { id },
-      data: { isActive: !classPackage.isActive },
+      data: {
+        isActive: !currentPackage.isActive,
+      },
     })
+
     revalidatePath("/admin/paquetes")
     return { success: true, package: updatedPackage }
   } catch (error) {
-    return { error: "Error al cambiar el status del paquete" }
+    const message = error instanceof Error ? error.message : "Error desconocido"
+    return { success: false, error: `Error al cambiar el status: ${message}` }
   }
 }

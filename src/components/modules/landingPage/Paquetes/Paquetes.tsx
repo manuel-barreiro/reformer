@@ -1,16 +1,16 @@
 "use client"
 import { useRef } from "react"
-import marmolBg from "/public/images/marmolBg.webp"
+import marmolBg from "/public/images/marmolBg.png"
 import Image from "next/image"
 import { motion, useScroll, useTransform } from "framer-motion"
 import Link from "next/link"
-import { ClassPackage } from "@prisma/client"
 import { cn } from "@/lib/utils"
+import { ClassPackageProps } from "@/types"
 
 export default function Paquetes({
   activeClassPackages,
 }: {
-  activeClassPackages: ClassPackage[]
+  activeClassPackages: ClassPackageProps[]
 }) {
   //Parallax
   const sectionRef = useRef(null)
@@ -26,7 +26,6 @@ export default function Paquetes({
       ref={sectionRef}
       className="relative flex h-auto min-h-[86vh] w-full flex-col items-center justify-center gap-10 overflow-hidden bg-black/80 px-10 py-20 font-dm_mono text-pearl lg:px-20 lg:py-40"
     >
-      {/* style={{ top: y }} */}
       <motion.div className="absolute -z-10 h-[110%] w-full" style={{ top: y }}>
         <Image
           alt="Fondo de marmol"
@@ -35,15 +34,6 @@ export default function Paquetes({
           src={marmolBg}
         />
       </motion.div>
-
-      {/* <div className="absolute -z-10 h-[110%] w-full">
-        <Image
-          alt="Fondo de marmol"
-          title="Fondo de marmol"
-          className="inset-0 h-full w-full object-cover object-center"
-          src={marmolBg}
-        />
-      </div> */}
 
       <h2 className="text-lg uppercase md:text-xl">Nuestros paquetes</h2>
 
@@ -58,7 +48,7 @@ export default function Paquetes({
             "md:grid-cols-3 lg:grid-cols-3 lg:gap-3"
         )}
       >
-        {activeClassPackages?.map((pack: ClassPackage) => (
+        {activeClassPackages?.map((pack: ClassPackageProps) => (
           <Paquete key={pack.id} name={pack.name} />
         ))}
       </div>

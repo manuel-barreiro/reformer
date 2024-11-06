@@ -3,57 +3,54 @@ import { redirect } from "next/navigation"
 import { type NextRequest } from "next/server"
 
 export async function GET(request: NextRequest) {
-  const searchParams = request.nextUrl.searchParams
-  const token = searchParams.get("token")
+  const token = request.nextUrl.searchParams.get("token")
 
   if (!token) {
-    return new Response("Token not found", { status: 400 })
+    return new Response("Token not provided", { status: 400 })
   }
 
-  // verificar si existe un token en la base de datos
-  const verifyToken = await prisma.verificationToken.findFirst({
-    where: {
-      token,
-    },
-  })
+  try {
+    const result = await prisma.$transaction(async (tx) => {
+      const verifyToken = await tx.verificationToken.findFirst({
+        where: { token },
+        select: {
+          identifier: true,
+          expires: true,
+        },
+      })
 
-  if (!verifyToken) {
-    return new Response("Token not found", { status: 400 })
+      if (!verifyToken) {
+        throw new Error("Token not found")
+      }
+
+      if (verifyToken.expires < new Date()) {
+        throw new Error("Token expired")
+      }
+
+      const user = await tx.user.findUnique({
+        where: { email: verifyToken.identifier },
+        select: { emailVerified: true },
+      })
+
+      if (user?.emailVerified) {
+        throw new Error("Email already verified")
+      }
+
+      // Update user and delete token atomically
+      await tx.user.update({
+        where: { email: verifyToken.identifier },
+        data: { emailVerified: new Date() },
+      })
+
+      await tx.verificationToken.delete({
+        where: { identifier: verifyToken.identifier },
+      })
+    })
+
+    redirect("/sign-in?verified=true")
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : "Verification failed"
+    return new Response(message, { status: 400 })
   }
-
-  // verificar si el token ya expiró
-  if (verifyToken.expires < new Date()) {
-    return new Response("Token expired", { status: 400 })
-  }
-
-  // verificar si el email ya esta verificado
-  const user = await prisma.user.findUnique({
-    where: {
-      email: verifyToken.identifier,
-    },
-  })
-
-  if (user?.emailVerified) {
-    return new Response("Email already verified", { status: 400 })
-  }
-
-  // marcar el email como verificado
-  await prisma.user.update({
-    where: {
-      email: verifyToken.identifier,
-    },
-    data: {
-      emailVerified: new Date(),
-    },
-  })
-
-  // eliminar el token
-  await prisma.verificationToken.delete({
-    where: {
-      identifier: verifyToken.identifier,
-    },
-  })
-
-  // return Response.json({ token });
-  redirect("/sign-in?verified=true")
 }

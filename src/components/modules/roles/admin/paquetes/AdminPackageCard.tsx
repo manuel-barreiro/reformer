@@ -28,8 +28,22 @@ import { Button } from "@/components/ui/button"
 import {
   softDeletePackage,
   togglePackageStatus,
+  PackageResponse,
+  SoftDeleteResponse,
 } from "@/actions/package-actions"
 import { cn } from "@/lib/utils"
+
+const isErrorResponse = (
+  response: PackageResponse
+): response is { success: false; error: string | Record<string, string[]> } => {
+  return !response.success
+}
+
+const isSoftDeleteError = (
+  response: SoftDeleteResponse
+): response is { success: false; error: string } => {
+  return !response.success
+}
 
 interface AdminPackageCardProps {
   pack: ClassPackage
@@ -53,20 +67,20 @@ export default function AdminPackageCard({
 
   const handleBlockPackage = async () => {
     const result = await togglePackageStatus(pack.id)
-    if (result.error) {
-      console.error("Error updating package status:", result.error)
-    } else if (result.package) {
+    if (!isErrorResponse(result)) {
       onPackageUpdate(result.package)
+    } else {
+      console.error("Error updating package status:", result.error)
     }
     setIsAlertOpen(false)
   }
 
   const handleDeletePackage = async () => {
     const result = await softDeletePackage(pack.id)
-    if (result.error) {
+    if (!isSoftDeleteError(result)) {
+      onPackageDelete(result.package.id)
+    } else {
       console.error("Error deleting package:", result.error)
-    } else if (result.package && result.isDeleted) {
-      onPackageDelete(pack.id)
     }
     setIsAlertOpen(false)
   }

@@ -106,30 +106,22 @@ export async function updatePackage(
 
 export async function deletePackage(packageId: string) {
   try {
-    // First, get the package to get the userId for revalidation
-    const packageToDelete = await prisma.purchasedPackage.findUnique({
-      where: { id: packageId },
-      select: { userId: true },
+    // Delete the package and all associated bookings in a transaction
+    const deletedPackage = await prisma.$transaction(async (tx) => {
+      // Delete all associated bookings first
+      await tx.booking.deleteMany({
+        where: { purchasedPackageId: packageId },
+      })
+
+      // Then delete the package itself
+      return await tx.purchasedPackage.delete({
+        where: { id: packageId },
+        select: { userId: true },
+      })
     })
 
-    if (!packageToDelete) {
-      throw new Error("Package not found")
-    }
-
-    // Delete the package and all associated bookings in a transaction
-    await prisma.$transaction([
-      // Delete all associated bookings first
-      prisma.booking.deleteMany({
-        where: { purchasedPackageId: packageId },
-      }),
-      // Then delete the package itself
-      prisma.purchasedPackage.delete({
-        where: { id: packageId },
-      }),
-    ])
-
-    revalidatePath(`/admin/usuarios/${packageToDelete.userId}`)
-    return { success: true, data: packageToDelete }
+    revalidatePath(`/admin/usuarios/${deletedPackage.userId}`)
+    return { success: true, data: deletedPackage }
   } catch (error) {
     console.error("Error al borrar paquete:", error)
     return { success: false, error: "Error al borrar paquete" }

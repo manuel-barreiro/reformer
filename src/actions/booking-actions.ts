@@ -5,94 +5,105 @@ import { revalidatePath } from "next/cache"
 import { auth } from "@/auth"
 import { addHours, isBefore } from "date-fns"
 
-export async function bookClass(classId: string, adminSelectedUserId?: string) {
+type SuccessResponse<T = void> = {
+  success: true
+  data?: T
+  booking?: any // Add this if you need it for bookClass response
+}
+
+type ErrorResponse = {
+  success: false
+  error: string
+}
+
+type ActionResponse<T = void> = SuccessResponse<T> | ErrorResponse
+
+export async function bookClass(
+  classId: string,
+  adminSelectedUserId?: string
+): Promise<ActionResponse> {
   try {
     const session = await auth()
     if (!session || !session.user) {
       throw new Error("Usuario no autenticado")
     }
 
-    // For admin bookings, use the provided userId, otherwise use the authenticated user's ID
     const userId = adminSelectedUserId || session.user.id
     if (!userId) {
       throw new Error("ID de usuario no encontrado")
     }
 
-    // Check if the user has already booked this class
-    const existingBooking = await prisma.booking.findFirst({
-      where: {
-        userId: userId,
-        classId: classId,
-        status: "confirmed",
-      },
-    })
+    return await prisma.$transaction(async (tx) => {
+      const [existingBooking, classDetails, activePurchasedPackage] =
+        await Promise.all([
+          tx.booking.findFirst({
+            where: {
+              userId: userId,
+              classId: classId,
+              status: "confirmed",
+            },
+          }),
+          tx.class.findUnique({
+            where: { id: classId },
+            include: { bookings: true },
+          }),
+          tx.purchasedPackage.findFirst({
+            where: {
+              userId: userId,
+              remainingClasses: { gt: 0 },
+              status: "active",
+              expirationDate: { gte: new Date() },
+            },
+            orderBy: { expirationDate: "asc" },
+          }),
+        ])
 
-    if (existingBooking) {
-      throw new Error("Ya tienes una reserva confirmada para esta clase")
-    }
+      if (existingBooking) {
+        throw new Error("Ya tienes una reserva confirmada para esta clase")
+      }
 
-    // Check if the class is full
-    const classDetails = await prisma.class.findUnique({
-      where: { id: classId },
-      include: { bookings: true },
-    })
+      if (!classDetails) {
+        throw new Error("Clase no encontrada")
+      }
 
-    if (!classDetails) {
-      throw new Error("Clase no encontrada")
-    }
+      const confirmedBookings = classDetails.bookings.filter(
+        (booking) => booking.status === "confirmed"
+      )
 
-    const confirmedBookings = classDetails.bookings.filter(
-      (booking) => booking.status === "confirmed"
-    )
+      if (confirmedBookings.length >= classDetails.maxCapacity) {
+        throw new Error("La clase no tiene lugares disponibles")
+      }
 
-    if (confirmedBookings.length >= classDetails.maxCapacity) {
-      throw new Error("La clase no tiene lugares disponibles")
-    }
+      if (!activePurchasedPackage) {
+        throw new Error("No tienes un paquete activo con clases disponibles")
+      }
 
-    // Find an active purchased package with remaining classes
-    const activePurchasedPackage = await prisma.purchasedPackage.findFirst({
-      where: {
-        userId: userId,
-        remainingClasses: { gt: 0 },
-        status: "active",
-        expirationDate: { gte: new Date() },
-      },
-      orderBy: { expirationDate: "asc" }, // Use the package expiring soonest
-    })
-
-    console.log("activePurchasedPackage", activePurchasedPackage)
-
-    if (!activePurchasedPackage) {
-      throw new Error("No tienes un paquete activo con clases disponibles")
-    }
-
-    // Create the booking
-    const booking = await prisma.booking.create({
-      data: {
-        userId: userId,
-        classId: classId,
-        purchasedPackageId: activePurchasedPackage.id,
-        status: "confirmed",
-      },
-      include: {
-        user: true, // Include user details in the response
-      },
-    })
-
-    // Decrease the remaining classes in the purchased package
-    await prisma.purchasedPackage.update({
-      where: { id: activePurchasedPackage.id },
-      data: {
-        remainingClasses: {
-          decrement: 1,
+      const booking = await tx.booking.create({
+        data: {
+          userId: userId,
+          classId: classId,
+          purchasedPackageId: activePurchasedPackage.id,
+          status: "confirmed",
         },
-      },
-    })
+        include: {
+          user: true,
+        },
+      })
 
-    adminSelectedUserId
-      ? revalidatePath("/admin/calendario")
-      : revalidatePath("/calendario")
-    return { success: true, booking }
+      await tx.purchasedPackage.update({
+        where: { id: activePurchasedPackage.id },
+        data: {
+          remainingClasses: {
+            decrement: 1,
+          },
+        },
+      })
+
+      adminSelectedUserId
+        ? revalidatePath("/admin/calendario")
+        : revalidatePath("/calendario")
+      return { success: true, booking }
+    })
   } catch (error) {
     if (error instanceof Error) {
       return { success: false, error: error.message }
@@ -107,11 +118,10 @@ export async function getUserBookings() {
     throw new Error("Usuario no autenticado")
   }
 
-  const userId = session.user.id
-
-  const bookings = await prisma.booking.findMany({
+  // No need for transaction here since it's a single read operation
+  return await prisma.booking.findMany({
     where: {
-      userId: userId,
+      userId: session.user.id,
       status: "confirmed",
     },
     include: {
@@ -128,8 +138,6 @@ export async function getUserBookings() {
       },
     },
   })
-
-  return bookings
 }
 
 export async function getUserBookingsInRange(startDate: Date, endDate: Date) {
@@ -138,11 +146,10 @@ export async function getUserBookingsInRange(startDate: Date, endDate: Date) {
     throw new Error("Usuario no autenticado")
   }
 
-  const userId = session.user.id
-
-  const bookings = await prisma.booking.findMany({
+  // No need for transaction here since it's a single read operation
+  return await prisma.booking.findMany({
     where: {
-      userId: userId,
+      userId: session.user.id,
       status: "confirmed",
       class: {
         startTime: { gte: startDate },
@@ -163,58 +170,60 @@ export async function getUserBookingsInRange(startDate: Date, endDate: Date) {
       },
     },
   })
-
-  return bookings
 }
 
-export async function cancelBooking(bookingId: string) {
+export async function cancelBooking(
+  bookingId: string
+): Promise<ActionResponse> {
   try {
     const session = await auth()
     if (!session || !session.user) {
       throw new Error("Usuario no autenticado")
     }
 
-    const userId = session.user.id
+    return await prisma.$transaction(async (tx) => {
+      const booking = await tx.booking.findUnique({
+        where: { id: bookingId },
+        include: { class: true },
+      })
 
-    const booking = await prisma.booking.findUnique({
-      where: { id: bookingId },
-      include: { class: true },
+      if (!booking) {
+        throw new Error("Reserva no encontrada")
+      }
+
+      if (booking.userId !== session.user.id) {
+        throw new Error("No tienes permiso para cancelar esta reserva")
+      }
+
+      const now = new Date()
+      const classTime = new Date(booking.class.startTime)
+      const twentyFourHoursBeforeClass = addHours(classTime, -24)
+
+      if (isBefore(twentyFourHoursBeforeClass, now)) {
+        throw new Error(
+          "No puedes cancelar la reserva con menos de 24 horas de anticipación"
+        )
+      }
+
+      // Execute both operations in parallel within the transaction
+      await Promise.all([
+        tx.booking.update({
+          where: { id: bookingId },
+          data: { status: "cancelled" },
+        }),
+        tx.purchasedPackage.update({
+          where: { id: booking.purchasedPackageId },
+          data: {
+            remainingClasses: {
+              increment: 1,
+            },
+          },
+        }),
+      ])
+
+      revalidatePath("/reservas")
+      return { success: true }
     })
-
-    if (!booking) {
-      throw new Error("Reserva no encontrada")
-    }
-
-    if (booking.userId !== userId) {
-      throw new Error("No tienes permiso para cancelar esta reserva")
-    }
-
-    const now = new Date()
-    const classTime = new Date(booking.class.startTime)
-    const twentyFourHoursBeforeClass = addHours(classTime, -24)
-
-    if (isBefore(twentyFourHoursBeforeClass, now)) {
-      throw new Error(
-        "No puedes cancelar la reserva con menos de 24 horas de anticipación"
-      )
-    }
-
-    await prisma.booking.update({
-      where: { id: bookingId },
-      data: { status: "cancelled" },
-    })
-
-    await prisma.purchasedPackage.update({
-      where: { id: booking.purchasedPackageId },
-      data: {
-        remainingClasses: {
-          increment: 1,
-        },
-      },
-    })
-
-    revalidatePath("/reservas")
-    return { success: true }
   } catch (error) {
     if (error instanceof Error) {
       return { success: false, error: error.message }
@@ -225,36 +234,35 @@ export async function cancelBooking(bookingId: string) {
 
 export async function deleteBooking(bookingId: string) {
   try {
-    const booking = await prisma.booking.findUnique({
-      where: { id: bookingId },
-      include: {
-        purchasedPackage: true,
-      },
-    })
-
-    if (!booking) {
-      return { success: false, error: "No se encontró la reserva" }
-    }
-
-    // Start a transaction to handle both the booking deletion and package update
-    const result = await prisma.$transaction(async (tx) => {
-      // Delete the booking
-      await tx.booking.delete({
+    return await prisma.$transaction(async (tx) => {
+      const booking = await tx.booking.findUnique({
         where: { id: bookingId },
-      })
-
-      // Update the remaining classes in the purchased package
-      await tx.purchasedPackage.update({
-        where: { id: booking.purchasedPackageId },
-        data: {
-          remainingClasses: {
-            increment: 1,
-          },
+        include: {
+          purchasedPackage: true,
         },
       })
-    })
 
-    return { success: true }
+      if (!booking) {
+        throw new Error("No se encontró la reserva")
+      }
+
+      // Execute both operations in parallel within the transaction
+      await Promise.all([
+        tx.booking.delete({
+          where: { id: bookingId },
+        }),
+        tx.purchasedPackage.update({
+          where: { id: booking.purchasedPackageId },
+          data: {
+            remainingClasses: {
+              increment: 1,
+            },
+          },
+        }),
+      ])
+
+      return { success: true }
+    })
   } catch (error) {
     console.error("Error borrando reserva:", error)
     return {
