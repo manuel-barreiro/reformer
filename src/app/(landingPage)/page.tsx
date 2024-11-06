@@ -1,9 +1,26 @@
 import LandingPage from "@/components/modules/landingPage/LandingPage"
 import { getActiveClassPackages } from "@/actions/package-actions"
-import { ClassPackage } from "@prisma/client"
+import { Suspense } from "react"
+import { ErrorBoundary } from "react-error-boundary"
 
 export default async function Home() {
-  const activeClassPackages: ClassPackage[] = await getActiveClassPackages()
+  return (
+    <ErrorBoundary fallback={<div>Error loading packages</div>}>
+      <Suspense fallback={<div>Loading...</div>}>
+        <PackagesLoader />
+      </Suspense>
+    </ErrorBoundary>
+  )
+}
 
-  return <LandingPage activeClassPackages={activeClassPackages} />
+async function PackagesLoader() {
+  const classPackages = await getActiveClassPackages().then((packages) =>
+    packages.map((pkg) => ({
+      ...pkg,
+      deletedAt: null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    }))
+  )
+  return <LandingPage activeClassPackages={classPackages} />
 }

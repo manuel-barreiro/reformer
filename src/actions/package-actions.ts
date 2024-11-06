@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma"
 import { revalidatePath } from "next/cache"
 import { z } from "zod"
 import { ClassPackage } from "@prisma/client"
+import { unstable_cache } from "next/cache"
 
 // Export the type definitio
 export type PackageResponse =
@@ -35,22 +36,39 @@ const packageSchema = z.object({
   durationMonths: z.coerce.number().min(1, "Duration must be at least 1 day"),
 })
 
-export async function getActiveClassPackages() {
-  try {
-    return await prisma.classPackage.findMany({
-      where: {
-        deletedAt: null,
-        isActive: true,
-      },
-      orderBy: {
-        classCount: "asc",
-      },
-    })
-  } catch (error) {
-    console.error("Error fetching active packages:", error)
-    return []
+export const getActiveClassPackages = unstable_cache(
+  async () => {
+    try {
+      return await prisma.classPackage.findMany({
+        where: {
+          deletedAt: null,
+          isActive: true,
+        },
+        select: {
+          id: true,
+          name: true,
+          description: true,
+          classCount: true,
+          price: true,
+          durationMonths: true,
+          isActive: true,
+        },
+        orderBy: {
+          classCount: "asc",
+        },
+        take: 10, // Limit results
+      })
+    } catch (error) {
+      console.error("Error fetching active packages:", error)
+      return []
+    }
+  },
+  ["active-packages"],
+  {
+    revalidate: 3600, // Cache for 1 hour
+    tags: ["packages"],
   }
-}
+)
 
 export async function getAllClassPackages() {
   try {
