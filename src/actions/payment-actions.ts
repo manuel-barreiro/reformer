@@ -3,6 +3,7 @@
 import { prisma } from "@/lib/prisma"
 import { Payment, User } from "@prisma/client"
 import { revalidatePath } from "next/cache"
+import { deletePackage } from "./purchased-packages"
 
 export async function getPayments(): Promise<(Payment & { user: User })[]> {
   return await prisma.payment.findMany({
@@ -52,15 +53,12 @@ export async function deletePayment(paymentId: string): Promise<void> {
       })
 
       if (purchasedPackage) {
-        // Delete all associated bookings first
-        await tx.booking.deleteMany({
-          where: { purchasedPackageId: purchasedPackage.id },
-        })
+        console.log(`Found purchasedPackage: ${purchasedPackage.id}`)
 
-        // Then delete the purchasedPackage
-        await tx.purchasedPackage.delete({
-          where: { id: purchasedPackage.id },
-        })
+        // Use the deletePackage function to delete the package and its associated bookings
+        await deletePackage(purchasedPackage.id)
+      } else {
+        console.log(`No purchasedPackage found for paymentId: ${paymentId}`)
       }
 
       // Finally delete the payment
