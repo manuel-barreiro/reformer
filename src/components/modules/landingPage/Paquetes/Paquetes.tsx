@@ -1,16 +1,16 @@
 "use client"
 import { useRef } from "react"
-import marmolBg from "/public/images/marmolBg.png"
+import marmolBg from "/public/images/marmolBg.webp"
 import Image from "next/image"
 import { motion, useScroll, useTransform } from "framer-motion"
 import Link from "next/link"
+import { ClassPackage } from "@prisma/client"
 import { cn } from "@/lib/utils"
-import { ClassPackageProps } from "@/types"
 
 export default function Paquetes({
   activeClassPackages,
 }: {
-  activeClassPackages: ClassPackageProps[]
+  activeClassPackages: ClassPackage[]
 }) {
   //Parallax
   const sectionRef = useRef(null)
@@ -48,7 +48,7 @@ export default function Paquetes({
             "md:grid-cols-3 lg:grid-cols-3 lg:gap-3"
         )}
       >
-        {activeClassPackages?.map((pack: ClassPackageProps) => (
+        {activeClassPackages?.map((pack: ClassPackage) => (
           <Paquete key={pack.id} name={pack.name} />
         ))}
       </div>

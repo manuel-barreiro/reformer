@@ -36,32 +36,15 @@ const packageSchema = z.object({
 })
 
 export async function getActiveClassPackages() {
-  try {
-    return await prisma.classPackage.findMany({
-      where: {
-        deletedAt: null,
-        isActive: true,
-      },
-      select: {
-        id: true,
-        name: true,
-        description: true,
-        classCount: true,
-        price: true,
-        durationMonths: true,
-        isActive: true,
-        deletedAt: true,
-        createdAt: true,
-        updatedAt: true,
-      },
-      orderBy: {
-        classCount: "asc",
-      },
-    })
-  } catch (error) {
-    console.error("Error fetching active packages:", error)
-    return []
-  }
+  return await prisma.classPackage.findMany({
+    where: {
+      deletedAt: null,
+      isActive: true,
+    },
+    orderBy: {
+      classCount: "asc",
+    },
+  })
 }
 
 export async function getAllClassPackages() {

@@ -1,6 +1,6 @@
 "use client"
 import { motion } from "framer-motion"
-import marmolBg from "/public/images/marmolBg.png"
+import marmolBg from "/public/images/marmolBg.webp"
 import React, { useEffect } from "react"
 import Image from "next/image"
 import DiscountCoupon from "./components/DiscountCoupon"

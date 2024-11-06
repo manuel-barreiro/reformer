@@ -10,14 +10,14 @@ import ServiciosGrid from "@/components/modules/landingPage/Servicios/ServiciosG
 import ContactForm from "@/components/modules/landingPage/Footer/ContactForm"
 import Pilates from "@/components/modules/landingPage/Pilates"
 import Paquetes from "@/components/modules/landingPage/Paquetes/Paquetes"
-import { ClassPackageProps } from "@/types"
+import { ClassPackage } from "@prisma/client"
 
 export default function LandingPage({
   activeClassPackages,
 }: {
-  activeClassPackages: ClassPackageProps[]
+  activeClassPackages: ClassPackage[]
 }) {
-  //Lenis smooth scroll
+  // Lenis smooth scroll
   useEffect(() => {
     const lenis = new Lenis()
     function raf(time: any) {

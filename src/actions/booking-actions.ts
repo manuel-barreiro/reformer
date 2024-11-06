@@ -8,7 +8,7 @@ import { addHours, isBefore } from "date-fns"
 type SuccessResponse<T = void> = {
   success: true
   data?: T
-  booking?: any // Add this if you need it for bookClass response
+  booking?: any
 }
 
 type ErrorResponse = {
