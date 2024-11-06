@@ -3,7 +3,7 @@ import Brand from "@/components/modules/landingPage/Brand/Brand"
 import ComingSoon from "@/components/modules/landingPage/ComingSoon"
 import Hero from "@/components/modules/landingPage/Hero/Hero"
 import QuienesSomos from "@/components/modules/landingPage/QuienesSomos"
-import { useEffect, useRef } from "react"
+import { Suspense, useEffect, useRef } from "react"
 import Lenis from "lenis"
 import Footer from "@/components/modules/landingPage/Footer/Footer"
 import ServiciosGrid from "@/components/modules/landingPage/Servicios/ServiciosGrid"
@@ -11,6 +11,15 @@ import ContactForm from "@/components/modules/landingPage/Footer/ContactForm"
 import Pilates from "@/components/modules/landingPage/Pilates"
 import Paquetes from "@/components/modules/landingPage/Paquetes/Paquetes"
 import { ClassPackageProps } from "@/types"
+
+const lenisOptions = {
+  duration: 0.8, // Reduced from 1.2
+  easing: (t: number) => t, // Simpler easing function
+  smoothWheel: true,
+  wheelMultiplier: 0.8, // Added to reduce scroll intensity
+  touchMultiplier: 1.5,
+  infinite: false,
+}
 
 export default function LandingPage({
   activeClassPackages,
@@ -21,14 +30,11 @@ export default function LandingPage({
   const lenisRef = useRef<any>(null)
 
   useEffect(() => {
-    lenisRef.current = new Lenis({
-      duration: 1.2,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      orientation: "vertical",
-      smoothWheel: true,
-    })
+    if (typeof window === "undefined") return
 
-    function raf(time: number) {
+    lenisRef.current = new Lenis(lenisOptions)
+
+    const raf = (time: number) => {
       lenisRef.current?.raf(time)
       requestAnimationFrame(raf)
     }
@@ -37,6 +43,7 @@ export default function LandingPage({
 
     return () => {
       lenisRef.current?.destroy()
+      lenisRef.current = null
     }
   }, [])
 
@@ -50,7 +57,9 @@ export default function LandingPage({
         <ComingSoon />
         <ServiciosGrid />
         <Pilates />
-        <Paquetes activeClassPackages={activeClassPackages} />
+        <Suspense fallback={null}>
+          <Paquetes activeClassPackages={activeClassPackages} />
+        </Suspense>{" "}
         <ContactForm />
         <Footer />
       </main>

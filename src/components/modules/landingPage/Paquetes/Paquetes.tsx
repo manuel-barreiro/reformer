@@ -1,5 +1,5 @@
 "use client"
-import { useRef, memo, useMemo } from "react"
+import { useRef, memo, useMemo, useState, useEffect } from "react"
 import marmolBg from "/public/images/marmolBg.png"
 import Image from "next/image"
 import Link from "next/link"
@@ -32,6 +32,24 @@ export default function Paquetes({
 }: {
   activeClassPackages: ClassPackageProps[]
 }) {
+  const [isVisible, setIsVisible] = useState(false)
+  const sectionRef = useRef<HTMLElement>(null)
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsVisible(entry.isIntersecting)
+      },
+      { threshold: 0.1 }
+    )
+
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current)
+    }
+
+    return () => observer.disconnect()
+  }, [])
+
   // Memoize the grid className calculation
   const gridClassName = useMemo(() => {
     return cn(
@@ -47,17 +65,19 @@ export default function Paquetes({
 
   // Memoize the packages list
   const packagesList = useMemo(() => {
+    if (!isVisible) return null
     return activeClassPackages?.map((pack: ClassPackageProps) => (
       <Paquete key={pack.id} name={pack.name} />
     ))
-  }, [activeClassPackages])
+  }, [activeClassPackages, isVisible])
 
   return (
     <section
+      ref={sectionRef}
       id="paquetes"
       className="relative flex h-auto min-h-[86vh] w-full flex-col items-center justify-center gap-10 overflow-hidden bg-black/80 px-10 py-20 font-dm_mono text-pearl lg:px-20 lg:py-40"
     >
-      <div className="absolute -z-10 h-[110%] w-full">
+      <div className="absolute -z-10 h-[110%] w-full will-change-transform">
         <Image
           alt="Fondo de marmol"
           title="Fondo de marmol"
@@ -65,6 +85,8 @@ export default function Paquetes({
           src={marmolBg}
           loading="lazy"
           priority={false}
+          sizes="100vw"
+          quality={75}
         />
       </div>
 
