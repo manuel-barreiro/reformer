@@ -16,14 +16,14 @@ export async function searchUsers(searchTerm: string): Promise<User[]> {
             ],
           },
           { role: "user" },
+          { emailVerified: { not: null } },
         ],
       },
       take: 5,
     })
-    // console.log(searchTerm, users)
     return users
   } catch (error) {
     console.error("Error en searchUsers:", error)
-    return [] // Return an empty array instead of undefinedA
+    return []
   }
 }
