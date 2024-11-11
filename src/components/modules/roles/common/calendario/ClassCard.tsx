@@ -179,7 +179,9 @@ export default function ClassCard({
       <div className="relative flex w-full flex-col items-start justify-between gap-3 2xl:flex-row 2xl:items-center 2xl:gap-6">
         <div className="w-auto">
           <p className="flex items-center gap-2 text-sm">
-            <Users className="h-4 w-4 text-midnight" />
+            <Users
+              className={`h-4 w-4 ${userRole === "user" && userBooking ? "text-pearl" : "text-midnight"}`}
+            />
             <span>
               {confirmedBookings.length}/{class_.maxCapacity}
             </span>
@@ -409,10 +411,12 @@ export default function ClassCard({
           </div>
         )}
       </div>
-      <Progress
-        value={(confirmedBookings.length / class_.maxCapacity) * 100}
-        className="absolute left-0 right-0 top-0 h-1 w-full rounded-b-none rounded-t-md"
-      />
+      {userRole === "admin" && (
+        <Progress
+          value={(confirmedBookings.length / class_.maxCapacity) * 100}
+          className="absolute left-0 right-0 top-0 h-1 w-full rounded-b-none rounded-t-md"
+        />
+      )}
     </Card>
   )
 }
