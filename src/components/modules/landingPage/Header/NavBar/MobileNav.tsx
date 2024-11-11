@@ -7,9 +7,9 @@ export default function MobileNav() {
   const [open, setOpen] = useState(false)
 
   return (
-    <nav className="flex items-center justify-between bg-midnight px-10 py-8 xl:hidden">
+    <nav className="flex items-center justify-between bg-midnight px-10 py-6 xl:hidden">
       <Link href="/#home" className="z-50" onClick={() => setOpen(false)}>
-        <Logo className="w-[150px] animate-fade text-pearl ease-in-out animate-normal animate-duration-[3000ms] animate-fill-both animate-once" />
+        <Logo className="w-[150px] animate-fade py-1 text-pearl ease-in-out animate-normal animate-duration-[3000ms] animate-fill-both animate-once" />
       </Link>
 
       {/* Botón para abrir o cerrar menú */}
