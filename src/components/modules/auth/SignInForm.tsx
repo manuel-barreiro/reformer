@@ -69,13 +69,13 @@ export default function SignInForm({
           )}
           {isVerified && (
             <p className="text-green-500">
-              Email verified, log into your account.
+              Email verificado. Por favor, inicia sesión.
             </p>
           )}
           {OAuthAccountNotLinked && (
             <p className="text-red-500">
-              To confirm your identity, sign in with the same account you used
-              originally.
+              Para confirmar tu identidad, inicia sesión con la misma cuenta que
+              usaste originalmente.
             </p>
           )}
           <FormField

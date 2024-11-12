@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma"
-import { redirect } from "next/navigation"
+import { NextResponse } from "next/server" // Add this import
 import { type NextRequest } from "next/server"
 
 export async function GET(request: NextRequest) {
@@ -47,7 +47,7 @@ export async function GET(request: NextRequest) {
       })
     })
 
-    redirect("/sign-in?verified=true")
+    return NextResponse.redirect(new URL("/sign-in?verified=true", request.url))
   } catch (error) {
     const message =
       error instanceof Error ? error.message : "Verification failed"
