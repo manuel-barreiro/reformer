@@ -4,38 +4,41 @@ import { Button } from "@/components/ui/button"
 import { GoogleSignInIcon } from "@/assets/icons"
 import { useSearchParams } from "next/navigation"
 import { useState, useEffect } from "react"
-import { ExternalLink } from "lucide-react" // Add this import
+import { ExternalLink, Copy } from "lucide-react" // Add Copy icon
+import { useToast } from "@/components/ui/use-toast" // Add toast if available
 
 export default function GoogleLoginButton() {
   const searchParams = useSearchParams()
   const callbackUrl = searchParams.get("callbackUrl") || "/paquetes"
   const [isInstagram, setIsInstagram] = useState(false)
+  const toast = useToast()
+  const externalUrl = "https://www.reformer.com.ar/sign-in"
 
   useEffect(() => {
     const userAgent = window.navigator.userAgent.toLowerCase()
     setIsInstagram(userAgent.includes("instagram"))
   }, [])
 
+  const copyToClipboard = async () => {
+    try {
+      await navigator.clipboard.writeText(externalUrl)
+      toast?.toast({
+        title: "¡Link copiado!",
+        description: "Pegalo en Chrome o Safari para iniciar sesión",
+      })
+    } catch (err) {
+      console.error("Failed to copy:", err)
+    }
+  }
+
   const handleGoogleSignIn = () => {
     if (isInstagram) {
-      const externalUrl = "https://www.reformer.com.ar/sign-in"
-
-      // Try multiple approaches for external browser
+      // Simple redirect with fallback
       try {
-        // Attempt 1: Universal Links / App Links
-        window.location.replace(externalUrl)
-
-        // Attempt 2: Custom scheme
-        setTimeout(() => {
-          window.location.href = `googlechrome:${externalUrl}`
-        }, 100)
-
-        // Attempt 3: Direct navigation
-        setTimeout(() => {
-          window.open(externalUrl, "_system")
-        }, 200)
+        window.open(externalUrl, "_blank")
       } catch (e) {
-        console.error("Failed to open external browser:", e)
+        console.error("Failed to open:", e)
+        copyToClipboard()
       }
     } else {
       signIn("google", { callbackUrl })
@@ -49,8 +52,13 @@ export default function GoogleLoginButton() {
           <p className="text-center text-sm text-amber-800">
             ⚠️ Para iniciar sesión con Google:
             <br />
-            1. Copiá este link:{" "}
-            <span className="font-medium">www.reformer.com.ar</span>
+            1. Copiá el link haciendo click aquí:
+            <button
+              onClick={copyToClipboard}
+              className="ml-2 inline-flex items-center text-rust hover:text-rust/80"
+            >
+              www.reformer.com.ar <Copy className="ml-1 h-3 w-3" />
+            </button>
             <br />
             2. Abrilo en Chrome o Safari
           </p>
