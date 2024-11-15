@@ -4,14 +4,13 @@ import { Button } from "@/components/ui/button"
 import { GoogleSignInIcon } from "@/assets/icons"
 import { useSearchParams } from "next/navigation"
 import { useState, useEffect } from "react"
-import { Copy } from "lucide-react"
-import { useToast } from "@/components/ui/use-toast"
+import { Copy, Check } from "lucide-react" // Add Check import
 
 export default function GoogleLoginButton() {
   const searchParams = useSearchParams()
   const callbackUrl = searchParams.get("callbackUrl") || "/paquetes"
   const [isInstagram, setIsInstagram] = useState(false)
-  const { toast } = useToast()
+  const [copied, setCopied] = useState(false)
   const externalUrl = "https://www.reformer.com.ar/sign-in"
 
   useEffect(() => {
@@ -20,13 +19,11 @@ export default function GoogleLoginButton() {
   }, [])
 
   const copyToClipboard = async (e: React.MouseEvent) => {
-    e.preventDefault() // Prevent form submission
+    e.preventDefault()
     try {
       await navigator.clipboard.writeText(externalUrl)
-      toast({
-        title: "¡Link copiado!",
-        description: "Pegalo en Chrome o Safari para iniciar sesión",
-      })
+      setCopied(true)
+      setTimeout(() => setCopied(false), 15000) // Reset after 15 seconds
     } catch (err) {
       console.error("Failed to copy:", err)
     }
@@ -35,9 +32,9 @@ export default function GoogleLoginButton() {
   return (
     <div className="w-full space-y-4">
       {isInstagram && (
-        <div className="rounded-md bg-amber-50 p-6">
+        <div className="rounded-md bg-pearlVariant p-6">
           <div className="space-y-4">
-            <p className="text-center text-sm font-medium text-amber-800">
+            <p className="text-center text-sm font-medium text-rust">
               ⚠️ Para iniciar sesión con Google necesitás abrir esta página en
               tu navegador
             </p>
@@ -46,13 +43,17 @@ export default function GoogleLoginButton() {
               onClick={copyToClipboard}
               type="button"
               variant="outline"
-              className="mx-auto flex w-full items-center justify-center gap-2 border-rust py-4 text-rust hover:bg-rust/10"
+              className={`mx-auto flex w-full items-center justify-center gap-2 py-4 ${copied ? "border-green-600 text-green-600 hover:bg-green-50" : "border-rust text-rust hover:bg-rust/10"}`}
             >
               <span className="font-medium">www.reformer.com.ar</span>
-              <Copy className="h-4 w-4" />
+              {copied ? (
+                <Check className="h-4 w-4" />
+              ) : (
+                <Copy className="h-4 w-4" />
+              )}
             </Button>
 
-            <p className="text-center text-xs text-amber-700">
+            <p className="text-center text-xs text-rust">
               1. Copiá el link presionando el botón de arriba
               <br />
               2. Abrilo en Chrome o Safari
