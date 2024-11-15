@@ -4,14 +4,14 @@ import { Button } from "@/components/ui/button"
 import { GoogleSignInIcon } from "@/assets/icons"
 import { useSearchParams } from "next/navigation"
 import { useState, useEffect } from "react"
-import { ExternalLink, Copy } from "lucide-react" // Add Copy icon
-import { useToast } from "@/components/ui/use-toast" // Add toast if available
+import { Copy } from "lucide-react"
+import { useToast } from "@/components/ui/use-toast"
 
 export default function GoogleLoginButton() {
   const searchParams = useSearchParams()
   const callbackUrl = searchParams.get("callbackUrl") || "/paquetes"
   const [isInstagram, setIsInstagram] = useState(false)
-  const toast = useToast()
+  const { toast } = useToast()
   const externalUrl = "https://www.reformer.com.ar/sign-in"
 
   useEffect(() => {
@@ -19,10 +19,11 @@ export default function GoogleLoginButton() {
     setIsInstagram(userAgent.includes("instagram"))
   }, [])
 
-  const copyToClipboard = async () => {
+  const copyToClipboard = async (e: React.MouseEvent) => {
+    e.preventDefault() // Prevent form submission
     try {
       await navigator.clipboard.writeText(externalUrl)
-      toast?.toast({
+      toast({
         title: "¡Link copiado!",
         description: "Pegalo en Chrome o Safari para iniciar sesión",
       })
@@ -31,55 +32,44 @@ export default function GoogleLoginButton() {
     }
   }
 
-  const handleGoogleSignIn = () => {
-    if (isInstagram) {
-      // Simple redirect with fallback
-      try {
-        window.open(externalUrl, "_blank")
-      } catch (e) {
-        console.error("Failed to open:", e)
-        copyToClipboard()
-      }
-    } else {
-      signIn("google", { callbackUrl })
-    }
-  }
-
   return (
     <div className="w-full space-y-4">
       {isInstagram && (
-        <div className="rounded-md bg-amber-50 p-4">
-          <p className="text-center text-sm text-amber-800">
-            ⚠️ Para iniciar sesión con Google:
-            <br />
-            1. Copiá el link haciendo click aquí:
-            <button
+        <div className="rounded-md bg-amber-50 p-6">
+          <div className="space-y-4">
+            <p className="text-center text-sm font-medium text-amber-800">
+              ⚠️ Para iniciar sesión con Google necesitás abrir esta página en
+              tu navegador
+            </p>
+
+            <Button
               onClick={copyToClipboard}
-              className="ml-2 inline-flex items-center text-rust hover:text-rust/80"
+              type="button"
+              variant="outline"
+              className="mx-auto flex w-full items-center justify-center gap-2 border-rust py-4 text-rust hover:bg-rust/10"
             >
-              www.reformer.com.ar <Copy className="ml-1 h-3 w-3" />
-            </button>
-            <br />
-            2. Abrilo en Chrome o Safari
-          </p>
+              <span className="font-medium">www.reformer.com.ar</span>
+              <Copy className="h-4 w-4" />
+            </Button>
+
+            <p className="text-center text-xs text-amber-700">
+              1. Copiá el link presionando el botón de arriba
+              <br />
+              2. Abrilo en Chrome o Safari
+            </p>
+          </div>
         </div>
       )}
 
       <Button
         type="button"
-        onClick={handleGoogleSignIn}
+        onClick={() => !isInstagram && signIn("google", { callbackUrl })}
         variant="outline"
-        className="w-full py-6 font-dm_sans text-midnight duration-300 ease-in-out hover:border hover:border-midnight"
+        disabled={isInstagram}
+        className="w-full py-6 font-dm_sans text-midnight duration-300 ease-in-out hover:border hover:border-midnight disabled:cursor-not-allowed disabled:opacity-50"
       >
         <GoogleSignInIcon className="mr-2 h-5 w-5" />
-        {isInstagram ? (
-          <>
-            ABRIR EN NAVEGADOR
-            <ExternalLink className="ml-2 h-4 w-4" />
-          </>
-        ) : (
-          "SIGN IN WITH GOOGLE"
-        )}
+        {isInstagram ? "NO DISPONIBLE EN INSTAGRAM" : "SIGN IN WITH GOOGLE"}
       </Button>
     </div>
   )
