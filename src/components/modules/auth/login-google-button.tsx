@@ -17,8 +17,20 @@ export default function GoogleLoginButton() {
 
   const handleGoogleSignIn = () => {
     if (isInstagram) {
-      // Open in default browser
-      window.open("https://www.reformer.com.ar/sign-in", "_blank")
+      // Force external browser using intent URL scheme
+      const externalUrl = "https://www.reformer.com.ar/sign-in"
+      // For Android
+      if (/android/i.test(navigator.userAgent)) {
+        window.location.href = `intent://${externalUrl.replace(/^https?:\/\//, "")}#Intent;scheme=https;package=com.android.chrome;end`
+      }
+      // For iOS
+      else if (/iphone|ipad|ipod/i.test(navigator.userAgent)) {
+        window.location.href = externalUrl
+      }
+      // Fallback
+      else {
+        window.location.href = externalUrl
+      }
     } else {
       signIn("google", { callbackUrl })
     }
@@ -38,8 +50,8 @@ export default function GoogleLoginButton() {
 
       {isInstagram && (
         <p className="mt-2 text-center text-sm text-rust">
-          Para iniciar sesión con Google, serás redirigido a tu navegador
-          predeterminado
+          Para iniciar sesión con Google, por favor abre el sitio en tu
+          navegador predeterminado
         </p>
       )}
     </div>
