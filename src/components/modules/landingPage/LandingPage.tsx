@@ -11,6 +11,7 @@ import ContactForm from "@/components/modules/landingPage/Footer/ContactForm"
 import Pilates from "@/components/modules/landingPage/Pilates"
 import Paquetes from "@/components/modules/landingPage/Paquetes/Paquetes"
 import { ClassPackage } from "@prisma/client"
+import Header from "./Header/Header"
 
 export default function LandingPage({
   activeClassPackages,
@@ -30,6 +31,7 @@ export default function LandingPage({
 
   return (
     <>
+      <Header />
       <main style={{ cursor: "url(/icons/solPearl.svg),auto" }}>
         <div className="h-0 w-full scroll-mt-32" id="home" />
         <Hero />

@@ -267,7 +267,7 @@ const CategoryManagement = () => {
           </DialogContent>
         </Dialog> */}
       </div>
-      <ScrollArea className="lg:h-[420px]">
+      <ScrollArea className="md:h-[530px]">
         <div className="grid gap-6 md:grid-cols-2">
           {isLoading && (
             <>

@@ -2,7 +2,7 @@ import CategoryManagement from "@/components/modules/roles/admin/categorias/Cate
 
 export default function CategoriesPage() {
   return (
-    <div className="mx-auto py-5 lg:px-10">
+    <div className="mx-auto w-full py-5 lg:px-10">
       <CategoryManagement />
     </div>
   )

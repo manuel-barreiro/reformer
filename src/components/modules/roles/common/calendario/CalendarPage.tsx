@@ -20,7 +20,9 @@ async function CalendarPage({ userRole }: { userRole: string }) {
   return (
     <ErrorBoundary>
       <Suspense
-        fallback={<Skeleton className="h-full rounded-lg bg-pearlVariant" />}
+        fallback={
+          <Skeleton className="h-full w-full rounded-lg bg-pearlVariant" />
+        }
       >
         <ClientCalendarPage
           currentUserId={currentUserId}

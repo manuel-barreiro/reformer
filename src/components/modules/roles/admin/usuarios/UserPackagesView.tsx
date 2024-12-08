@@ -224,7 +224,7 @@ export function UserPackagesView({
 
   if (user.purchasedPackages.length === 0) {
     return (
-      <div className="space-y-6 p-6">
+      <div className="h-full w-full space-y-6 p-6">
         <div className="flex items-center justify-between">
           <div className="space-y-1">
             <Link
@@ -242,7 +242,7 @@ export function UserPackagesView({
           <Dialog open={isAssignModalOpen} onOpenChange={setIsAssignModalOpen}>
             <DialogTrigger asChild>
               <Button className="bg-rust text-pearl hover:bg-rust/90">
-                Asignar nuevo paquete
+                + Asignar nuevo paquete
               </Button>
             </DialogTrigger>
             <DialogContent className="bg-pearl">
@@ -317,7 +317,7 @@ export function UserPackagesView({
   }
 
   return (
-    <div className="space-y-6 p-6">
+    <div className="h-full w-full space-y-6 p-6">
       <div className="flex items-center justify-between">
         <div className="space-y-1">
           <Link
@@ -335,7 +335,7 @@ export function UserPackagesView({
         <Dialog open={isAssignModalOpen} onOpenChange={setIsAssignModalOpen}>
           <DialogTrigger asChild>
             <Button className="bg-rust text-pearl hover:bg-rust/90">
-              Asignar nuevo paquete
+              + Asignar nuevo paquete
             </Button>
           </DialogTrigger>
           <DialogContent className="bg-pearl">

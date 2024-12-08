@@ -49,32 +49,34 @@ export default function AdminPackagesPage({
   }
 
   return (
-    <>
-      <div className="flex w-full items-center justify-between border-b border-grey_pebble pb-4 font-dm_sans text-xs font-medium uppercase sm:text-sm md:justify-between md:pb-6 md:pl-10 lg:text-lg">
-        <div className="flex items-center gap-4">
-          <h1 className="py-2">Paquetes</h1>
-          <Dialog open={isOpen} onOpenChange={setIsOpen}>
-            <DialogTrigger asChild>
-              <Button className="aspect-square rounded-full bg-rust p-1 hover:bg-rust/80">
-                <PlusIcon size={24} className="text-pearl" />
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Nuevo Paquete</DialogTitle>
-              </DialogHeader>
-              <AddPackageForm onSuccess={handlePackageUpdate} />
-            </DialogContent>
-          </Dialog>
-        </div>
+    <section className="h-full w-full">
+      <div className="flex w-full items-center justify-between gap-4 border-b border-grey_pebble pb-4 font-dm_sans text-xs sm:text-sm md:pb-6 md:pl-10 lg:text-lg">
+        <h1 className="py-2 font-marcellus text-2xl font-bold uppercase">
+          Paquetes
+        </h1>
+        <Dialog open={isOpen} onOpenChange={setIsOpen}>
+          <DialogTrigger asChild>
+            <Button className="aspect-square rounded-full bg-rust p-2 hover:bg-rust/80">
+              <PlusIcon size={24} className="text-pearl" />
+              <span>Agregar Paquete</span>
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Nuevo Paquete</DialogTitle>
+            </DialogHeader>
+            <AddPackageForm onSuccess={handlePackageUpdate} />
+          </DialogContent>
+        </Dialog>
       </div>
-      <ScrollArea className="w-full overflow-y-auto md:h-96">
+
+      <ScrollArea className="h-full w-full overflow-y-auto md:h-[560px]">
         <PackageList
           packages={packages}
           onPackageUpdate={handlePackageUpdate}
           onPackageDelete={handlePackageDelete}
         />
       </ScrollArea>
-    </>
+    </section>
   )
 }
