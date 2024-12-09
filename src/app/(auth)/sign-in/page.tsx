@@ -15,7 +15,7 @@ export default function SignIn({
   const passwordReset = searchParams.reset === "true"
 
   return (
-    <div className="h-auto w-full text-pearl lg:grid lg:grid-cols-2">
+    <div className="min-h-[100dvh] w-full text-pearl lg:grid lg:grid-cols-2">
       <div className="relative hidden lg:block">
         <Image
           src="/images/signin.jpg"

@@ -13,7 +13,7 @@ export default function ReservasList({
   return (
     <div
       className={cn(
-        "h-full py-5 xl:max-w-[1000px]",
+        "h-full w-full py-5",
         bookings.length === 0 && "flex items-center justify-center",
         bookings.length > 0 &&
           "grid grid-cols-1 gap-3 md:grid-cols-3 md:p-10 lg:grid-cols-4"

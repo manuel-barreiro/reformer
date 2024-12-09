@@ -33,14 +33,14 @@ export default function PackagesPage({ initialPackages }: PackagesPageProps) {
   }, [initialPackages, filter])
 
   return (
-    <section className="h-full">
+    <section className="h-full w-full">
       <HeaderToggle
         title="Mis Paquetes"
         filterOptions={["ACTIVOS", "INACTIVOS"]}
         currentFilter={filter}
         onFilterChange={setFilter}
       />
-      <ScrollArea className="w-full overflow-y-auto md:h-96">
+      <ScrollArea className="h-auto w-full overflow-y-auto md:h-[560px]">
         <PackageList packages={filteredPackages} />
       </ScrollArea>
     </section>

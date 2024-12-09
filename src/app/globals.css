@@ -33,3 +33,26 @@ html.lenis body {
 .lenis.lenis-smooth iframe {
   pointer-events: none;
 }
+
+@layer base {
+  :root {
+    --sidebar-background: 240 5% 13%; /* midnight color */
+    --sidebar-foreground: 43 33% 95%; /* pearl color */
+    --sidebar-primary: 43 33% 95%;
+    --sidebar-primary-foreground: 240 5% 13%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5% 13%;
+    --sidebar-border: 25 59% 34%; /* rust color */
+    --sidebar-ring: 25 59% 34%;
+  }
+  .dark {
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}

@@ -49,23 +49,26 @@ export default function Paquetes({
         )}
       >
         {activeClassPackages?.map((pack: ClassPackage) => (
-          <Paquete key={pack.id} name={pack.name} />
+          <Paquete key={pack.id} pack={pack} />
         ))}
       </div>
     </section>
   )
 }
 
-function Paquete({ name }: { name: string }) {
+function Paquete({ pack }: { pack: ClassPackage }) {
   return (
     <div className="flex h-full max-w-[300px] flex-col items-center justify-evenly bg-midnight/60">
       <div className="w-full flex-1 border-[2px] border-b-0 border-grey_pebble p-6 text-center">
-        <span className="w-full text-lg font-thin">{name}</span>
+        <span className="w-full text-lg font-thin">{pack.name}</span>
       </div>
-      <div className="flex w-full flex-1 flex-col border-[2px] border-b-0 border-grey_pebble p-6 py-8 text-center font-dm_sans text-sm font-light">
-        <span className="mb-2">Duración: 1 mes</span>
+      <div className="flex h-20 w-full flex-1 flex-col items-center justify-center border-[2px] border-b-0 border-grey_pebble p-6 py-8 text-center font-dm_sans text-sm font-light">
+        <span className="mb-2">
+          Duración: {pack.durationMonths}{" "}
+          {pack.durationMonths === 1 ? "mes" : "meses"}
+        </span>
 
-        <span>10% OFF pagando en efectivo o transferencia bancaria</span>
+        <span>{pack.description}</span>
       </div>
       <Link href="/checkout" className="w-full">
         <button className="w-full flex-1 border-[2px] border-grey_pebble p-6 font-dm_sans text-lg font-bold duration-300 ease-in-out hover:bg-pearlVariant2 hover:text-midnight">

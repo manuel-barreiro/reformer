@@ -33,7 +33,7 @@ const ClientCalendarPage = ({
   } = useClassesData(initialDate, initialClasses, userBookings, userRole)
 
   return (
-    <div className="flex flex-col justify-items-stretch gap-10 lg:flex-row lg:pl-10">
+    <div className="flex h-full w-full flex-col justify-items-stretch gap-10 lg:flex-row lg:pl-10">
       <ReformerCalendar
         date={currentDate}
         onDateChange={handleDateChange}

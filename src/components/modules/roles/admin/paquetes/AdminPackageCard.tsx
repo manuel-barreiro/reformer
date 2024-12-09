@@ -110,12 +110,15 @@ export default function AdminPackageCard({
       </div>
       <div
         className={cn(
-          "flex w-full flex-1 flex-col border-[2px] border-b-0 border-grey_pebble p-6 py-8 text-center font-dm_sans text-sm font-light",
+          "flex h-20 w-full flex-1 flex-col border-[2px] border-b-0 border-grey_pebble p-6 py-8 text-center font-dm_sans text-sm font-light",
           !pack.isActive && "border-grey_pebble/50"
         )}
       >
-        <span className="mb-2">Duración: {pack.durationMonths} mes</span>
-        <span>10% OFF pagando en efectivo o transferencia bancaria</span>
+        <span className="mb-2">
+          Duración: {pack.durationMonths}{" "}
+          {pack.durationMonths === 1 ? "mes" : "meses"}
+        </span>
+        <span>{pack.description}</span>
       </div>
       <div className="flex w-full items-center justify-between bg-pearlVariant3 p-6 text-center text-midnight">
         <div

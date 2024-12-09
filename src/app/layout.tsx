@@ -3,8 +3,6 @@ import { Marcellus, DM_Sans, DM_Mono } from "next/font/google"
 import "./globals.css"
 import { Toaster } from "@/components/ui/toaster"
 import { auth } from "@/auth"
-import Header from "@/components/modules/landingPage/Header/Header"
-import { Analytics } from "@vercel/analytics/react"
 import JsonLd from "@/components/JsonLd"
 
 const marcellus = Marcellus({
@@ -95,16 +93,14 @@ export default async function RootLayout({
 }>) {
   const session = await auth()
   return (
-    <html lang="es" className="scrollbar-hide min-h-[100dvh] scroll-smooth">
+    <html lang="es" className="scrollbar-hide scroll-smooth">
       <head>
         <JsonLd />
       </head>
       <body
         className={`${marcellus.variable} ${dm_sans.variable} ${dm_sans.className} ${dm_mono.variable} scrollbar-hide`}
       >
-        <Header />
         {children}
-        <Analytics />
         <Toaster />
       </body>
     </html>

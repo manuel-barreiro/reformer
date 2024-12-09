@@ -1,19 +1,61 @@
+import { AppSidebar } from "@/components/modules/sidebar/app-sidebar"
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb"
 import { Separator } from "@/components/ui/separator"
-import SideMenu from "./SideMenu"
+import {
+  SidebarInset,
+  SidebarProvider,
+  SidebarTrigger,
+} from "@/components/ui/sidebar"
+import { auth } from "@/auth"
 
-export default function AppLayout({ children }: { children: React.ReactNode }) {
+export default async function AppLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  const session = await auth()
+
+  const user = {
+    name: session?.user?.name ?? "Guest",
+    email: session?.user?.email ?? "",
+    avatar: session?.user?.image ?? "",
+    role: session?.user?.role ?? "user",
+  }
+
   return (
-    <main className="flex h-auto min-h-[86dvh] w-full cursor-default flex-col justify-start overflow-hidden bg-pearl px-10 pb-10 xl:h-[86dvh] xl:justify-center xl:px-20 xl:pb-0">
-      <div className="flex w-full flex-col items-start justify-between gap-10 xl:flex-row xl:gap-0">
-        <nav className="w-full xl:w-auto xl:basis-1/5 xl:pr-10">
-          <SideMenu />
-        </nav>
-        <Separator
-          orientation="vertical"
-          className="hidden h-full w-[1px] bg-midnight/50 xl:block"
-        />
-        <section className="w-full xl:w-auto xl:basis-4/5">{children}</section>
-      </div>
-    </main>
+    <SidebarProvider>
+      <AppSidebar user={user} />
+      <SidebarInset className="bg-pearl">
+        <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
+          <div className="flex items-center gap-2 px-4">
+            <SidebarTrigger className="-ml-1" />
+            <Separator orientation="vertical" className="mr-2 h-4" />
+            {/* <Breadcrumb>
+              <BreadcrumbList>
+                <BreadcrumbItem className="hidden md:block">
+                  <BreadcrumbLink href="#">
+                    Reformer Wellness Club
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator className="hidden md:block" />
+                <BreadcrumbItem>
+                  <BreadcrumbPage>Pagos</BreadcrumbPage>
+                </BreadcrumbItem>
+              </BreadcrumbList>
+            </Breadcrumb> */}
+          </div>
+        </header>
+        <div className="flex h-full flex-1 flex-col items-center justify-center gap-4 p-4 pt-0">
+          {children}
+        </div>
+      </SidebarInset>
+    </SidebarProvider>
   )
 }

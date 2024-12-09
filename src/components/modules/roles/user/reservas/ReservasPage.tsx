@@ -68,7 +68,7 @@ export default function ReservasPage({
   }
 
   return (
-    <section className="h-full">
+    <section className="h-full w-full">
       <HeaderToggle
         title="Mis Reservas"
         filterOptions={["TODOS", "YOGA", "PILATES"]}
@@ -77,7 +77,7 @@ export default function ReservasPage({
       />
       <ScrollArea className="w-full overflow-y-auto md:h-96">
         {isLoading ? (
-          <div className="grid h-full grid-cols-2 gap-3 py-5 md:grid-cols-3 md:p-10 lg:grid-cols-4 xl:max-w-[1000px]">
+          <div className="grid h-full w-full grid-cols-1 gap-3 py-5 md:grid-cols-3 md:p-10 lg:grid-cols-4">
             {Array(4)
               .fill(null)
               .map((item) => (
