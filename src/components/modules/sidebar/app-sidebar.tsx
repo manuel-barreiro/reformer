@@ -10,6 +10,7 @@ import {
   User,
   List,
   CalendarCheck,
+  LineChart,
 } from "lucide-react"
 import { NavMain } from "@/components/modules/sidebar/nav-main"
 import { NavSecondary } from "@/components/modules/sidebar/nav-secondary"
@@ -31,6 +32,11 @@ const adminMenuItems = [
     title: "Pagos",
     url: "/admin/pagos",
     icon: CircleDollarSign,
+  },
+  {
+    title: "Dashboard",
+    url: "/admin/dashboard",
+    icon: LineChart,
   },
   {
     title: "Paquetes",
