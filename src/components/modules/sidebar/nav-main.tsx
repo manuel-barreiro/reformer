@@ -39,8 +39,8 @@ export function NavMain({
     <SidebarGroup>
       {/* <SidebarGroupLabel>Platform</SidebarGroupLabel> */}
       <SidebarMenu>
-        {items.map((item) => (
-          <SidebarMenuItem>
+        {items.map((item, idx) => (
+          <SidebarMenuItem key={idx}>
             <Link href={item.url}>
               <SidebarMenuButton
                 tooltip={item.title}

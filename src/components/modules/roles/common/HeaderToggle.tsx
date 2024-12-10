@@ -7,7 +7,7 @@ import { PlusIcon } from "lucide-react"
 import { usePathname } from "next/navigation"
 
 interface HeaderToggleProps {
-  title: string
+  title?: string
   filterOptions?: string[]
   currentFilter?: string
   onFilterChange?: (filter: string) => void
@@ -25,7 +25,6 @@ export default function HeaderToggle({
     <>
       <div className="flex w-full items-center justify-between border-b border-grey_pebble pb-4 font-dm_sans text-xs font-medium uppercase sm:text-sm md:justify-between md:pb-6 md:pl-10 lg:flex-row lg:text-lg">
         <div className="flex items-center gap-4">
-          <h1 className="hidden py-2 lg:block">{title}</h1>
           {(pathname === "/paquetes" || pathname === "/reservas") && (
             <Link
               href={
@@ -36,8 +35,15 @@ export default function HeaderToggle({
                     : ""
               }
             >
-              <Button className="h-auto rounded-full bg-rust p-1 hover:bg-rust/80">
-                <PlusIcon className="h-4 w-4 text-pearl md:h-7 md:w-7" />
+              <Button className="flex h-auto items-center gap-2 rounded-full bg-rust p-1 px-2 hover:bg-rust/80">
+                <PlusIcon className="size-4 text-pearl sm:size-5" />
+                {pathname === "/paquetes" ? (
+                  <span className="font-dm_mono text-xs">COMPRAR</span>
+                ) : pathname === "/reservas" ? (
+                  <span className="font-dm_mono text-xs">RESERVAR</span>
+                ) : (
+                  ""
+                )}
               </Button>
             </Link>
           )}
