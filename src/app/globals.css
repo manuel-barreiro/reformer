@@ -36,12 +36,12 @@ html.lenis body {
 
 @layer base {
   :root {
-    --sidebar-background: 240 5% 13%; /* midnight color */
-    --sidebar-foreground: 43 33% 95%; /* pearl color */
-    --sidebar-primary: 43 33% 95%;
-    --sidebar-primary-foreground: 240 5% 13%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5% 13%;
+    --sidebar-background: 345, 6%, 13%; /* midnight color */
+    --sidebar-foreground: 48, 38%, 95%; /* pearl color */
+    --sidebar-primary: 48, 38%, 95%;
+    --sidebar-primary-foreground: 345, 6%, 13%;
+    --sidebar-accent: 48, 38%, 95%;
+    --sidebar-accent-foreground: 345, 6%, 13%;
     --sidebar-border: 25 59% 34%; /* rust color */
     --sidebar-ring: 25 59% 34%;
   }
