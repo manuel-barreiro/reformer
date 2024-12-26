@@ -197,11 +197,11 @@ export async function cancelBooking(
 
       const now = new Date()
       const classTime = new Date(booking.class.startTime)
-      const twentyFourHoursBeforeClass = addHours(classTime, -24)
+      const twelveHoursBeforeClass = addHours(classTime, -12)
 
-      if (isBefore(twentyFourHoursBeforeClass, now)) {
+      if (isBefore(twelveHoursBeforeClass, now)) {
         throw new Error(
-          "No puedes cancelar la reserva con menos de 24 horas de anticipación"
+          "No puedes cancelar la reserva con menos de 12 horas de anticipación"
         )
       }
 

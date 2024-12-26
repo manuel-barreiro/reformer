@@ -36,8 +36,8 @@ export default function ReservasCard({
 
   const now = new Date()
   const classTime = utcToLocal(booking.class.startTime)
-  const twentyFourHoursBeforeClass = addHours(classTime, -24)
-  const canCancel = isBefore(now, twentyFourHoursBeforeClass)
+  const twelveHoursBeforeClass = addHours(classTime, -12)
+  const canCancel = isBefore(now, twelveHoursBeforeClass)
 
   return (
     <div className="flex max-h-56 w-full flex-col items-start justify-evenly rounded-md bg-rust font-dm_mono font-medium text-pearl">
