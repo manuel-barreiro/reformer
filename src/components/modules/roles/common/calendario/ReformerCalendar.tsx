@@ -92,7 +92,7 @@ export default function ReformerCalendar({
     ]
   }, [userRole, lastAvailableDate, today])
 
-  const fromMonth = userRole === "admin" ? undefined : startOfMonth(today)
+  const fromMonth = userRole === "admin" ? undefined : today
   const toMonth = lastAvailableDate
 
   const CustomDay = ({
@@ -143,16 +143,15 @@ export default function ReformerCalendar({
   }
 
   const handleMonthChange = (increment: number) => {
-    const newMonth = new Date(currentMonth)
-    newMonth.setMonth(newMonth.getMonth() + increment)
+    const newMonth = addMonths(currentMonth, increment)
 
-    if (userRole === "admin") {
-      if (increment > 0 && isAfter(startOfMonth(newMonth), addMonths(today, 3)))
-        return
+    // Check navigation boundaries
+    if (increment > 0) {
+      const maxDate =
+        userRole === "admin" ? addMonths(today, 3) : addMonths(today, 1)
+      if (isAfter(startOfMonth(newMonth), maxDate)) return
     } else {
-      if (increment > 0 && isAfter(startOfMonth(newMonth), addMonths(today, 1)))
-        return
-      if (increment < 0 && isBefore(endOfMonth(newMonth), today)) return
+      if (userRole !== "admin" && isBefore(endOfMonth(newMonth), today)) return
     }
 
     setCurrentMonth(newMonth)
@@ -161,8 +160,8 @@ export default function ReformerCalendar({
 
   const canNavigateNext =
     userRole === "admin"
-      ? !isAfter(startOfMonth(currentMonth), addMonths(today, 2))
-      : !isAfter(startOfMonth(currentMonth), addMonths(today, 0))
+      ? isBefore(startOfMonth(currentMonth), addMonths(today, 3))
+      : isBefore(startOfMonth(currentMonth), addMonths(today, 1))
 
   const canNavigatePrev =
     userRole === "admin" ? true : !isBefore(endOfMonth(currentMonth), today)
