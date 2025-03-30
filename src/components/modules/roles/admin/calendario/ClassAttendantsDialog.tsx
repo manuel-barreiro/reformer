@@ -140,6 +140,7 @@ export default function ClassAttendantsDialog({
             <Users className="h-4 w-4 text-midnight" />
           </Button>
         }
+        className="mx-auto w-[95vw] max-w-md sm:max-w-lg md:max-w-xl"
         title={
           <div className="w-auto font-dm_sans">
             <p className="flex items-center gap-2 text-sm text-gray-500">
@@ -183,49 +184,58 @@ export default function ClassAttendantsDialog({
           </div>
         }
         content={
-          <div className="space-y-4">
-            <ScrollArea className="max-h-96">
-              <Table>
-                <TableBody className="bg-pearlVariant text-sm text-tableContent">
-                  {localBookings.length > 0 ? (
-                    localBookings.map((booking) => (
-                      <TableRow
-                        key={booking.id}
-                        className="border-b border-grey_pebble"
-                      >
-                        <TableCell className="font-medium">
-                          {booking.user.name}
-                        </TableCell>
-                        <TableCell>{booking.user.email}</TableCell>
-                        <TableCell className="text-right">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => {
-                              setSelectedBooking(booking)
-                              setIsDeleteDialogOpen(true)
-                            }}
-                            disabled={isProcessing}
-                          >
-                            <TrashIcon className="text-destructive h-4 w-4" />
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  ) : (
-                    <TableRow>
-                      <TableCell colSpan={3} className="text-center">
-                        No hay reservas en esta clase
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </ScrollArea>
+          <div className="flex max-h-[70vh] flex-col overflow-x-hidden">
+            <div className="mb-4 flex-grow overflow-hidden">
+              <h4 className="mb-2 font-medium">Asistentes</h4>
+              <div className="h-[250px] overflow-hidden rounded border border-gray-200">
+                <ScrollArea className="h-full w-full">
+                  <div className="min-w-full overflow-x-auto">
+                    <Table>
+                      <TableBody className="bg-pearlVariant text-sm text-tableContent">
+                        {localBookings.length > 0 ? (
+                          localBookings.map((booking) => (
+                            <TableRow
+                              key={booking.id}
+                              className="border-b border-grey_pebble"
+                            >
+                              <TableCell className="max-w-[120px] whitespace-normal break-words font-medium sm:max-w-none">
+                                {booking.user.name}
+                              </TableCell>
+                              <TableCell className="max-w-[120px] whitespace-normal break-words sm:max-w-none">
+                                {booking.user.email}
+                              </TableCell>
+                              <TableCell className="w-10 text-right">
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => {
+                                    setSelectedBooking(booking)
+                                    setIsDeleteDialogOpen(true)
+                                  }}
+                                  disabled={isProcessing}
+                                >
+                                  <TrashIcon className="text-destructive h-4 w-4" />
+                                </Button>
+                              </TableCell>
+                            </TableRow>
+                          ))
+                        ) : (
+                          <TableRow>
+                            <TableCell colSpan={3} className="text-center">
+                              No hay reservas en esta clase
+                            </TableCell>
+                          </TableRow>
+                        )}
+                      </TableBody>
+                    </Table>
+                  </div>
+                </ScrollArea>
+              </div>
+            </div>
 
-            <div className="mt-6 space-y-4 border-t pt-4">
+            <div className="border-t pt-4">
               <h3 className="font-medium">Agregar Usuario</h3>
-              <div className="flex w-full flex-col gap-2">
+              <div className="mt-2 flex w-full flex-col gap-2">
                 <div className="flex-grow">
                   <UserSearch
                     onSelectUser={setSelectedUser}
@@ -250,6 +260,7 @@ export default function ClassAttendantsDialog({
         buttons={true}
         open={isDeleteDialogOpen}
         onOpenChange={setIsDeleteDialogOpen}
+        className="mx-auto w-[95vw] max-w-md"
         trigger={<></>}
         title="Eliminar Reserva"
         description={
