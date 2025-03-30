@@ -38,9 +38,18 @@ export default function Footer() {
           <div className="-ml-1 hidden gap-3 uppercase text-pearl md:flex">
             <ContactInfo />
           </div>
-          <p className="text-center text-sm text-grey_pebble lg:text-right">
-            Reformer Wellness Club &reg; 2024
-          </p>
+          <div className="flex flex-col items-end">
+            <p className="text-center text-sm text-grey_pebble lg:text-right">
+              Reformer Wellness Club &reg; 2024
+            </p>
+            <a
+              href="https://www.instagram.com/cs__creativestudio?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw=="
+              target="_blank"
+              className="text-xs text-grey_pebble transition-opacity hover:underline hover:opacity-80 sm:text-sm"
+            >
+              DESIGNED BY CS CREATIVE STUDIO
+            </a>
+          </div>
         </div>
       </div>
     </footer>
