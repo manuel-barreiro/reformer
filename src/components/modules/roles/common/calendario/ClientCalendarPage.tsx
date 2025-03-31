@@ -2,7 +2,7 @@
 import ReformerCalendar from "@/components/modules/roles/common/calendario/ReformerCalendar"
 import ClassesSchedule from "@/components/modules/roles/common/calendario/ClassesSchedule"
 import { Booking, Class } from "@prisma/client"
-import { useClassesData } from "@/components/modules/roles/common/calendario/useClassesData"
+import { useClassesData } from "@/components/modules/roles/common/calendario/hooks/useClassesData"
 import { BookingWithClass } from "@/components/modules/roles/user/reservas/ReservasPage"
 import { ClassWithBookings } from "./types"
 

@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useTransition } from "react"
+import React from "react"
 import { Button } from "@/components/ui/button"
 import { ClassFormDialog } from "@/components/modules/roles/admin/calendario/ClassFormDialog"
 import {
@@ -17,19 +17,16 @@ import { Card } from "@/components/ui/card"
 import { ClassWithBookings } from "@/components/modules/roles/common/calendario/types"
 import ActionDialog from "@/components/modules/roles/common/ActionDialog"
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table"
-import { bookClass, cancelBooking } from "@/actions/booking-actions"
-import { toast } from "@/components/ui/use-toast"
 import ClassAttendantsDialog from "@/components/modules/roles/admin/calendario/ClassAttendantsDialog"
 import { useCallback } from "react"
 import { Progress } from "@/components/ui/progress"
-import { toggleClassLock } from "@/actions/class"
+import { useClassMutations } from "@/components/modules/roles/common/calendario/hooks/useClassMutations"
 
 interface ClassCardProps {
   date: Date
   class_: ClassWithBookings
   onClassChange: () => void
   updateClassBookings: (classId: string, updatedBookings: any[]) => void
-  handleDeleteClass: (classId: string) => Promise<void>
   userRole: string
   currentUserId?: string
 }
@@ -39,11 +36,21 @@ export default function ClassCard({
   class_,
   onClassChange,
   updateClassBookings,
-  handleDeleteClass,
   userRole,
   currentUserId,
 }: ClassCardProps) {
-  const [isPending, startTransition] = useTransition()
+  // Access all mutations from the custom hook
+  const {
+    useBookClassMutation,
+    useCancelBookingMutation,
+    useToggleLockMutation,
+    useDeleteClassMutation,
+  } = useClassMutations(date, onClassChange)
+
+  // Initialize mutations for this specific class
+  const bookClassMutation = useBookClassMutation(class_.id)
+  const toggleLockMutation = useToggleLockMutation(class_)
+  const deleteClassMutation = useDeleteClassMutation(class_.id)
 
   const classDetails = [
     { label: "Categoría", value: class_.category.name },
@@ -74,87 +81,8 @@ export default function ClassCard({
       booking.userId === currentUserId && booking.status === "confirmed"
   )
 
-  const handleBookClass = async () => {
-    startTransition(async () => {
-      try {
-        const result = await bookClass(class_.id)
-        if (result.success) {
-          toast({
-            title: "Clase reservada",
-            description: "La clase ha sido reservada exitosamente.",
-            variant: "reformer",
-          })
-          onClassChange()
-        } else {
-          toast({
-            title: "Error",
-            description: result.error,
-            variant: "destructive",
-          })
-        }
-      } catch (error) {
-        toast({
-          title: "Error",
-          description:
-            "No se pudo realizar la reserva. Por favor intente nuevamente.",
-          variant: "destructive",
-        })
-      }
-    })
-  }
-
-  const handleCancelBooking = async () => {
-    if (!userBooking) return
-
-    startTransition(async () => {
-      try {
-        const result = await cancelBooking(userBooking.id)
-        if (result.success) {
-          toast({
-            title: "Reserva cancelada",
-            description: "La reserva ha sido cancelada exitosamente.",
-            variant: "reformer",
-          })
-          onClassChange()
-        } else {
-          toast({
-            title: "Error",
-            description: result.error,
-            variant: "destructive",
-          })
-        }
-      } catch (error) {
-        toast({
-          title: "Error",
-          description:
-            "No se pudo cancelar la reserva. Por favor intente nuevamente.",
-          variant: "destructive",
-        })
-      }
-    })
-  }
-
-  const handleToggleLock = async () => {
-    startTransition(async () => {
-      const result = await toggleClassLock(class_.id)
-      if (result.success) {
-        toast({
-          title: class_.isActive ? "Clase bloqueada" : "Clase desbloqueada",
-          description: class_.isActive
-            ? "La clase ha sido bloqueada y no será visible para los usuarios."
-            : "La clase ha sido desbloqueada y ahora es visible para los usuarios.",
-          variant: "reformer",
-        })
-        onClassChange()
-      } else {
-        toast({
-          title: "Error",
-          description: "No se pudo cambiar el estado de la clase.",
-          variant: "destructive",
-        })
-      }
-    })
-  }
+  // Initialize cancel booking mutation only if there's a booking to cancel
+  const cancelBookingMutation = useCancelBookingMutation(userBooking?.id)
 
   const handleBookingChange = useCallback(
     (updatedBookings: any[]) => {
@@ -221,8 +149,15 @@ export default function ClassCard({
             <ActionDialog
               buttons={true}
               trigger={
-                <Button variant="ghost">
-                  <TrashIcon className="h-4 w-4 text-midnight" />
+                <Button
+                  variant="ghost"
+                  disabled={deleteClassMutation.isPending}
+                >
+                  {deleteClassMutation.isPending ? (
+                    <Loader2 className="h-4 w-4 animate-spin text-midnight" />
+                  ) : (
+                    <TrashIcon className="h-4 w-4 text-midnight" />
+                  )}
                 </Button>
               }
               title="Eliminar Clase"
@@ -240,7 +175,7 @@ export default function ClassCard({
                   </span>
                 </div>
               }
-              action={() => handleDeleteClass(class_.id)}
+              action={() => deleteClassMutation.mutate()}
               buttonText="Eliminar"
               icon={<TrashIcon className="h-4 w-4 text-pearl" />}
             />
@@ -252,8 +187,11 @@ export default function ClassCard({
                   title={
                     class_.isActive ? "Bloquear clase" : "Desbloquear clase"
                   }
+                  disabled={toggleLockMutation.isPending}
                 >
-                  {class_.isActive ? (
+                  {toggleLockMutation.isPending ? (
+                    <Loader2 className="h-4 w-4 animate-spin text-midnight" />
+                  ) : class_.isActive ? (
                     <LockIcon className="h-4 w-4 text-midnight" />
                   ) : (
                     <UnlockIcon className="h-4 w-4 text-midnight" />
@@ -279,7 +217,7 @@ export default function ClassCard({
                   )}
                 </div>
               }
-              action={handleToggleLock}
+              action={() => toggleLockMutation.mutate()}
               buttonText={class_.isActive ? "Bloquear" : "Desbloquear"}
               icon={
                 class_.isActive ? (
@@ -334,9 +272,9 @@ export default function ClassCard({
                   <Button
                     variant="ghost"
                     className="group text-pearl hover:bg-pearlVariant hover:text-midnight"
-                    disabled={isPending}
+                    disabled={cancelBookingMutation.isPending}
                   >
-                    {isPending ? (
+                    {cancelBookingMutation.isPending ? (
                       <Loader2 className="h-7 w-7 animate-spin text-pearlVariant" />
                     ) : (
                       <CalendarMinus className="h-4 w-4" />
@@ -345,7 +283,7 @@ export default function ClassCard({
                 }
                 title="Cancelar Reserva"
                 description="¿Estás seguro que deseas cancelar esta reserva?"
-                action={handleCancelBooking}
+                action={() => cancelBookingMutation.mutate()}
                 buttonText="Cancelar Reserva"
                 content={
                   <Table>
@@ -373,8 +311,11 @@ export default function ClassCard({
                 <ActionDialog
                   buttons={true}
                   trigger={
-                    <Button variant="ghost" disabled={isPending}>
-                      {isPending ? (
+                    <Button
+                      variant="ghost"
+                      disabled={bookClassMutation.isPending}
+                    >
+                      {bookClassMutation.isPending ? (
                         <Loader2 className="h-7 w-7 animate-spin text-midnight" />
                       ) : (
                         <CalendarPlus className="h-4 w-4 text-midnight" />
@@ -383,7 +324,7 @@ export default function ClassCard({
                   }
                   title="Reservar Clase"
                   description="¿Deseas reservar esta clase?"
-                  action={handleBookClass}
+                  action={() => bookClassMutation.mutate()}
                   buttonText="Reservar"
                   content={
                     <Table>

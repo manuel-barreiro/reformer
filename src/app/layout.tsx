@@ -4,6 +4,7 @@ import "./globals.css"
 import { Toaster } from "@/components/ui/toaster"
 import { auth } from "@/auth"
 import JsonLd from "@/components/JsonLd"
+import { QueryProvider } from "@/providers/QueryProvider"
 
 const marcellus = Marcellus({
   weight: "400",
@@ -100,7 +101,7 @@ export default async function RootLayout({
       <body
         className={`${marcellus.variable} ${dm_sans.variable} ${dm_sans.className} ${dm_mono.variable} scrollbar-hide`}
       >
-        {children}
+        <QueryProvider>{children}</QueryProvider>
         <Toaster />
       </body>
     </html>

@@ -4,18 +4,14 @@ import { Button } from "@/components/ui/button"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { PlusCircle } from "lucide-react"
 import { ClassFormDialog } from "@/components/modules/roles/admin/calendario/ClassFormDialog"
-import { deleteClass } from "@/actions/class"
 import { toast } from "@/components/ui/use-toast"
 import { useState } from "react"
 import { ClassWithBookings } from "@/components/modules/roles/common/calendario/types"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Skeleton } from "@/components/ui/skeleton"
 import ClassCard from "@/components/modules/roles/common/calendario/ClassCard"
-import { Category, Subcategory } from "@prisma/client"
-
-interface ClassWithCategory extends ClassWithBookings {
-  category: Category
-}
+import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { deleteClass } from "@/actions/class"
 
 interface ClassesScheduleProps {
   date: Date
@@ -38,6 +34,8 @@ export default function ClassesSchedule({
 }: ClassesScheduleProps) {
   const [timeOfDay, setTimeOfDay] = useState("AM")
   const [category, setCategory] = useState("pilates")
+  const queryClient = useQueryClient()
+  const monthKey = date.toISOString().substring(0, 7) // "YYYY-MM" format
 
   const filteredClasses = Array.isArray(classes)
     ? classes.filter((class_) => {
@@ -63,32 +61,6 @@ export default function ClassesSchedule({
         )
       })
     : []
-
-  const handleDeleteClass = async (classId: string) => {
-    try {
-      const result = await deleteClass(classId)
-      if (result.success) {
-        toast({
-          title: "Clase eliminada",
-          description: "La clase ha sido eliminada exitosamente.",
-          variant: "reformer",
-        })
-        await onClassChange()
-      } else {
-        toast({
-          title: "Error",
-          description: result.error,
-          variant: "destructive",
-        })
-      }
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Error al eliminar la clase.",
-        variant: "destructive",
-      })
-    }
-  }
 
   return (
     <div className="flex w-full flex-col justify-between gap-4 text-grey_pebble">
@@ -150,7 +122,6 @@ export default function ClassesSchedule({
                 class_={class_}
                 onClassChange={onClassChange}
                 updateClassBookings={updateClassBookings}
-                handleDeleteClass={handleDeleteClass}
                 userRole={userRole}
                 currentUserId={currentUserId}
               />
