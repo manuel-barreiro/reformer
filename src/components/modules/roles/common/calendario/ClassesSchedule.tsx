@@ -99,7 +99,7 @@ export default function ClassesSchedule({
         </Tabs>
       </div>
 
-      <ScrollArea className="h-full w-full overflow-y-auto 2xl:pr-4">
+      <ScrollArea className="h-full w-full overflow-y-auto lg:max-h-[450px] 2xl:pr-4">
         <div className="space-y-2 py-5">
           {isLoading ? (
             Array(3)
@@ -139,7 +139,7 @@ export default function ClassesSchedule({
           selectedDate={date}
           onSuccess={onClassChange}
           trigger={
-            <Button className="mt-6 w-full bg-[#8B4513] hover:bg-[#723A0F]">
+            <Button className="w-full bg-[#8B4513] hover:bg-[#723A0F]">
               <PlusCircle className="mr-2 h-4 w-4" />
               Nueva Clase
             </Button>
