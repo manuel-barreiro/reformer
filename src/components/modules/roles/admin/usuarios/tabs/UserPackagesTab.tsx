@@ -228,7 +228,7 @@ export function UserPackagesTab({
         <Dialog open={isAssignModalOpen} onOpenChange={setIsAssignModalOpen}>
           <DialogTrigger asChild>
             <Button
-              className="bg-rust text-pearl hover:bg-rust/90"
+              className="bg-midnight text-pearl hover:bg-midnight/90"
               disabled={assignPackageMutation.isPending}
             >
               {assignPackageMutation.isPending ? (
