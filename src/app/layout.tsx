@@ -87,7 +87,7 @@ export const viewport: Viewport = {
   width: "device-width",
 }
 
-export default async function RootLayout({
+export default async function Root({
   children,
 }: Readonly<{
   children: React.ReactNode
