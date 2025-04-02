@@ -7,19 +7,17 @@ import {
   HoverCardTrigger,
 } from "@/components/ui/hover-card"
 import { Badge } from "@/components/ui/badge"
-import { UserCog } from "lucide-react"
+import { Eye } from "lucide-react" // Import the Eye icon
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { CheckIcon, ChevronDownIcon, Package } from "lucide-react"
+import { CheckIcon, ChevronDownIcon } from "lucide-react"
 import Link from "next/link"
 
 export const createColumns = (
-  onOpenDetailModal: (user: User) => void,
-  onOpenPackagesModal: (user: User) => void,
   roleFilter: Role | "all",
   setRoleFilter: (role: Role | "all") => void
 ): ColumnDef<User>[] => [
@@ -114,32 +112,21 @@ export const createColumns = (
       </div>
     ),
   },
-  // {
-  //   accessorKey: "createdAt",
-  //   header: "FECHA REGISTRO",
-  //   cell: ({ row }) =>
-  //     new Date(row.original.createdAt).toLocaleDateString("es-ES"),
-  // },
   {
-    accessorKey: "detail",
-    header: "DETALLE",
-    cell: ({ row }) => (
-      <div className="flex justify-center">
-        <Button variant="ghost" onClick={() => onOpenDetailModal(row.original)}>
-          <UserCog className="w-6" />
-        </Button>
-      </div>
-    ),
+    accessorKey: "createdAt",
+    header: "FECHA REGISTRO",
+    cell: ({ row }) =>
+      new Date(row.original.createdAt).toLocaleDateString("es-ES"),
   },
   {
-    id: "packages",
-    header: "PAQUETES",
+    id: "view",
+    header: "VER",
     cell: ({ row }) => {
       const user = row.original
       return (
         <Link href={`/admin/usuarios/${user.id}`}>
-          <Button variant="ghost">
-            <Package className="mx-auto w-6" />
+          <Button variant="ghost" className="hover:bg-grey_pebble/10">
+            <Eye className="h-5 w-5 text-midnight" />
           </Button>
         </Link>
       )

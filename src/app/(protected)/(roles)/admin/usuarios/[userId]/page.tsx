@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma"
-import { UserPackagesView } from "@/components/modules/roles/admin/usuarios/UserPackagesView"
+import { UserDetailView } from "@/components/modules/roles/admin/usuarios/UserDetailView"
 import { notFound } from "next/navigation"
 
 interface PageProps {
@@ -8,7 +8,8 @@ interface PageProps {
   }
 }
 
-export default async function UserPackagesPage({ params }: PageProps) {
+export default async function UserDetailPage({ params }: PageProps) {
+  // Fetch user with all related data
   const user = await prisma.user.findUnique({
     where: { id: params.userId },
     include: {
@@ -24,6 +25,24 @@ export default async function UserPackagesPage({ params }: PageProps) {
           },
         },
       },
+      payments: {
+        orderBy: {
+          dateCreated: "desc",
+        },
+      },
+      bookings: {
+        include: {
+          class: {
+            include: {
+              category: true,
+              subcategory: true,
+            },
+          },
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+      },
     },
   })
 
@@ -35,5 +54,5 @@ export default async function UserPackagesPage({ params }: PageProps) {
     where: { isActive: true },
   })
 
-  return <UserPackagesView user={user} availablePackages={availablePackages} />
+  return <UserDetailView user={user} availablePackages={availablePackages} />
 }
