@@ -20,10 +20,11 @@ export const userBookingsColumns = (
     header: "Clase",
     cell: ({ row }) =>
       `${row.original.class.category.name} - ${row.original.class.subcategory.name}`,
+    enableSorting: true,
   },
   {
     accessorKey: "class.date",
-    header: "Fecha",
+    header: "Fecha Clase",
     cell: ({ row }) => formatDate(row.original.class.date),
   },
   {
@@ -33,6 +34,7 @@ export const userBookingsColumns = (
       `${formatTime(row.original.class.startTime)} - ${formatTime(
         row.original.class.endTime
       )}`,
+    enableSorting: true,
   },
   {
     accessorKey: "class.instructor",
@@ -50,10 +52,12 @@ export const userBookingsColumns = (
         </Badge>
       </div>
     ),
+    enableSorting: true,
   },
   {
     accessorKey: "createdAt",
-    header: "Fecha de Reserva",
+    header: "Creación Reserva",
     cell: ({ row }) => formatDate(row.original.createdAt),
+    enableSorting: true,
   },
 ]

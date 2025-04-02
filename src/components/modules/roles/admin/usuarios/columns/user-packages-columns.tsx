@@ -6,28 +6,6 @@ import { Loader2 } from "lucide-react"
 import { PackageStatus } from "@prisma/client"
 import { Badge } from "@/components/ui/badge"
 
-interface UserPackagesColumnsProps {
-  editingPackage: string | null
-  editForm: {
-    remainingClasses: number
-    expirationDate: string
-  }
-  setEditForm: React.Dispatch<
-    React.SetStateAction<{
-      remainingClasses: number
-      expirationDate: string
-    }>
-  >
-  formatDisplayDate: (date: Date) => string
-  getStatusBadgeColor: (status: PackageStatus) => string
-  handleEdit: (pkg: ExtendedPurchasedPackage) => void
-  handleSave: (pkg: ExtendedPurchasedPackage) => Promise<void>
-  updatePackageMutation: any
-  setEditingPackage: React.Dispatch<React.SetStateAction<string | null>>
-  setPackageToDelete: React.Dispatch<React.SetStateAction<string | null>>
-  setIsDeleteModalOpen: React.Dispatch<React.SetStateAction<boolean>>
-}
-
 export const userPackagesColumns = (
   editingPackage: string | null,
   editForm: {
@@ -101,13 +79,29 @@ export const userPackagesColumns = (
     },
   },
   {
+    accessorKey: "createdAt",
+    header: "Fecha de Compra",
+    cell: ({ row }) => formatDisplayDate(row.original.createdAt),
+    sortingFn: (rowA, rowB, columnId) => {
+      const dateA = new Date(rowA.getValue(columnId) as string)
+      const dateB = new Date(rowB.getValue(columnId) as string)
+      return dateA.getTime() - dateB.getTime()
+    },
+    enableSorting: true,
+  },
+  {
     accessorKey: "status",
     header: "Estado",
     cell: ({ row }) => {
       const pkg = row.original
+      const statusMapping: Record<string, string> = {
+        active: "Activo",
+        expired: "Expirado",
+        cancelled: "Cancelado",
+      }
       return (
         <Badge className={`${getStatusBadgeColor(pkg.status)} text-pearl`}>
-          {pkg.status}
+          {statusMapping[pkg.status]}
         </Badge>
       )
     },

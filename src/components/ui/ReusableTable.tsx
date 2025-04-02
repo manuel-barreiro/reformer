@@ -6,6 +6,7 @@ import {
   getPaginationRowModel,
   flexRender,
   ColumnDef,
+  getSortedRowModel,
 } from "@tanstack/react-table"
 import {
   Table,
@@ -17,6 +18,7 @@ import {
 } from "@/components/ui/table"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { PaginationControls } from "@/components/modules/roles/admin/usuarios/PaginationControls"
+import { ArrowDown, ArrowUp, Minus } from "lucide-react"
 
 interface ReusableTableProps<T extends object> {
   data: T[]
@@ -31,6 +33,7 @@ export function ReusableTable<T extends object>({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     initialState: {
       pagination: {
@@ -49,14 +52,33 @@ export function ReusableTable<T extends object>({
                 {headerGroup.headers.map((header) => (
                   <TableHead
                     key={header.id}
-                    className="text-center font-dm_sans text-sm font-semibold text-midnight"
+                    className={`text-center font-dm_sans text-sm font-semibold text-midnight ${
+                      header.column.getCanSort() ? "cursor-pointer" : ""
+                    }`}
+                    onClick={
+                      header.column.getCanSort()
+                        ? header.column.getToggleSortingHandler()
+                        : undefined
+                    }
                   >
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
+                    {header.isPlaceholder ? null : (
+                      <>
+                        {flexRender(
                           header.column.columnDef.header,
                           header.getContext()
                         )}
+                        {header.column.getCanSort() ? (
+                          header.column.getIsSorted() === "asc" ? (
+                            <ArrowUp size={16} className="ml-1 inline" />
+                          ) : header.column.getIsSorted() === "desc" ? (
+                            <ArrowDown size={16} className="ml-1 inline" />
+                          ) : (
+                            // <Minus size={16} className="ml-1 inline" />
+                            ""
+                          )
+                        ) : null}
+                      </>
+                    )}
                   </TableHead>
                 ))}
               </TableRow>

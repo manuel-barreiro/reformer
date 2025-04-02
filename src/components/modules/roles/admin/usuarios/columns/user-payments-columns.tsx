@@ -16,20 +16,24 @@ export const userPaymentsColumns = (
   {
     accessorKey: "paymentId",
     header: "ID de Pago",
+    enableSorting: false,
   },
   {
     accessorKey: "dateCreated",
     header: "Fecha",
     cell: ({ row }) => formatDate(row.original.dateCreated),
+    enableSorting: true,
   },
   {
     accessorKey: "description",
     header: "Descripción",
+    enableSorting: true,
   },
   {
     accessorKey: "total",
     header: "Monto",
     cell: ({ row }) => `$${row.original.total.toFixed(2)}`,
+    enableSorting: true,
   },
   {
     accessorKey: "status",
@@ -43,9 +47,11 @@ export const userPaymentsColumns = (
         </Badge>
       </div>
     ),
+    enableSorting: true,
   },
   {
     accessorKey: "paymentType",
     header: "Tipo de Pago",
+    enableSorting: true,
   },
 ]
