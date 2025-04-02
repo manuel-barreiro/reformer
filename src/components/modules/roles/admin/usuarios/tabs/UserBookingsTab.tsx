@@ -1,28 +1,21 @@
 "use client"
 
 import { Booking, Class, Category, Subcategory } from "@prisma/client"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
-import { Badge } from "@/components/ui/badge"
 import { format } from "date-fns"
 import { es } from "date-fns/locale"
 import { utcToLocal } from "@/lib/timezone-utils"
 import { useUserBookings } from "../hooks/useUserQueries"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useEffect } from "react"
+import { ReusableTable } from "@/components/ui/ReusableTable"
+import { userBookingsColumns } from "@/components/modules/roles/admin/usuarios/columns/user-bookings-columns"
 
 interface ClassWithDetails extends Class {
   category: Category
   subcategory: Subcategory
 }
 
-interface ExtendedBooking extends Booking {
+export interface ExtendedBooking extends Booking {
   class: ClassWithDetails
 }
 
@@ -138,51 +131,15 @@ export function UserBookingsTab({ userId }: UserBookingsTabProps) {
           </p>
         </div>
       ) : (
-        <div className="rounded-md border">
-          <Table>
-            <TableHeader>
-              <TableRow className="border-b border-grey_pebble">
-                <TableHead className="text-grey_pebble">Clase</TableHead>
-                <TableHead className="text-grey_pebble">Fecha</TableHead>
-                <TableHead className="text-grey_pebble">Horario</TableHead>
-                <TableHead className="text-grey_pebble">Instructor</TableHead>
-                <TableHead className="text-grey_pebble">Estado</TableHead>
-                <TableHead className="text-grey_pebble">
-                  Fecha de Reserva
-                </TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {bookings.map((booking) => (
-                <TableRow
-                  key={booking.id}
-                  className="border-b border-grey_pebble"
-                >
-                  <TableCell className="font-medium">
-                    {booking.class.category.name} -{" "}
-                    {booking.class.subcategory.name}
-                  </TableCell>
-                  <TableCell>{formatDate(booking.class.date)}</TableCell>
-                  <TableCell>
-                    {formatTime(booking.class.startTime)} -{" "}
-                    {formatTime(booking.class.endTime)}
-                  </TableCell>
-                  <TableCell>{booking.class.instructor}</TableCell>
-                  <TableCell>
-                    <Badge
-                      className={`${getStatusBadgeColor(booking.status)} text-pearl`}
-                    >
-                      {formatBookingStatus(booking.status)}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    {format(booking.createdAt, "dd MMM yyyy", { locale: es })}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
+        <ReusableTable
+          columns={userBookingsColumns(
+            formatDate,
+            formatTime,
+            formatBookingStatus,
+            getStatusBadgeColor
+          )}
+          data={bookings}
+        />
       )}
     </div>
   )

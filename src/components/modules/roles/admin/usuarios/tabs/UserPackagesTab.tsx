@@ -7,14 +7,6 @@ import {
   ClassPackage,
   PackageStatus,
 } from "@prisma/client"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -43,8 +35,10 @@ import {
   useDeletePackage,
 } from "@/components/modules/roles/admin/usuarios/hooks/useUserQueries"
 import { Skeleton } from "@/components/ui/skeleton"
+import { ReusableTable } from "@/components/ui/ReusableTable"
+import { userPackagesColumns } from "../columns/user-packages-columns"
 
-interface ExtendedPurchasedPackage extends PurchasedPackage {
+export interface ExtendedPurchasedPackage extends PurchasedPackage {
   classPackage: ClassPackage
   payment: {
     total: number
@@ -320,126 +314,22 @@ export function UserPackagesTab({
           </p>
         </div>
       ) : (
-        <div className="rounded-md border">
-          <Table>
-            <TableHeader>
-              <TableRow className="border-b border-grey_pebble">
-                <TableHead className="text-grey_pebble">Paquete</TableHead>
-                <TableHead className="text-grey_pebble">
-                  Clases Restantes
-                </TableHead>
-                <TableHead className="text-grey_pebble">
-                  Fecha de Expiración
-                </TableHead>
-                <TableHead className="text-grey_pebble">Estado</TableHead>
-                <TableHead className="text-right text-grey_pebble">
-                  Acciones
-                </TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {packages.map((pkg) => (
-                <TableRow key={pkg.id} className="border-b border-grey_pebble">
-                  <TableCell className="font-medium">
-                    {pkg.classPackage.name}
-                  </TableCell>
-                  <TableCell>
-                    {editingPackage === pkg.id ? (
-                      <Input
-                        type="number"
-                        value={editForm.remainingClasses}
-                        onChange={(e) =>
-                          setEditForm({
-                            ...editForm,
-                            remainingClasses: parseInt(e.target.value),
-                          })
-                        }
-                        className="w-20 border-grey_pebble/20 bg-pearl"
-                        min="0"
-                        max={pkg.classPackage.classCount}
-                      />
-                    ) : (
-                      pkg.remainingClasses
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    {editingPackage === pkg.id ? (
-                      <Input
-                        type="date"
-                        value={editForm.expirationDate}
-                        onChange={(e) =>
-                          setEditForm({
-                            ...editForm,
-                            expirationDate: e.target.value,
-                          })
-                        }
-                        min={format(new Date(), "yyyy-MM-dd")}
-                        className="w-40 border-grey_pebble/20 bg-pearl"
-                      />
-                    ) : (
-                      formatDisplayDate(pkg.expirationDate)
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    <Badge
-                      className={`${getStatusBadgeColor(pkg.status)} text-pearl`}
-                    >
-                      {pkg.status}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    {editingPackage === pkg.id ? (
-                      <div className="flex justify-end space-x-2">
-                        <Button
-                          size="sm"
-                          onClick={() => handleSave(pkg)}
-                          disabled={updatePackageMutation.isPending}
-                          className="bg-rust text-pearl hover:bg-rust/90"
-                        >
-                          {updatePackageMutation.isPending ? (
-                            <Loader2 className="h-4 w-4 animate-spin" />
-                          ) : (
-                            "Guardar"
-                          )}
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => setEditingPackage(null)}
-                          className="border-grey_pebble/20 text-grey_pebble hover:bg-grey_pebble/10"
-                        >
-                          Cancelar
-                        </Button>
-                      </div>
-                    ) : (
-                      <div className="flex justify-end space-x-2">
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => handleEdit(pkg)}
-                          className="text-grey_pebble hover:bg-grey_pebble/10"
-                        >
-                          Editar
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => {
-                            setPackageToDelete(pkg.id)
-                            setIsDeleteModalOpen(true)
-                          }}
-                          className="text-rust hover:bg-rust/10"
-                        >
-                          Eliminar
-                        </Button>
-                      </div>
-                    )}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
+        <ReusableTable
+          columns={userPackagesColumns(
+            editingPackage,
+            editForm,
+            setEditForm,
+            formatDisplayDate,
+            getStatusBadgeColor,
+            handleEdit,
+            handleSave,
+            updatePackageMutation,
+            setEditingPackage,
+            setPackageToDelete,
+            setIsDeleteModalOpen
+          )}
+          data={packages}
+        />
       )}
 
       <Dialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>

@@ -159,7 +159,7 @@ export function UserDetailView({ userId }: UserDetailViewProps) {
 
       {/* Activity Tabs */}
       <Tabs defaultValue="packages" className="w-full">
-        <TabsList className="grid w-full grid-cols-3 bg-pearlVariant3">
+        <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger
             value="packages"
             className="data-[state=active]:bg-rust data-[state=active]:text-pearl"

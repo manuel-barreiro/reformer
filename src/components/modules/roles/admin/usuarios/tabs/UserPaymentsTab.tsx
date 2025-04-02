@@ -1,21 +1,14 @@
 "use client"
 
 import { Payment } from "@prisma/client"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
-import { Badge } from "@/components/ui/badge"
+import { Skeleton } from "@/components/ui/skeleton"
 import { format } from "date-fns"
 import { es } from "date-fns/locale"
 import { utcToLocal } from "@/lib/timezone-utils"
 import { useUserPayments } from "../hooks/useUserQueries"
-import { Skeleton } from "@/components/ui/skeleton"
 import { useEffect } from "react"
+import { ReusableTable } from "@/components/ui/ReusableTable"
+import { userPaymentsColumns } from "@/components/modules/roles/admin/usuarios/columns/user-payments-columns"
 
 interface UserPaymentsTabProps {
   userId: string
@@ -131,49 +124,14 @@ export function UserPaymentsTab({ userId }: UserPaymentsTabProps) {
           </p>
         </div>
       ) : (
-        <div className="rounded-md border">
-          <Table>
-            <TableHeader>
-              <TableRow className="border-b border-grey_pebble">
-                <TableHead className="text-grey_pebble">ID de Pago</TableHead>
-                <TableHead className="text-grey_pebble">Fecha</TableHead>
-                <TableHead className="text-grey_pebble">Descripción</TableHead>
-                <TableHead className="text-grey_pebble">Monto</TableHead>
-                <TableHead className="text-grey_pebble">Estado</TableHead>
-                <TableHead className="text-grey_pebble">Tipo de Pago</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {payments.map((payment) => (
-                <TableRow
-                  key={payment.id}
-                  className="border-b border-grey_pebble"
-                >
-                  <TableCell className="font-mono text-xs">
-                    {payment.paymentId}
-                  </TableCell>
-                  <TableCell>{formatDate(payment.dateCreated)}</TableCell>
-                  <TableCell>
-                    {payment.description || "Sin descripción"}
-                  </TableCell>
-                  <TableCell>${payment.total.toFixed(2)}</TableCell>
-                  <TableCell>
-                    <Badge
-                      className={`${getStatusBadgeColor(payment.status)} text-pearl`}
-                    >
-                      {formatPaymentStatus(payment.status)}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="capitalize">
-                    {payment.paymentType === "mercadopago"
-                      ? "MercadoPago"
-                      : payment.paymentType}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
+        <ReusableTable
+          columns={userPaymentsColumns(
+            formatDate,
+            formatPaymentStatus,
+            getStatusBadgeColor
+          )}
+          data={payments}
+        />
       )}
     </div>
   )
