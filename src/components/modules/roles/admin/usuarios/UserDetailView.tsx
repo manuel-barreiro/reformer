@@ -104,18 +104,48 @@ export function UserDetailView({ userId }: UserDetailViewProps) {
     <div className="h-full w-full space-y-6 p-6">
       {/* Header with back button and user info */}
       <div className="flex items-center justify-between">
-        <div className="space-y-1">
-          <Link
-            href="/admin/usuarios"
-            className="flex items-center text-sm text-gray-500 hover:text-gray-700"
-          >
-            <ChevronLeft className="mr-1 h-4 w-4" />
-            Volver a usuarios
-          </Link>
-          <h2 className="font-marcellus text-2xl font-bold">
-            {user.name} {user.surname}
-          </h2>
-          <h3 className="font-dm_mono">[{user.email}]</h3>
+        <Link
+          href="/admin/usuarios"
+          className="flex items-center text-sm text-gray-500 hover:text-gray-700"
+        >
+          <ChevronLeft className="mr-1 h-4 w-4" />
+          Volver a usuarios
+        </Link>
+      </div>
+
+      {/* User metadata card */}
+      <Card className="flex flex-col items-start justify-between bg-pearlVariant px-6 shadow-md sm:flex-row sm:items-center">
+        <div className="flex h-full w-full flex-col items-start sm:flex-row sm:items-center">
+          <CardHeader className="p-0">
+            <CardTitle className="font-marcellus text-2xl text-grey_pebble">
+              {user.name} {user.surname}
+            </CardTitle>
+            <CardDescription>
+              {" "}
+              <h3 className="font-dm_mono">[{user.email}]</h3>
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="flex h-full flex-row gap-10 p-6">
+            <div className="h-full space-y-1.5">
+              <h4 className="text-sm font-semibold">Teléfono</h4>
+              <p className="text-grey_pebble">
+                {user.phone || "No registrado"}
+              </p>
+            </div>
+            <div className="h-full space-y-1.5">
+              <h4 className="text-sm font-semibold">Rol</h4>
+              <div className="flex items-center">
+                <div
+                  className={`mr-2 rounded-full ${user.role === "admin" ? "bg-rust" : "bg-grey_pebble"} p-1`}
+                >
+                  <UserIcon className="h-3 w-3 text-pearl" />
+                </div>
+                <span className="text-grey_pebble">
+                  {user.role === "admin" ? "Administrador" : "Usuario"}
+                </span>
+              </div>
+            </div>
+          </CardContent>
         </div>
         <Button
           onClick={() => setIsDetailModalOpen(true)}
@@ -125,47 +155,6 @@ export function UserDetailView({ userId }: UserDetailViewProps) {
           <Edit className="mr-2 h-4 w-4" />
           Editar Usuario
         </Button>
-      </div>
-
-      {/* User metadata card */}
-      <Card className="bg-pearlVariant">
-        <CardHeader>
-          <CardTitle className="font-marcellus text-xl text-grey_pebble">
-            Información del Usuario
-          </CardTitle>
-          <CardDescription>Datos personales y de contacto</CardDescription>
-        </CardHeader>
-        <CardContent className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          <div className="space-y-2">
-            <h4 className="text-sm font-semibold">Nombre</h4>
-            <p className="text-grey_pebble">
-              {user.name} {user.surname || ""}
-            </p>
-          </div>
-          <div className="space-y-2">
-            <h4 className="text-sm font-semibold">Email</h4>
-            <p className="font-dm_mono text-sm text-grey_pebble">
-              {user.email}
-            </p>
-          </div>
-          <div className="space-y-2">
-            <h4 className="text-sm font-semibold">Teléfono</h4>
-            <p className="text-grey_pebble">{user.phone || "No registrado"}</p>
-          </div>
-          <div className="space-y-2">
-            <h4 className="text-sm font-semibold">Rol</h4>
-            <div className="flex items-center">
-              <div
-                className={`mr-2 rounded-full ${user.role === "admin" ? "bg-rust" : "bg-grey_pebble"} p-1`}
-              >
-                <UserIcon className="h-3 w-3 text-pearl" />
-              </div>
-              <span className="text-grey_pebble">
-                {user.role === "admin" ? "Administrador" : "Usuario"}
-              </span>
-            </div>
-          </div>
-        </CardContent>
       </Card>
 
       {/* Activity Tabs */}
@@ -191,7 +180,7 @@ export function UserDetailView({ userId }: UserDetailViewProps) {
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="packages">
+        <TabsContent value="packages" className="mt-4">
           <UserPackagesTab
             userId={userId}
             packages={user.purchasedPackages}
@@ -200,11 +189,11 @@ export function UserDetailView({ userId }: UserDetailViewProps) {
           />
         </TabsContent>
 
-        <TabsContent value="payments">
+        <TabsContent value="payments" className="mt-4">
           <UserPaymentsTab userId={userId} />{" "}
         </TabsContent>
 
-        <TabsContent value="bookings">
+        <TabsContent value="bookings" className="mt-4">
           <UserBookingsTab userId={userId} />{" "}
         </TabsContent>
       </Tabs>
