@@ -13,12 +13,41 @@ import { Badge } from "@/components/ui/badge"
 import { format } from "date-fns"
 import { es } from "date-fns/locale"
 import { utcToLocal } from "@/lib/timezone-utils"
+import { useUserPayments } from "../hooks/useUserQueries"
+import { Skeleton } from "@/components/ui/skeleton"
+import { useEffect } from "react"
 
 interface UserPaymentsTabProps {
-  payments: Payment[]
+  userId: string
 }
 
-export function UserPaymentsTab({ payments }: UserPaymentsTabProps) {
+export function UserPaymentsTab({ userId }: UserPaymentsTabProps) {
+  // Early check for undefined userId
+  if (!userId) {
+    console.error("UserPaymentsTab: userId is undefined")
+    return (
+      <div className="space-y-4">
+        <h3 className="text-xl font-bold">Pagos</h3>
+        <div className="rounded-md border p-8 text-center">
+          <p className="text-rust">Error: ID de usuario no proporcionado</p>
+        </div>
+      </div>
+    )
+  }
+
+  const { data, isLoading, error } = useUserPayments(userId)
+
+  const payments = data?.success ? (data.data as Payment[]) : []
+
+  useEffect(() => {
+    console.log("Component debug:", {
+      userId,
+      data,
+      error,
+      isLoading,
+    })
+  }, [userId, data, error, isLoading])
+
   // Format payment status from BE to human readable
   const formatPaymentStatus = (status: string) => {
     switch (status) {
@@ -59,6 +88,36 @@ export function UserPaymentsTab({ payments }: UserPaymentsTabProps) {
       default:
         return "bg-midnight"
     }
+  }
+
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className="space-y-4">
+        <h3 className="text-xl font-bold">Pagos</h3>
+        <Skeleton className="h-40 w-full" />
+      </div>
+    )
+  }
+
+  // Error handling
+  if (error || !data) {
+    console.error("Data loading error:", error, data)
+    return (
+      <div className="space-y-4">
+        <h3 className="text-xl font-bold">Pagos</h3>
+        <div className="rounded-md border p-8 text-center">
+          <p className="text-rust">
+            Error al cargar los pagos:{" "}
+            {error?.message ||
+              (data && !data.success ? data.error : "Error desconocido")}
+          </p>
+          <p className="mt-2 text-xs text-gray-500">
+            Por favor revisa la consola del navegador para más detalles.
+          </p>
+        </div>
+      </div>
+    )
   }
 
   return (

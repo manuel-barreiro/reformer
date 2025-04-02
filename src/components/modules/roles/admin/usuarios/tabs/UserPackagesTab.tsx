@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useTransition } from "react"
+import { useState } from "react"
 import {
   User,
   PurchasedPackage,
@@ -18,7 +18,7 @@ import {
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { AlertTriangle } from "lucide-react"
+import { AlertTriangle, Loader2 } from "lucide-react"
 import { formatLocalDate, utcToLocal } from "@/lib/timezone-utils"
 import {
   Dialog,
@@ -35,15 +35,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { UpdatePackageInput } from "@/actions/users"
 import { format } from "date-fns"
-import {
-  assignPackage,
-  updatePackage,
-  deletePackage,
-} from "@/actions/purchased-packages"
-import { useRouter } from "next/navigation"
 import { useToast } from "@/components/ui/use-toast"
+import {
+  useAssignPackage,
+  useUpdatePackage,
+  useDeletePackage,
+} from "@/components/modules/roles/admin/usuarios/hooks/useUserQueries"
+import { Skeleton } from "@/components/ui/skeleton"
 
 interface ExtendedPurchasedPackage extends PurchasedPackage {
   classPackage: ClassPackage
@@ -55,32 +54,47 @@ interface ExtendedPurchasedPackage extends PurchasedPackage {
 }
 
 interface UserPackagesTabProps {
-  user: User
+  userId: string
   packages: ExtendedPurchasedPackage[]
   availablePackages: ClassPackage[]
+  isLoading: boolean
 }
 
 export function UserPackagesTab({
-  user,
+  userId,
   packages,
   availablePackages,
+  isLoading,
 }: UserPackagesTabProps) {
-  const [isPending, startTransition] = useTransition()
-  const router = useRouter()
   const { toast } = useToast()
+
+  // State for package editing
   const [editingPackage, setEditingPackage] = useState<string | null>(null)
-  const [editForm, setEditForm] = useState<UpdatePackageInput>({
+  const [editForm, setEditForm] = useState<{
+    remainingClasses: number
+    expirationDate: string
+  }>({
     remainingClasses: 0,
     expirationDate: "",
   })
+
+  // State for modal visibility
   const [isAssignModalOpen, setIsAssignModalOpen] = useState(false)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [packageToDelete, setPackageToDelete] = useState<string | null>(null)
+
+  // State for new package form
   const [newPackageForm, setNewPackageForm] = useState({
     classPackageId: "",
     expirationDate: "",
   })
 
+  // Mutations with Tanstack Query
+  const assignPackageMutation = useAssignPackage()
+  const updatePackageMutation = useUpdatePackage()
+  const deletePackageMutation = useDeletePackage()
+
+  // Handler for editing a package
   const handleEdit = (pkg: ExtendedPurchasedPackage) => {
     setEditingPackage(pkg.id)
     setEditForm({
@@ -89,6 +103,7 @@ export function UserPackagesTab({
     })
   }
 
+  // Validate the edit form
   const validateEditForm = (pkg: ExtendedPurchasedPackage) => {
     const today = new Date()
     today.setHours(0, 0, 0, 0)
@@ -115,58 +130,44 @@ export function UserPackagesTab({
     return true
   }
 
+  // Handler for saving package edits
   const handleSave = async (pkg: ExtendedPurchasedPackage) => {
     if (!validateEditForm(pkg)) return
 
-    startTransition(async () => {
-      try {
-        const result = await updatePackage(pkg.id, editForm)
-        if (result.success) {
-          toast({
-            title: "Paquete actualizado con éxito",
-            description: "Se ha actualizado el paquete correctamente.",
-            variant: "reformer",
-          })
+    updatePackageMutation.mutate(
+      {
+        packageId: pkg.id,
+        userId: userId,
+        updateData: editForm,
+      },
+      {
+        onSuccess: () => {
           setEditingPackage(null)
-          router.refresh()
-        }
-      } catch (error) {
-        console.error("Error:", error)
-        toast({
-          title: "Error",
-          description: `Error al actualizar el paquete: ${error}`,
-          variant: "destructive",
-        })
+        },
       }
-    })
+    )
   }
 
-  const handleDelete = async (packageId: string) => {
-    startTransition(async () => {
-      try {
-        const result = await deletePackage(packageId)
-        if (result.success) {
-          toast({
-            title: "Paquete eliminado con éxito",
-            description: "Se ha eliminado el paquete y sus reservas asociadas.",
-            variant: "reformer",
-          })
+  // Handler for deleting packages
+  const handleDelete = async () => {
+    if (!packageToDelete) return
+
+    deletePackageMutation.mutate(
+      {
+        packageId: packageToDelete,
+        userId: userId,
+      },
+      {
+        onSuccess: () => {
           setIsDeleteModalOpen(false)
           setPackageToDelete(null)
-          router.refresh()
-        }
-      } catch (error) {
-        console.error("Error:", error)
-        toast({
-          title: "Error",
-          description: `Error al eliminar el paquete: ${error}`,
-          variant: "destructive",
-        })
+        },
       }
-    })
+    )
   }
 
-  const handleAssignPackage = async () => {
+  // Handler for assigning new packages
+  const handleAssignPackage = () => {
     const today = new Date()
     today.setHours(0, 0, 0, 0)
     const selectedDate = new Date(newPackageForm.expirationDate)
@@ -180,30 +181,21 @@ export function UserPackagesTab({
       return
     }
 
-    startTransition(async () => {
-      try {
-        const result = await assignPackage(user.id, newPackageForm)
-        if (result.success) {
-          toast({
-            title: "Paquete asignado al usuario con éxito",
-            description: "Se ha asignado el paquete correctamente.",
-            variant: "reformer",
-          })
+    assignPackageMutation.mutate(
+      {
+        userId: userId,
+        packageData: newPackageForm,
+      },
+      {
+        onSuccess: () => {
           setIsAssignModalOpen(false)
           setNewPackageForm({ classPackageId: "", expirationDate: "" })
-          router.refresh()
-        }
-      } catch (error) {
-        console.error("Error:", error)
-        toast({
-          title: "Error",
-          description: `Error al asignar el paquete: ${error}`,
-          variant: "destructive",
-        })
+        },
       }
-    })
+    )
   }
 
+  // Helper functions for formatting
   const formatDisplayDate = (date: Date) => {
     const localDate = utcToLocal(new Date(date))
     return format(localDate, "dd/MM/yyyy")
@@ -222,14 +214,37 @@ export function UserPackagesTab({
     }
   }
 
+  // Show loading state
+  if (isLoading) {
+    return (
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <Skeleton className="h-8 w-24" />
+          <Skeleton className="h-10 w-40" />
+        </div>
+        <Skeleton className="h-40 w-full" />
+      </div>
+    )
+  }
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h3 className="text-xl font-bold">Paquetes</h3>
         <Dialog open={isAssignModalOpen} onOpenChange={setIsAssignModalOpen}>
           <DialogTrigger asChild>
-            <Button className="bg-rust text-pearl hover:bg-rust/90">
-              + Asignar nuevo paquete
+            <Button
+              className="bg-rust text-pearl hover:bg-rust/90"
+              disabled={assignPackageMutation.isPending}
+            >
+              {assignPackageMutation.isPending ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Asignando...
+                </>
+              ) : (
+                "+ Asignar nuevo paquete"
+              )}
             </Button>
           </DialogTrigger>
           <DialogContent className="bg-pearl">
@@ -286,10 +301,12 @@ export function UserPackagesTab({
               </div>
               <Button
                 onClick={handleAssignPackage}
-                disabled={isPending}
+                disabled={assignPackageMutation.isPending}
                 className="w-full bg-rust text-pearl hover:bg-rust/90"
               >
-                {isPending ? "Asignando..." : "Asignar paquete"}
+                {assignPackageMutation.isPending
+                  ? "Asignando..."
+                  : "Asignar paquete"}
               </Button>
             </div>
           </DialogContent>
@@ -376,10 +393,14 @@ export function UserPackagesTab({
                         <Button
                           size="sm"
                           onClick={() => handleSave(pkg)}
-                          disabled={isPending}
+                          disabled={updatePackageMutation.isPending}
                           className="bg-rust text-pearl hover:bg-rust/90"
                         >
-                          {isPending ? "Guardando..." : "Guardar"}
+                          {updatePackageMutation.isPending ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : (
+                            "Guardar"
+                          )}
                         </Button>
                         <Button
                           size="sm"
@@ -446,11 +467,18 @@ export function UserPackagesTab({
               Cancelar
             </Button>
             <Button
-              onClick={() => packageToDelete && handleDelete(packageToDelete)}
-              disabled={isPending}
+              onClick={handleDelete}
+              disabled={deletePackageMutation.isPending}
               className="bg-rust text-pearl hover:bg-rust/90"
             >
-              {isPending ? "Eliminando..." : "Eliminar"}
+              {deletePackageMutation.isPending ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Eliminando...
+                </>
+              ) : (
+                "Eliminar"
+              )}
             </Button>
           </div>
         </DialogContent>

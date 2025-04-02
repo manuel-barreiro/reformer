@@ -1,16 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import {
-  User,
-  PurchasedPackage,
-  ClassPackage,
-  Payment,
-  Booking,
-  Class,
-  Category,
-  Subcategory,
-} from "@prisma/client"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
 import {
@@ -30,75 +20,85 @@ import {
 } from "lucide-react"
 import Link from "next/link"
 import { UserDetailModal } from "./UserDetailModal"
-import { updateUser } from "@/actions/users"
-import { useToast } from "@/components/ui/use-toast"
 import { useRouter } from "next/navigation"
 import { UserPackagesTab } from "./tabs/UserPackagesTab"
 import { UserPaymentsTab } from "./tabs/UserPaymentsTab"
 import { UserBookingsTab } from "./tabs/UserBookingsTab"
-
-interface ExtendedPurchasedPackage extends PurchasedPackage {
-  classPackage: ClassPackage
-  payment: {
-    total: number
-    status: string
-    dateCreated: Date
-  } | null
-}
-
-interface ClassWithDetails extends Class {
-  category: Category
-  subcategory: Subcategory
-}
-
-interface ExtendedBooking extends Booking {
-  class: ClassWithDetails
-}
+import { Skeleton } from "@/components/ui/skeleton"
+import {
+  useUserDetails,
+  useAvailablePackages,
+  useUpdateUser,
+} from "@/components/modules/roles/admin/usuarios/hooks/useUserQueries"
 
 interface UserDetailViewProps {
-  user: User & {
-    purchasedPackages: ExtendedPurchasedPackage[]
-    payments: Payment[]
-    bookings: ExtendedBooking[]
-  }
-  availablePackages: ClassPackage[]
+  userId: string
 }
 
-export function UserDetailView({
-  user,
-  availablePackages,
-}: UserDetailViewProps) {
+export function UserDetailView({ userId }: UserDetailViewProps) {
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false)
-  const { toast } = useToast()
   const router = useRouter()
 
-  const handleUpdateUser = async (userId: string, userData: Partial<User>) => {
-    try {
-      await updateUser(userId, {
-        name: userData.name!,
-        role: userData.role!,
-        surname: userData.surname,
-        phone: userData.phone,
-      })
+  // Fetch user data with Tanstack Query
+  const {
+    data: userData,
+    isLoading: isUserLoading,
+    error: userError,
+  } = useUserDetails(userId)
 
-      toast({
-        title: "Usuario actualizado",
-        description:
-          "La información del usuario ha sido actualizada con éxito.",
-        variant: "reformer",
-      })
+  // Fetch available packages with Tanstack Query
+  const { data: packagesData, isLoading: isPackagesLoading } =
+    useAvailablePackages()
 
-      setIsDetailModalOpen(false)
-      router.refresh()
-    } catch (error) {
-      console.error("Failed to update user:", error)
-      toast({
-        title: "Error",
-        description: "No se pudo actualizar la información del usuario.",
-        variant: "destructive",
-      })
-    }
+  // Get the update user mutation
+  const updateUserMutation = useUpdateUser()
+
+  // Handle updating user data
+  const handleUpdateUser = async (userId: string, userData: any) => {
+    updateUserMutation.mutate({ userId, userData })
+    setIsDetailModalOpen(false)
   }
+
+  // Show loading state while data is being fetched
+  if (isUserLoading) {
+    return (
+      <div className="h-full w-full space-y-6 p-6">
+        <div className="flex items-center justify-between">
+          <div className="space-y-3">
+            <Skeleton className="h-4 w-32" />
+            <Skeleton className="h-8 w-64" />
+            <Skeleton className="h-5 w-48" />
+          </div>
+          <Skeleton className="h-10 w-32" />
+        </div>
+        <Skeleton className="h-40 w-full" />
+        <Skeleton className="h-80 w-full" />
+      </div>
+    )
+  }
+
+  // Show error state if fetching failed
+  if (userError || !userData?.success) {
+    return (
+      <div className="flex h-full w-full flex-col items-center justify-center p-6">
+        <h2 className="mb-4 text-2xl font-bold text-rust">
+          Error al cargar los datos del usuario
+        </h2>
+        <p className="mb-6 text-grey_pebble">
+          {userData?.error || "No se pudo cargar la información del usuario."}
+        </p>
+        <Button
+          onClick={() => router.push("/admin/usuarios")}
+          className="bg-midnight text-pearl hover:bg-midnight/90"
+        >
+          Volver a la lista de usuarios
+        </Button>
+      </div>
+    )
+  }
+
+  const user = userData.data
+  const availablePackages = packagesData?.data || []
 
   return (
     <div className="h-full w-full space-y-6 p-6">
@@ -120,6 +120,7 @@ export function UserDetailView({
         <Button
           onClick={() => setIsDetailModalOpen(true)}
           className="bg-rust text-pearl hover:bg-rust/90"
+          disabled={updateUserMutation.isPending}
         >
           <Edit className="mr-2 h-4 w-4" />
           Editar Usuario
@@ -192,18 +193,19 @@ export function UserDetailView({
 
         <TabsContent value="packages">
           <UserPackagesTab
-            user={user}
+            userId={userId}
             packages={user.purchasedPackages}
             availablePackages={availablePackages}
+            isLoading={isPackagesLoading}
           />
         </TabsContent>
 
         <TabsContent value="payments">
-          <UserPaymentsTab payments={user.payments} />
+          <UserPaymentsTab userId={userId} />{" "}
         </TabsContent>
 
         <TabsContent value="bookings">
-          <UserBookingsTab bookings={user.bookings} />
+          <UserBookingsTab userId={userId} />{" "}
         </TabsContent>
       </Tabs>
 
@@ -213,6 +215,7 @@ export function UserDetailView({
         onClose={() => setIsDetailModalOpen(false)}
         user={user}
         onUpdateUser={handleUpdateUser}
+        isLoading={updateUserMutation.isPending}
       />
     </div>
   )

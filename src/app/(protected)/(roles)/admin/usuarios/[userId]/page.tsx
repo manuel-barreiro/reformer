@@ -9,50 +9,16 @@ interface PageProps {
 }
 
 export default async function UserDetailPage({ params }: PageProps) {
-  // Fetch user with all related data
+  // We're just checking if the user exists for SSR
+  // The full data will be fetched client-side with Tanstack Query
   const user = await prisma.user.findUnique({
     where: { id: params.userId },
-    include: {
-      purchasedPackages: {
-        include: {
-          classPackage: true,
-          payment: {
-            select: {
-              total: true,
-              status: true,
-              dateCreated: true,
-            },
-          },
-        },
-      },
-      payments: {
-        orderBy: {
-          dateCreated: "desc",
-        },
-      },
-      bookings: {
-        include: {
-          class: {
-            include: {
-              category: true,
-              subcategory: true,
-            },
-          },
-        },
-        orderBy: {
-          createdAt: "desc",
-        },
-      },
-    },
+    select: { id: true }, // Just fetch the ID to check existence
   })
 
   if (!user) {
     notFound()
   }
 
-  const availablePackages = await prisma.classPackage.findMany({
-    where: { isActive: true },
-  })
-
-  return <UserDetailView user={user} availablePackages={availablePackages} />
+  return <UserDetailView userId={params.userId} />
 }

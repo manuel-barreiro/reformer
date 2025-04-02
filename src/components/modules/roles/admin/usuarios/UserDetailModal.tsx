@@ -1,12 +1,16 @@
 "use client"
+
+import { useState } from "react"
+import { User, Role } from "@prisma/client"
+import { z } from "zod"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import { User } from "@prisma/client"
-import { Button } from "@/components/ui/button"
 import {
   Form,
   FormControl,
@@ -16,6 +20,7 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
 import {
   Select,
   SelectContent,
@@ -23,16 +28,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import * as z from "zod"
+import { Loader2 } from "lucide-react"
 
 interface UserDetailModalProps {
   isOpen: boolean
   onClose: () => void
   user: User
-  onUpdateUser: (userId: string, userData: Partial<User>) => Promise<void>
+  onUpdateUser: (userId: string, userData: any) => void
+  isLoading: boolean
 }
 
 const formSchema = z.object({
@@ -48,163 +51,133 @@ export function UserDetailModal({
   onClose,
   user,
   onUpdateUser,
+  isLoading,
 }: UserDetailModalProps) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: user.name,
+      name: user.name || "",
       surname: user.surname || "",
-      email: user.email,
+      email: user.email || "",
       phone: user.phone || "",
-      role: user.role,
+      role: user.role as Role,
     },
   })
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    try {
-      await onUpdateUser(user.id, values)
-      onClose()
-    } catch (error) {
-      console.error("Error updating user:", error)
-    }
+  function onSubmit(values: z.infer<typeof formSchema>) {
+    onUpdateUser(user.id, values)
   }
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle className="font-marcellus text-xl text-grey_pebble">
-            Detalles del Usuario
-          </DialogTitle>
+          <DialogTitle>Editar Usuario</DialogTitle>
         </DialogHeader>
-        <ScrollArea className="max-h-[80vh] w-full">
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <div className="grid gap-4 px-4">
-                <FormField
-                  control={form.control}
-                  name="name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-grey_pebble">Nombre</FormLabel>
-                      <FormControl>
-                        <Input
-                          {...field}
-                          className="border border-rust/50 bg-pearlVariant font-semibold text-grey_pebble/60"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="surname"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-grey_pebble">
-                        Apellido
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          {...field}
-                          className="border border-rust/50 bg-pearlVariant font-semibold text-grey_pebble/60"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-grey_pebble">Email</FormLabel>
-                      <FormControl>
-                        <Input
-                          disabled
-                          {...field}
-                          className="border border-rust/50 bg-pearlVariant font-semibold text-grey_pebble/60"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="phone"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-grey_pebble">
-                        Teléfono
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          {...field}
-                          className="border border-rust/50 bg-pearlVariant font-semibold text-grey_pebble/60"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="role"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-grey_pebble">Rol</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger className="border-rust/50 bg-pearlVariant font-semibold text-grey_pebble/60">
-                            <SelectValue placeholder="Seleccionar rol" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent className="bg-grey_pebble text-pearl">
-                          <SelectItem
-                            className="border-b border-pearl/50 capitalize hover:!bg-pearlVariant3"
-                            value="user"
-                          >
-                            Usuario
-                          </SelectItem>
-                          <SelectItem
-                            className="border-b border-pearl/50 capitalize hover:!bg-pearlVariant3"
-                            value="admin"
-                          >
-                            Administrador
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              <div className="flex justify-end space-x-2 border-t border-grey_pebble/20 px-4 pt-4">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={onClose}
-                  className="border-grey_pebble/20 text-grey_pebble hover:bg-grey_pebble/10"
-                >
-                  Cancelar
-                </Button>
-                <Button
-                  type="submit"
-                  className="bg-rust text-pearl hover:bg-rust/90"
-                >
-                  Guardar Cambios
-                </Button>
-              </div>
-            </form>
-          </Form>
-        </ScrollArea>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Nombre</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="surname"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Apellido</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email</FormLabel>
+                  <FormControl>
+                    <Input {...field} type="email" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="phone"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Teléfono</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="role"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Rol</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Seleccionar rol" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="user">Usuario</SelectItem>
+                      <SelectItem value="admin">Admin</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <div className="flex justify-end gap-2 pt-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={onClose}
+                className="border-grey_pebble/20"
+              >
+                Cancelar
+              </Button>
+              <Button
+                type="submit"
+                className="bg-rust text-pearl hover:bg-rust/90"
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Guardando...
+                  </>
+                ) : (
+                  "Guardar"
+                )}
+              </Button>
+            </div>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   )

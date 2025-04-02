@@ -13,6 +13,9 @@ import { Badge } from "@/components/ui/badge"
 import { format } from "date-fns"
 import { es } from "date-fns/locale"
 import { utcToLocal } from "@/lib/timezone-utils"
+import { useUserBookings } from "../hooks/useUserQueries"
+import { Skeleton } from "@/components/ui/skeleton"
+import { useEffect } from "react"
 
 interface ClassWithDetails extends Class {
   category: Category
@@ -24,10 +27,36 @@ interface ExtendedBooking extends Booking {
 }
 
 interface UserBookingsTabProps {
-  bookings: ExtendedBooking[]
+  userId: string
 }
 
-export function UserBookingsTab({ bookings }: UserBookingsTabProps) {
+export function UserBookingsTab({ userId }: UserBookingsTabProps) {
+  // Early check for undefined userId
+  if (!userId) {
+    console.error("UserBookingsTab: userId is undefined")
+    return (
+      <div className="space-y-4">
+        <h3 className="text-xl font-bold">Reservas</h3>
+        <div className="rounded-md border p-8 text-center">
+          <p className="text-rust">Error: ID de usuario no proporcionado</p>
+        </div>
+      </div>
+    )
+  }
+
+  const { data, isLoading, error } = useUserBookings(userId)
+
+  const bookings = data?.success ? (data.data as ExtendedBooking[]) : []
+
+  useEffect(() => {
+    console.log("Component debug:", {
+      userId,
+      data,
+      error,
+      isLoading,
+    })
+  }, [userId, data, error, isLoading])
+
   // Format booking status
   const formatBookingStatus = (status: string) => {
     switch (status) {
@@ -66,6 +95,36 @@ export function UserBookingsTab({ bookings }: UserBookingsTabProps) {
       default:
         return "bg-midnight"
     }
+  }
+
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className="space-y-4">
+        <h3 className="text-xl font-bold">Reservas</h3>
+        <Skeleton className="h-40 w-full" />
+      </div>
+    )
+  }
+
+  // Error handling
+  if (error || !data) {
+    console.error("Data loading error:", error, data)
+    return (
+      <div className="space-y-4">
+        <h3 className="text-xl font-bold">Reservas</h3>
+        <div className="rounded-md border p-8 text-center">
+          <p className="text-rust">
+            Error al cargar las reservas:{" "}
+            {error?.message ||
+              (data && !data.success ? data.error : "Error desconocido")}
+          </p>
+          <p className="mt-2 text-xs text-gray-500">
+            Por favor revisa la consola del navegador para más detalles.
+          </p>
+        </div>
+      </div>
+    )
   }
 
   return (
