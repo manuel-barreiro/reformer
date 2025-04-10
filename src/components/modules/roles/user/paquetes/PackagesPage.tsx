@@ -6,6 +6,9 @@ import PackageList from "./components/PackageList"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { PurchasedPackageWithClassPackage } from "@/actions/purchased-packages"
 import { isExpired } from "@/lib/timezone-utils"
+import { Button } from "@/components/ui/button"
+import Link from "next/link"
+import { Package } from "lucide-react"
 
 interface PackagesPageProps {
   initialPackages: PurchasedPackageWithClassPackage[]
@@ -32,15 +35,27 @@ export default function PackagesPage({ initialPackages }: PackagesPageProps) {
     })
   }, [initialPackages, filter])
 
+  const buyButton = (
+    <Button
+      asChild
+      className="flex w-full shrink-0 items-center gap-1 bg-rust font-dm_mono text-pearl hover:bg-rust/90"
+    >
+      <Link href="/checkout" className="flex w-full items-center gap-3">
+        <Package size={18} />
+        <span className="">COMPRAR PAQUETE</span>
+      </Link>
+    </Button>
+  )
+
   return (
     <section className="h-full w-full">
       <HeaderToggle
-        title="Mis Paquetes"
         filterOptions={["ACTIVOS", "INACTIVOS"]}
         currentFilter={filter}
         onFilterChange={setFilter}
+        actionButton={buyButton}
       />
-      <ScrollArea className="h-auto w-full overflow-y-auto md:h-[560px]">
+      <ScrollArea className="h-auto w-full overflow-y-auto md:h-[500px]">
         <PackageList packages={filteredPackages} />
       </ScrollArea>
     </section>

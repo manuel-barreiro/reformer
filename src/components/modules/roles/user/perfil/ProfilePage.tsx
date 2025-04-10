@@ -33,8 +33,6 @@ export default async function ProfilePage() {
 
   return (
     <section className="h-full">
-      <h1>MI PERFIL</h1>
-      <HeaderToggle />
       <UserInfoForm userInfo={userInfo} />
     </section>
   )

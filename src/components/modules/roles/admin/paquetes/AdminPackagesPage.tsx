@@ -70,11 +70,9 @@ export default function AdminPackagesPage({
   const addPackageButton = (
     <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
       <DialogTrigger asChild>
-        <Button className="flex shrink-0 items-center gap-1 bg-midnight text-pearl hover:bg-midnight/90">
+        <Button className="flex w-full shrink-0 items-center gap-1 bg-midnight text-pearl hover:bg-midnight/90">
           <PlusIcon size={18} />
-          <span className="hidden sm:inline">Agregar Paquete</span>
-          <span className="sm:hidden">Agregar</span>{" "}
-          {/* Shorter text for small screens */}
+          <span className="">Agregar Paquete</span>
         </Button>
       </DialogTrigger>
       <DialogContent>

@@ -1,11 +1,13 @@
 "use client"
 import ActionDialog from "@/components/modules/roles/common/ActionDialog"
-import { CalendarX } from "lucide-react"
+import { CalendarDays, CalendarX, Clock } from "lucide-react"
 import { cancelBooking } from "@/actions/booking-actions"
 import { toast } from "@/components/ui/use-toast"
 import { addHours, isBefore, format } from "date-fns"
 import { BookingWithClass } from "@/components/modules/roles/user/reservas/ReservasPage"
 import { utcToLocal } from "@/lib/timezone-utils"
+import { cn } from "@/lib/utils"
+import { es } from "date-fns/locale"
 
 interface ReservasCardProps {
   booking: BookingWithClass
@@ -40,34 +42,67 @@ export default function ReservasCard({
   const canCancel = isBefore(now, twelveHoursBeforeClass)
 
   return (
-    <div className="flex max-h-56 w-full flex-col items-start justify-evenly rounded-md bg-rust font-dm_mono font-medium text-pearl">
-      <div className="flex h-full w-full flex-col items-start justify-evenly p-5">
-        <p>{format(classTime, "dd/MM/yyyy")}</p>
-        <span className="my-1 w-full border border-dashed border-pearl" />
-        <p className="text-md uppercase">{booking.class.category.name}</p>
-        <p className="font-dm_sans text-xs font-thin uppercase">
+    // Restore min-height, background, and adjust border/text colors
+    <div className="flex h-52 w-full flex-col justify-between rounded-lg border border-pearl/30 bg-rust font-dm_sans text-pearl shadow-sm">
+      {/* Main content area */}
+      <div className="flex flex-grow flex-col p-4">
+        {/* Date and Time - Adjust icon/separator color */}
+        <div className="mb-2 flex items-center gap-2 text-sm font-medium">
+          <CalendarDays size={16} className="text-pearl/80" />
+          <span>
+            {format(classTime, "EEEE d/M", { locale: es }).replace(/^\w/, (c) =>
+              c.toUpperCase()
+            )}
+          </span>
+          <span className="mx-1 text-pearl/50">|</span>
+          <Clock size={16} className="text-pearl/80" />
+          <span>{format(classTime, "HH:mm")}</span>
+        </div>
+
+        {/* Separator - Adjust color */}
+        <span className="my-1 w-full border-t border-dashed border-pearl/50" />
+
+        {/* Class Details - Adjust text colors */}
+        <p className="mt-1 text-lg font-semibold uppercase text-pearl">
+          {booking.class.category.name}
+        </p>
+        <p className="text-sm font-normal uppercase text-pearl/70">
+          {" "}
+          {/* Lighter secondary text */}
           {booking.class.subcategory.name}
         </p>
-        <p className="mt-1">{format(classTime, "HH:mm")}</p>
       </div>
 
+      {/* Action Area */}
       <ActionDialog
         buttons={true}
-        title="¿Estás seguro?"
+        title="¿Confirmar cancelación?"
         description={
           canCancel
-            ? "Esta acción no se puede revertir."
-            : "No puedes cancelar una reserva con menos de 24 horas de anticipación."
+            ? "Tu clase se liberará y se acreditará de nuevo en tu paquete si corresponde. Esta acción no se puede revertir."
+            : "No puedes cancelar una reserva con menos de 12 horas de anticipación."
         }
-        buttonText="CANCELAR"
+        buttonText="Cancelar reserva"
+        cancelText="Volver"
         action={handleCancelReservation}
-        icon={<CalendarX className="h-4 w-4 text-pearl" />}
+        // Icon color needs to contrast with the button background
+        icon={<CalendarX className="h-4 w-4 text-pearl" />} // Icon for the dialog button (dark on light bg)
         trigger={
           <button
-            className={`w-full p-2 font-dm_sans font-semibold ${canCancel ? "bg-pearlVariant2/80 text-grey_pebble" : "cursor-not-allowed bg-grey_pebble/50 text-pearlVariant2/80"}`}
+            className={cn(
+              "flex w-full items-center justify-center gap-2 rounded-b-lg p-3 text-sm font-semibold transition-colors",
+              canCancel
+                ? // Active button: Light background, dark text
+                  "bg-pearl text-rust hover:bg-pearl/90"
+                : // Disabled button: Keep the improved subtle disabled style
+                  "cursor-not-allowed bg-pearl/30 text-pearl/70"
+            )}
             disabled={!canCancel}
           >
-            CANCELAR
+            <CalendarX
+              className={cn("h-4 w-4", canCancel ? "text-rust" : "text-pearl")}
+            />
+            CANCELAR RESERVA
           </button>
         }
       />

@@ -28,7 +28,7 @@ export default async function AppLayout({
     <SidebarProvider>
       <AppSidebar user={user} />
       <SidebarInset className="bg-pearl">
-        <header className="flex h-16 shrink-0 items-center justify-between gap-2 pr-4 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
+        <header className="sticky top-0 z-50 flex h-16 shrink-0 items-center justify-between gap-2 rounded-t-lg bg-pearl pr-6 transition-[width,height] ease-linear md:pr-10">
           <div className="flex items-center gap-2 px-4">
             <SidebarTrigger className="-ml-1" />
             <Separator orientation="vertical" className="mr-2 h-4" />
@@ -40,8 +40,7 @@ export default async function AppLayout({
         </header>
         <div
           className={cn(
-            "flex h-full flex-1 flex-col items-center justify-center gap-4 px-4 pb-4",
-            user.role === "admin" ? "pt-0" : "pt-6"
+            "flex h-full flex-1 flex-col items-center justify-center gap-4"
           )}
         >
           {children}

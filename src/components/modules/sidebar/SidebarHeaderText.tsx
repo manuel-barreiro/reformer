@@ -14,6 +14,10 @@ const headerTexts = [
     title: "Calendario de clases",
     url: "/calendario",
   },
+  {
+    title: "Mi Perfil",
+    url: "/perfil",
+  },
 ]
 
 export default function SidebarHeaderText() {

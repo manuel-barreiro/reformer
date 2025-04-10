@@ -8,6 +8,9 @@ import { getUserBookings } from "@/actions/booking-actions"
 import { toast } from "@/components/ui/use-toast"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Booking, Class, Category } from "@prisma/client"
+import { Button } from "@/components/ui/button"
+import Link from "next/link"
+import { CalendarSearch } from "lucide-react"
 
 interface ExtendedClass extends Class {
   category: {
@@ -67,15 +70,27 @@ export default function ReservasPage({
     fetchBookings()
   }
 
+  const buyButton = (
+    <Button
+      asChild
+      className="flex w-full shrink-0 items-center gap-1 bg-rust font-dm_mono text-pearl hover:bg-rust/90"
+    >
+      <Link href="/calendario" className="flex w-full items-center gap-3">
+        <CalendarSearch size={18} />
+        <span className="">NUEVA RESERVA</span>
+      </Link>
+    </Button>
+  )
+
   return (
-    <section className="h-full w-full">
+    <section className="flex h-full w-full flex-col">
       <HeaderToggle
-        title="Mis Reservas"
         filterOptions={["TODOS", "YOGA", "PILATES"]}
         currentFilter={filter}
         onFilterChange={setFilter}
+        actionButton={buyButton}
       />
-      <ScrollArea className="w-full overflow-y-auto md:h-96">
+      <ScrollArea className="w-full flex-grow overflow-y-auto">
         {isLoading ? (
           <div className="grid h-full w-full grid-cols-1 gap-3 py-5 md:grid-cols-3 md:p-10 lg:grid-cols-4">
             {Array(4)

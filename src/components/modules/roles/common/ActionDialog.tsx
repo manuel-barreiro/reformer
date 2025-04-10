@@ -26,6 +26,7 @@ export default function ActionDialog({
   open,
   onOpenChange,
   disabled,
+  cancelText = "Cancelar",
 }: {
   trigger: JSX.Element
   content?: JSX.Element
@@ -40,6 +41,7 @@ export default function ActionDialog({
   open?: boolean
   onOpenChange?: (open: boolean) => void
   disabled?: boolean
+  cancelText?: string
 }) {
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
@@ -64,7 +66,7 @@ export default function ActionDialog({
         {content}
         {buttons && (
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogCancel>{cancelText}</AlertDialogCancel>
             <AlertDialogAction
               onClick={action}
               className="flex items-center gap-2"
