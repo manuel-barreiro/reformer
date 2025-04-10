@@ -33,6 +33,7 @@ const packageSchema = z.object({
   classCount: z.coerce.number().min(1, "Class count must be at least 1"),
   price: z.coerce.number().min(0, "Price must be non-negative"),
   durationMonths: z.coerce.number().min(1, "Duration must be at least 1 day"),
+  isVisible: z.boolean().default(true),
 })
 
 export async function getActiveClassPackages() {
@@ -40,6 +41,7 @@ export async function getActiveClassPackages() {
     where: {
       deletedAt: null,
       isActive: true,
+      isVisible: true, // Add this condition
     },
     orderBy: {
       classCount: "asc",
@@ -61,6 +63,7 @@ export async function getAllClassPackages() {
         price: true,
         durationMonths: true,
         isActive: true,
+        isVisible: true, // Select the new field
         deletedAt: true,
         createdAt: true,
         updatedAt: true,
@@ -84,6 +87,7 @@ export async function createPackage(
     classCount: formData.get("classCount"),
     price: formData.get("price"),
     durationMonths: formData.get("durationMonths"),
+    isVisible: formData.get("isVisible") === "true", // Handle boolean conversion
   })
 
   if (!validatedFields.success) {
@@ -116,6 +120,7 @@ export async function updatePackage(
     classCount: formData.get("classCount"),
     price: formData.get("price"),
     durationMonths: formData.get("durationMonths"),
+    isVisible: formData.get("isVisible") === "true", // Handle boolean conversion
   })
 
   if (!validatedFields.success) {
@@ -192,5 +197,34 @@ export async function togglePackageStatus(
   } catch (error) {
     const message = error instanceof Error ? error.message : "Error desconocido"
     return { success: false, error: `Error al cambiar el status: ${message}` }
+  }
+}
+
+// Add new action to toggle visibility
+export async function togglePackageVisibility(
+  id: string
+): Promise<PackageResponse> {
+  try {
+    const currentPackage = await prisma.classPackage.findUnique({
+      where: { id },
+      select: { isVisible: true },
+    })
+
+    if (!currentPackage) {
+      return { success: false, error: "Package not found" }
+    }
+
+    const updatedPackage = await prisma.classPackage.update({
+      where: { id },
+      data: {
+        isVisible: !currentPackage.isVisible,
+      },
+    })
+
+    revalidatePath("/admin/paquetes")
+    return { success: true, package: updatedPackage }
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Error desconocido"
+    return { success: false, error: `Error al cambiar visibilidad: ${message}` }
   }
 }

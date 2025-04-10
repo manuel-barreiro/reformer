@@ -1,6 +1,7 @@
+// filepath: c:\Users\manue\Desktop\Proyectos\reformer\src\components\modules\roles\admin\paquetes\AdminPackagesPage.tsx
 "use client"
 
-import React, { useState } from "react"
+import React, { useState, useMemo } from "react"
 import {
   Dialog,
   DialogContent,
@@ -11,21 +12,25 @@ import {
 import PackageList from "./PackageList"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { ClassPackage } from "@prisma/client"
-import { useRouter } from "next/navigation"
+// import { useRouter } from "next/navigation" // Remove if not used
 import { PlusIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { AddPackageForm } from "./components/AddPackageForm"
+import HeaderToggle from "@/components/modules/roles/common/HeaderToggle"
 
 interface AdminPackagesPageProps {
   initialPackages: ClassPackage[]
 }
 
+type PackageFilter = "TODOS" | "VISIBLE" | "OCULTO"
+
 export default function AdminPackagesPage({
   initialPackages,
 }: AdminPackagesPageProps) {
   const [packages, setPackages] = useState(initialPackages)
-  const [isOpen, setIsOpen] = useState(false)
-  const router = useRouter()
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false) // Renamed state for clarity
+  const [filter, setFilter] = useState<PackageFilter>("TODOS")
+  // const router = useRouter() // Remove if not used
 
   const handlePackageUpdate = (updatedPackage: ClassPackage) => {
     setPackages((prevPackages) => {
@@ -33,46 +38,72 @@ export default function AdminPackagesPage({
       if (index !== -1) {
         const newPackages = [...prevPackages]
         newPackages[index] = updatedPackage
-        return newPackages
+        return newPackages.sort((a, b) => a.classCount - b.classCount) // Keep sorted
       }
-      return [...prevPackages, updatedPackage]
+      // If it's a new package (from AddPackageForm)
+      return [...prevPackages, updatedPackage].sort(
+        (a, b) => a.classCount - b.classCount
+      ) // Keep sorted
     })
-    setIsOpen(false)
-    router.refresh()
+    setIsAddModalOpen(false) // Close modal on success
   }
 
   const handlePackageDelete = (deletedPackageId: string) => {
     setPackages((prevPackages) =>
       prevPackages.filter((p) => p.id !== deletedPackageId)
     )
-    router.refresh()
   }
 
-  return (
-    <section className="h-full w-full">
-      <div className="flex w-full items-center justify-between gap-4 border-b border-grey_pebble pb-4 font-dm_sans text-xs sm:text-sm md:pb-6 md:pl-10 lg:text-lg">
-        <h1 className="py-2 font-marcellus text-2xl font-bold uppercase">
-          Paquetes
-        </h1>
-        <Dialog open={isOpen} onOpenChange={setIsOpen}>
-          <DialogTrigger asChild>
-            <Button className="aspect-square rounded-full bg-rust p-2 hover:bg-rust/80">
-              <PlusIcon size={24} className="text-pearl" />
-              <span>Agregar Paquete</span>
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Nuevo Paquete</DialogTitle>
-            </DialogHeader>
-            <AddPackageForm onSuccess={handlePackageUpdate} />
-          </DialogContent>
-        </Dialog>
-      </div>
+  const filteredPackages = useMemo(() => {
+    switch (filter) {
+      case "VISIBLE":
+        return packages.filter((p) => p.isVisible)
+      case "OCULTO":
+        return packages.filter((p) => !p.isVisible)
+      case "TODOS":
+      default:
+        return packages
+    }
+  }, [packages, filter])
 
-      <ScrollArea className="h-full w-full overflow-y-auto md:h-[560px]">
+  // Define the action button separately for clarity
+  const addPackageButton = (
+    <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
+      <DialogTrigger asChild>
+        <Button className="flex shrink-0 items-center gap-1 bg-midnight text-pearl hover:bg-midnight/90">
+          <PlusIcon size={18} />
+          <span className="hidden sm:inline">Agregar Paquete</span>
+          <span className="sm:hidden">Agregar</span>{" "}
+          {/* Shorter text for small screens */}
+        </Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Nuevo Paquete</DialogTitle>
+        </DialogHeader>
+        <AddPackageForm onSuccess={handlePackageUpdate} />
+      </DialogContent>
+    </Dialog>
+  )
+
+  return (
+    // Use flex-col for overall structure
+    <section className="flex h-full w-full flex-col">
+      {/* Header section */}
+      <HeaderToggle
+        // title="Paquetes" // Pass title to HeaderToggle
+        filterOptions={["TODOS", "VISIBLE", "OCULTO"]}
+        currentFilter={filter}
+        onFilterChange={(newFilter) => setFilter(newFilter as PackageFilter)}
+        actionButton={addPackageButton} // Pass the button here
+      />
+
+      {/* Content Area - takes remaining height */}
+      <ScrollArea className="flex-grow overflow-y-auto">
+        {" "}
+        {/* Use flex-grow */}
         <PackageList
-          packages={packages}
+          packages={filteredPackages}
           onPackageUpdate={handlePackageUpdate}
           onPackageDelete={handlePackageDelete}
         />
