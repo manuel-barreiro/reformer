@@ -11,7 +11,7 @@ export default function PackageList({
   return (
     <div
       className={cn(
-        "h-full py-5 md:p-10",
+        "h-full px-6 py-5 md:p-10",
         packages.length === 0 && "flex items-center justify-center",
         packages.length > 0 &&
           "grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"

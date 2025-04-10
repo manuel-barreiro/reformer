@@ -16,7 +16,7 @@ export default function ReservasList({
   return (
     <div
       className={cn(
-        "h-full w-full py-5",
+        "h-full w-full px-6 py-5 md:p-10",
         // Center content vertically and horizontally when empty
         bookings.length === 0 &&
           "flex min-h-[200px] items-center justify-center",

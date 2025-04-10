@@ -48,14 +48,14 @@ export default function PackagesPage({ initialPackages }: PackagesPageProps) {
   )
 
   return (
-    <section className="h-full w-full">
+    <section className="flex h-full w-full flex-col">
       <HeaderToggle
         filterOptions={["ACTIVOS", "INACTIVOS"]}
         currentFilter={filter}
         onFilterChange={setFilter}
         actionButton={buyButton}
       />
-      <ScrollArea className="h-auto w-full overflow-y-auto md:h-[500px]">
+      <ScrollArea className="w-full flex-grow overflow-y-auto">
         <PackageList packages={filteredPackages} />
       </ScrollArea>
     </section>

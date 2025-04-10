@@ -577,18 +577,20 @@ const SidebarMenuButton = React.forwardRef<
       }
     }
 
-    return (
-      <Tooltip>
-        <TooltipTrigger asChild>{button}</TooltipTrigger>
-        <TooltipContent
-          side="right"
-          align="center"
-          className="!z-50"
-          hidden={state !== "collapsed" || isMobile}
-          {...tooltip}
-        />
-      </Tooltip>
-    )
+    return button
+
+    // return (
+    //   <Tooltip>
+    //     <TooltipTrigger asChild>{button}</TooltipTrigger>
+    //     <TooltipContent
+    //       side="right"
+    //       align="center"
+    //       className="!z-50"
+    //       hidden={state !== "collapsed" || isMobile}
+    //       {...tooltip}
+    //     />
+    //   </Tooltip>
+    // )
   }
 )
 SidebarMenuButton.displayName = "SidebarMenuButton"

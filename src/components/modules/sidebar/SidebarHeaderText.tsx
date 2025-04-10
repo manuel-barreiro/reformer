@@ -1,5 +1,6 @@
 "use client"
 import { usePathname } from "next/navigation"
+import { title } from "process"
 
 const headerTexts = [
   {
@@ -17,6 +18,26 @@ const headerTexts = [
   {
     title: "Mi Perfil",
     url: "/perfil",
+  },
+  {
+    title: "Pagos",
+    url: "/admin/pagos",
+  },
+  {
+    title: "Paquetes",
+    url: "/admin/paquetes",
+  },
+  {
+    title: "Calendario",
+    url: "/admin/calendario",
+  },
+  {
+    title: "Usuarios",
+    url: "/admin/usuarios",
+  },
+  {
+    title: "Categorias",
+    url: "/admin/categorias",
   },
 ]
 
