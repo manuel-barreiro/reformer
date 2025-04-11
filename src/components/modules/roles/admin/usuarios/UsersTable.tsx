@@ -89,7 +89,7 @@ export function UsersTable({ initialUsers }: { initialUsers: User[] }) {
   })
 
   return (
-    <div className="h-auto min-h-[86dvh] w-full space-y-4 lg:min-h-0 lg:pl-10">
+    <div className="h-auto min-h-[86dvh] w-full space-y-4 lg:min-h-0 lg:p-10">
       <div className="flex w-full flex-col items-start justify-between gap-3 lg:flex-row">
         <h2 className="font-marcellus text-2xl font-bold uppercase">
           Usuarios

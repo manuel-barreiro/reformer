@@ -8,7 +8,7 @@ export default async function PaymentsPage() {
 
   return (
     <Suspense
-      fallback={<Skeleton className="h-96 w-full bg-pearlVariant lg:pl-10" />}
+      fallback={<Skeleton className="h-96 w-full bg-pearlVariant lg:p-10" />}
     >
       <PaymentsTable initialPayments={initialPayments} />
     </Suspense>

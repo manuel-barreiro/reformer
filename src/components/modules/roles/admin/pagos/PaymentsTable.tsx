@@ -125,7 +125,8 @@ export function PaymentsTable({ initialPayments }: PaymentsTableProps) {
   }
 
   return (
-    <div className="h-auto min-h-[86dvh] w-full space-y-4 lg:min-h-0 lg:pl-10">
+    <div className="h-auto w-full space-y-4 p-4 lg:p-10">
+      {/* ... Header section with title, search, add button ... */}
       <div className="flex w-full flex-col items-start justify-between gap-3 lg:flex-row">
         <h2 className="font-marcellus text-2xl font-bold uppercase">Pagos</h2>
         <div className="flex w-full items-center gap-2 lg:w-auto">
@@ -148,59 +149,65 @@ export function PaymentsTable({ initialPayments }: PaymentsTableProps) {
         </div>
       </div>
 
-      <div className="rounded-md border">
-        <ScrollArea className="h-[400px]">
-          <Table>
-            <TableHeader className="sticky top-0 bg-pearlVariant3 font-dm_sans font-black text-midnight">
-              {table.getHeaderGroups().map((headerGroup) => (
-                <TableRow key={headerGroup.id}>
-                  {headerGroup.headers.map((header) => (
-                    <TableHead
-                      key={header.id}
-                      className="text-center font-dm_sans text-sm font-semibold text-midnight"
+      {/* Apply max-height and overflow-auto directly to this div, remove ScrollArea */}
+      <div className="max-h-[60vh] w-full overflow-auto rounded-md border">
+        {/* The Table component itself has an internal overflow-auto wrapper */}
+        <Table className="w-full">
+          {/* Keep sticky header */}
+          <TableHeader className="sticky top-0 z-10 bg-pearlVariant3 font-dm_sans font-black text-midnight">
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id} className="hover:bg-transparent">
+                {" "}
+                {/* Added hover:bg-transparent like example */}
+                {headerGroup.headers.map((header) => (
+                  <TableHead
+                    key={header.id}
+                    className="whitespace-nowrap px-4 py-2 text-center font-dm_sans text-sm font-semibold text-midnight"
+                  >
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
+                  </TableHead>
+                ))}
+              </TableRow>
+            ))}
+          </TableHeader>
+          <TableBody className="bg-pearlVariant text-sm text-tableContent">
+            {table.getRowModel().rows?.length ? (
+              table.getRowModel().rows.map((row) => (
+                <TableRow
+                  key={row.id}
+                  data-state={row.getIsSelected() && "selected"}
+                  className="border-b border-grey_pebble" // Keep existing border style
+                >
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell
+                      key={cell.id}
+                      className="whitespace-nowrap px-4 py-2 text-center"
                     >
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                    </TableHead>
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
+                    </TableCell>
                   ))}
                 </TableRow>
-              ))}
-            </TableHeader>
-            <TableBody className="bg-pearlVariant text-sm text-tableContent">
-              {table.getRowModel().rows?.length ? (
-                table.getRowModel().rows.map((row) => (
-                  <TableRow
-                    key={row.id}
-                    data-state={row.getIsSelected() && "selected"}
-                    className="border-b border-grey_pebble"
-                  >
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id} className="text-center">
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext()
-                        )}
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell
-                    colSpan={columns.length}
-                    className="h-24 text-center"
-                  >
-                    No se encontraron resultados.
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </ScrollArea>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell
+                  colSpan={columns.length}
+                  className="h-24 text-center"
+                >
+                  No se encontraron resultados.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
       </div>
       <PaginationControls table={table} />
       <AddPaymentModal

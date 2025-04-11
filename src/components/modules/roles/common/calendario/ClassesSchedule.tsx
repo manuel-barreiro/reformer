@@ -99,7 +99,7 @@ export default function ClassesSchedule({
         </Tabs>
       </div>
 
-      <ScrollArea className="h-full w-full overflow-y-auto lg:max-h-[450px] 2xl:pr-4">
+      <ScrollArea className="h-full w-full overflow-y-auto lg:max-h-[350px] 2xl:pr-4">
         <div className="space-y-2 py-5">
           {isLoading ? (
             Array(3)
