@@ -60,6 +60,7 @@ export const createColumns = (
     accessorKey: "phone",
     header: "TELÉFONO",
     cell: ({ row }) => row.original.phone || "N/A",
+    enableSorting: false,
   },
   {
     accessorKey: "role",
@@ -111,6 +112,7 @@ export const createColumns = (
         </Badge>
       </div>
     ),
+    enableSorting: false,
   },
   {
     accessorKey: "createdAt",
@@ -131,5 +133,6 @@ export const createColumns = (
         </Link>
       )
     },
+    enableSorting: false,
   },
 ]

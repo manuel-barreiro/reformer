@@ -10,7 +10,7 @@ import {
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { AlertTriangle, Loader2 } from "lucide-react"
+import { AlertTriangle, Loader2, Plus } from "lucide-react"
 import { formatLocalDate, utcToLocal } from "@/lib/timezone-utils"
 import {
   Dialog,
@@ -35,7 +35,7 @@ import {
   useDeletePackage,
 } from "@/components/modules/roles/admin/usuarios/hooks/useUserQueries"
 import { Skeleton } from "@/components/ui/skeleton"
-import { ReusableTable } from "@/components/ui/ReusableTable"
+import { ReformerTable } from "@/components/ui/table/ReformerTable"
 import { userPackagesColumns } from "../columns/user-packages-columns"
 
 export interface ExtendedPurchasedPackage extends PurchasedPackage {
@@ -208,6 +208,24 @@ export function UserPackagesTab({
     }
   }
 
+  // Define columns - passing necessary handlers and state
+  const columns = userPackagesColumns(
+    editingPackage,
+    editForm,
+    setEditForm,
+    formatDisplayDate,
+    getStatusBadgeColor,
+    handleEdit,
+    handleSave,
+    updatePackageMutation,
+    setEditingPackage,
+    setPackageToDelete,
+    setIsDeleteModalOpen
+  )
+
+  // Define filter keys for the search bar - Empty array to hide search bar
+  const filterKeys: string[] = []
+
   // Show loading state
   if (isLoading) {
     return (
@@ -223,116 +241,214 @@ export function UserPackagesTab({
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h3 className="text-xl font-bold">Paquetes</h3>
-        <Dialog open={isAssignModalOpen} onOpenChange={setIsAssignModalOpen}>
-          <DialogTrigger asChild>
-            <Button
-              className="bg-midnight text-pearl hover:bg-midnight/90"
-              disabled={assignPackageMutation.isPending}
-            >
-              {assignPackageMutation.isPending ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Asignando...
-                </>
-              ) : (
-                "+ Asignar nuevo paquete"
-              )}
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="bg-pearl">
-            <DialogHeader>
-              <DialogTitle className="font-marcellus text-xl text-grey_pebble">
-                Asignar nuevo paquete
-              </DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <label className="text-sm text-grey_pebble">
-                  Seleccionar paquete
-                </label>
-                <Select
-                  value={newPackageForm.classPackageId}
-                  onValueChange={(value) =>
-                    setNewPackageForm({
-                      ...newPackageForm,
-                      classPackageId: value,
-                    })
-                  }
-                >
-                  <SelectTrigger className="border-rust/50 bg-pearlVariant font-semibold text-grey_pebble/60">
-                    <SelectValue placeholder="Seleccionar paquete" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-grey_pebble text-pearl">
-                    {availablePackages.map((pkg) => (
-                      <SelectItem
-                        className="border-b border-pearl/50 capitalize hover:!bg-pearlVariant3"
-                        key={pkg.id}
-                        value={pkg.id}
-                      >
-                        {pkg.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm text-grey_pebble">
-                  Fecha de expiración
-                </label>
-                <Input
-                  type="date"
-                  value={newPackageForm.expirationDate}
-                  onChange={(e) =>
-                    setNewPackageForm({
-                      ...newPackageForm,
-                      expirationDate: e.target.value,
-                    })
-                  }
-                  className="border border-rust/50 bg-pearlVariant font-semibold text-grey_pebble/60"
-                />
-              </div>
-              <Button
-                onClick={handleAssignPackage}
-                disabled={assignPackageMutation.isPending}
-                className="w-full bg-rust text-pearl hover:bg-rust/90"
-              >
-                {assignPackageMutation.isPending
-                  ? "Asignando..."
-                  : "Asignar paquete"}
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
-      </div>
+      {/* Title and Assign Button are now passed as children to ReformerTable */}
+      {/* Removed the outer div wrapping title and button */}
 
-      {packages.length === 0 ? (
-        <div className="rounded-md border p-8 text-center">
-          <p className="text-grey_pebble">
-            No hay paquetes registrados para este usuario
-          </p>
+      {packages.length === 0 && !isLoading ? ( // Added !isLoading check
+        // Show message and button if no packages
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className="text-xl font-bold">Paquetes</h3>
+            {/* Assign Package Dialog Trigger Button */}
+            <Dialog
+              open={isAssignModalOpen}
+              onOpenChange={setIsAssignModalOpen}
+            >
+              <DialogTrigger asChild>
+                <Button
+                  className="flex items-center justify-center bg-midnight font-dm_mono text-pearl hover:bg-midnight/90"
+                  disabled={assignPackageMutation.isPending}
+                >
+                  <Plus className="mr-2 h-4 w-4" />
+                  <span className="hidden lg:inline">Asignar paquete</span>
+                  <span className="lg:hidden">Asignar</span>
+                </Button>
+              </DialogTrigger>
+              {/* Assign Package Dialog Content */}
+              <DialogContent className="bg-pearl">
+                {/* ... dialog content ... */}
+                <DialogHeader>
+                  <DialogTitle className="font-marcellus text-xl text-grey_pebble">
+                    Asignar nuevo paquete
+                  </DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <label className="text-sm text-grey_pebble">
+                      Seleccionar paquete
+                    </label>
+                    <Select
+                      value={newPackageForm.classPackageId}
+                      onValueChange={(value) =>
+                        setNewPackageForm({
+                          ...newPackageForm,
+                          classPackageId: value,
+                        })
+                      }
+                    >
+                      <SelectTrigger className="border-rust/50 bg-pearlVariant font-semibold text-grey_pebble/60">
+                        <SelectValue placeholder="Seleccionar paquete" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-grey_pebble text-pearl">
+                        {availablePackages.map((pkg) => (
+                          <SelectItem
+                            className="border-b border-pearl/50 capitalize hover:!bg-pearlVariant3"
+                            key={pkg.id}
+                            value={pkg.id}
+                          >
+                            {pkg.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm text-grey_pebble">
+                      Fecha de expiración
+                    </label>
+                    <Input
+                      type="date"
+                      value={newPackageForm.expirationDate}
+                      onChange={(e) =>
+                        setNewPackageForm({
+                          ...newPackageForm,
+                          expirationDate: e.target.value,
+                        })
+                      }
+                      min={new Date().toISOString().split("T")[0]} // Prevent past dates
+                      className="border border-rust/50 bg-pearlVariant font-semibold text-grey_pebble/60"
+                    />
+                  </div>
+                  <Button
+                    onClick={handleAssignPackage}
+                    disabled={
+                      assignPackageMutation.isPending ||
+                      !newPackageForm.classPackageId ||
+                      !newPackageForm.expirationDate
+                    } // Disable if form incomplete
+                    className="w-full bg-rust text-pearl hover:bg-rust/90"
+                  >
+                    {assignPackageMutation.isPending
+                      ? "Asignando..."
+                      : "Asignar paquete"}
+                  </Button>
+                </div>
+              </DialogContent>
+            </Dialog>
+          </div>
+          <div className="rounded-md border p-8 text-center">
+            <p className="text-grey_pebble">
+              No hay paquetes registrados para este usuario
+            </p>
+          </div>
         </div>
       ) : (
-        <ReusableTable
-          columns={userPackagesColumns(
-            editingPackage,
-            editForm,
-            setEditForm,
-            formatDisplayDate,
-            getStatusBadgeColor,
-            handleEdit,
-            handleSave,
-            updatePackageMutation,
-            setEditingPackage,
-            setPackageToDelete,
-            setIsDeleteModalOpen
-          )}
+        // Render table if packages exist
+        <ReformerTable
+          columns={columns}
           data={packages}
-        />
+          filterKeys={filterKeys} // Pass empty array to hide search
+          // searchPlaceholder="Buscar por nombre paquete, estado..." // Placeholder not needed
+          noResultsMessage="No se encontraron paquetes."
+          isLoading={isLoading} // Pass loading state
+          initialPageSize={10} // Adjust as needed for tabs
+        >
+          {/* Children: Title and Assign Button */}
+          <div className="flex w-full flex-col items-start justify-between gap-3 lg:flex-row">
+            <h3 className="text-xl font-bold">Paquetes</h3>
+            {/* Assign Package Dialog Trigger Button */}
+            <Dialog
+              open={isAssignModalOpen}
+              onOpenChange={setIsAssignModalOpen}
+            >
+              <DialogTrigger asChild>
+                <Button
+                  className="flex items-center justify-center bg-midnight font-dm_mono text-pearl hover:bg-midnight/90"
+                  disabled={assignPackageMutation.isPending}
+                >
+                  <Plus className="mr-2 h-4 w-4" />
+                  <span className="hidden lg:inline">Asignar paquete</span>
+                  <span className="lg:hidden">Asignar</span>
+                </Button>
+              </DialogTrigger>
+              {/* Assign Package Dialog Content */}
+              <DialogContent className="bg-pearl">
+                {/* ... dialog content ... */}
+                <DialogHeader>
+                  <DialogTitle className="font-marcellus text-xl text-grey_pebble">
+                    Asignar nuevo paquete
+                  </DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <label className="text-sm text-grey_pebble">
+                      Seleccionar paquete
+                    </label>
+                    <Select
+                      value={newPackageForm.classPackageId}
+                      onValueChange={(value) =>
+                        setNewPackageForm({
+                          ...newPackageForm,
+                          classPackageId: value,
+                        })
+                      }
+                    >
+                      <SelectTrigger className="border-rust/50 bg-pearlVariant font-semibold text-grey_pebble/60">
+                        <SelectValue placeholder="Seleccionar paquete" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-grey_pebble text-pearl">
+                        {availablePackages.map((pkg) => (
+                          <SelectItem
+                            className="border-b border-pearl/50 capitalize hover:!bg-pearlVariant3"
+                            key={pkg.id}
+                            value={pkg.id}
+                          >
+                            {pkg.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm text-grey_pebble">
+                      Fecha de expiración
+                    </label>
+                    <Input
+                      type="date"
+                      value={newPackageForm.expirationDate}
+                      onChange={(e) =>
+                        setNewPackageForm({
+                          ...newPackageForm,
+                          expirationDate: e.target.value,
+                        })
+                      }
+                      min={new Date().toISOString().split("T")[0]} // Prevent past dates
+                      className="border border-rust/50 bg-pearlVariant font-semibold text-grey_pebble/60"
+                    />
+                  </div>
+                  <Button
+                    onClick={handleAssignPackage}
+                    disabled={
+                      assignPackageMutation.isPending ||
+                      !newPackageForm.classPackageId ||
+                      !newPackageForm.expirationDate
+                    } // Disable if form incomplete
+                    className="w-full bg-rust text-pearl hover:bg-rust/90"
+                  >
+                    {assignPackageMutation.isPending
+                      ? "Asignando..."
+                      : "Asignar paquete"}
+                  </Button>
+                </div>
+              </DialogContent>
+            </Dialog>
+          </div>
+        </ReformerTable>
       )}
 
+      {/* Delete Confirmation Dialog */}
       <Dialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
+        {/* ... dialog content ... */}
         <DialogContent className="bg-pearl">
           <DialogHeader>
             <DialogTitle className="font-marcellus text-xl text-grey_pebble">

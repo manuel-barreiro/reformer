@@ -1,6 +1,6 @@
 import { Suspense } from "react"
 import { Skeleton } from "@/components/ui/skeleton"
-import { UsersTable } from "@/components/modules/roles/admin/usuarios/UsersTable"
+import { UsersPage } from "@/components/modules/roles/admin/usuarios/UsersPage"
 import { prisma } from "@/lib/prisma"
 
 export default async function PaymentsPage() {
@@ -16,7 +16,7 @@ export default async function PaymentsPage() {
     <Suspense
       fallback={<Skeleton className="h-96 w-full bg-pearlVariant3 lg:p-10" />}
     >
-      <UsersTable initialUsers={users} />
+      <UsersPage initialUsers={users} />
     </Suspense>
   )
 }

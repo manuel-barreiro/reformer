@@ -43,22 +43,26 @@ export const createColumns = (
         </div>
       )
     },
+    enableSorting: true,
   },
   {
     accessorKey: "dateCreated",
     header: "FECHA",
     cell: ({ row }) =>
       new Date(row.original.dateCreated).toLocaleDateString("es-ES"),
+    enableSorting: true,
   },
   {
     accessorKey: "purchasedPackage.classPackage.name",
     header: "PAQUETE",
     cell: ({ row }) => row.original.description || "N/A",
+    enableSorting: false,
   },
   {
     accessorKey: "total",
     header: "TOTAL",
     cell: ({ row }) => `${numberFormatter.format(row.original.total)}`,
+    enableSorting: true,
   },
   {
     accessorKey: "paymentTypeId",
@@ -77,6 +81,7 @@ export const createColumns = (
         </div>
       )
     },
+    enableSorting: false,
   },
   {
     accessorKey: "status",
@@ -90,6 +95,7 @@ export const createColumns = (
         </div>
       )
     },
+    enableSorting: true,
   },
   {
     accessorKey: "detail",
@@ -101,5 +107,6 @@ export const createColumns = (
         </Button>
       </div>
     ),
+    enableSorting: false,
   },
 ]
