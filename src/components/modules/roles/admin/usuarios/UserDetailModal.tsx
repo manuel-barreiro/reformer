@@ -109,7 +109,7 @@ export function UserDetailModal({
                 <FormItem>
                   <FormLabel>Email</FormLabel>
                   <FormControl>
-                    <Input {...field} type="email" />
+                    <Input {...field} type="email" disabled />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

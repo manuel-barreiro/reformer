@@ -7,9 +7,7 @@ import { utcToLocal } from "@/lib/timezone-utils"
 import { useUserBookings } from "../hooks/useUserQueries"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useEffect } from "react"
-// Import ReformerTable and remove ReusableTable
 import { ReformerTable } from "@/components/ui/table/ReformerTable"
-// import { ReusableTable } from "@/components/ui/ReusableTable"
 import { userBookingsColumns } from "@/components/modules/roles/admin/usuarios/columns/user-bookings-columns"
 
 interface ClassWithDetails extends Class {

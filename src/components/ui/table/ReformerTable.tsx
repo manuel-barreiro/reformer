@@ -42,7 +42,7 @@ interface ReformerTableProps<TData, TValue> {
 export function ReformerTable<TData, TValue>({
   columns,
   data,
-  filterKeys, // Type is now string[]
+  filterKeys,
   searchPlaceholder = "Buscar...",
   isLoading = false,
   noResultsMessage = "No se encontraron resultados.",
@@ -109,7 +109,6 @@ export function ReformerTable<TData, TValue>({
     },
   })
 
-  // ... rest of the component remains the same ...
   return (
     <div className="w-full space-y-4">
       {/* ... header section with children and search input ... */}
@@ -170,12 +169,12 @@ export function ReformerTable<TData, TValue>({
               Array.from({ length: initialPageSize }).map((_, index) => (
                 <TableRow
                   key={`skeleton-${index}`}
-                  className="border-b border-grey_pebble/20"
+                  className="h-14 border-b border-grey_pebble/20" // Added fixed height
                 >
                   {columns.map((column, colIndex) => (
                     <TableCell
                       key={`skeleton-cell-${index}-${colIndex}`}
-                      className="p-3 text-center"
+                      className="p-3 text-center align-middle" // Added align-middle
                     >
                       <Skeleton className="h-4 w-full" />
                     </TableCell>
@@ -187,12 +186,12 @@ export function ReformerTable<TData, TValue>({
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
-                  className="border-b border-grey_pebble/20 hover:bg-pearlVariant3/50"
+                  className="!h-9 border-b border-grey_pebble/20 hover:bg-pearlVariant3/50" // Added fixed height
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell
                       key={cell.id}
-                      className="p-3 text-center"
+                      className="py-2 text-center align-middle" // Added align-middle
                       style={{ whiteSpace: "nowrap" }}
                     >
                       {flexRender(
@@ -204,10 +203,12 @@ export function ReformerTable<TData, TValue>({
                 </TableRow>
               ))
             ) : (
-              <TableRow>
+              <TableRow className="h-14">
+                {" "}
+                {/* Changed from h-24 to h-14 for consistency */}
                 <TableCell
                   colSpan={columns.length}
-                  className="h-24 text-center"
+                  className="text-center align-middle" // Updated for consistency
                 >
                   {noResultsMessage}
                 </TableCell>

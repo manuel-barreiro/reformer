@@ -7,9 +7,7 @@ import { es } from "date-fns/locale"
 import { utcToLocal } from "@/lib/timezone-utils"
 import { useUserPayments } from "../hooks/useUserQueries"
 import { useEffect } from "react"
-// Import ReformerTable and remove ReusableTable
 import { ReformerTable } from "@/components/ui/table/ReformerTable"
-// import { ReusableTable } from "@/components/ui/ReusableTable"
 import { userPaymentsColumns } from "@/components/modules/roles/admin/usuarios/columns/user-payments-columns"
 
 interface UserPaymentsTabProps {

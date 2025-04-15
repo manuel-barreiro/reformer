@@ -3,7 +3,7 @@
 import React, { useState, useMemo, useCallback } from "react"
 import { Payment, User } from "@prisma/client"
 import { createColumns } from "./columns"
-import { ReformerTable } from "@/components/ui/table/ReformerTable" // Import the new reusable component
+import { ReformerTable } from "@/components/ui/table/ReformerTable"
 import { AddPaymentModal } from "./AddPaymentModal"
 import { PaymentDetailModal } from "./PaymentDetailModal"
 import { Button } from "@/components/ui/button"
