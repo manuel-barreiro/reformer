@@ -7,7 +7,11 @@ import { getUserBookingsInRange } from "@/actions/booking-actions"
 import { auth } from "@/auth"
 import ReformerLoader from "@/components/ui/ReformerLoader"
 
-async function CalendarPage({ userRole }: { userRole: string }) {
+async function CalendarPage({
+  userRole,
+}: {
+  userRole: "admin" | "user" | "guest"
+}) {
   const initialDate = new Date()
   const monthStart = startOfMonth(initialDate)
   const monthEnd = endOfMonth(initialDate)

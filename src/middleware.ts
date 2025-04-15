@@ -1,7 +1,12 @@
 import { NextResponse } from "next/server"
 import { auth } from "./auth"
 
-const publicRoutes = ["/", "/api/notify", "/api/cron/update-statuses"]
+const publicRoutes = [
+  "/",
+  "/api/notify",
+  "/api/cron/update-statuses",
+  "/calendario-clases",
+]
 const authRoutes = ["/sign-in", "/sign-up"]
 const apiAuthPrefix = "/api/auth"
 const apiRoutes = ["/api/create_preference", "/api/packages"]

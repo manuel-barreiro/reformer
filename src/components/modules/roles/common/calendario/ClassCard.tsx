@@ -27,7 +27,7 @@ interface ClassCardProps {
   class_: ClassWithBookings
   onClassChange: () => void
   updateClassBookings: (classId: string, updatedBookings: any[]) => void
-  userRole: string
+  userRole: "admin" | "user" | "guest"
   currentUserId?: string
 }
 
@@ -47,10 +47,13 @@ export default function ClassCard({
     useDeleteClassMutation,
   } = useClassMutations(date, onClassChange)
 
-  // Initialize mutations for this specific class
-  const bookClassMutation = useBookClassMutation(class_.id)
-  const toggleLockMutation = useToggleLockMutation(class_)
-  const deleteClassMutation = useDeleteClassMutation(class_.id)
+  // Initialize mutations - only needed if userRole is 'admin' or 'user'
+  const bookClassMutation =
+    userRole === "user" ? useBookClassMutation(class_.id) : null
+  const toggleLockMutation =
+    userRole === "admin" ? useToggleLockMutation(class_) : null
+  const deleteClassMutation =
+    userRole === "admin" ? useDeleteClassMutation(class_.id) : null
 
   const classDetails = [
     { label: "Categoría", value: class_.category.name },
@@ -75,14 +78,17 @@ export default function ClassCard({
     },
     { label: "Instructor", value: class_.instructor },
   ]
+  const userBooking =
+    userRole === "user"
+      ? class_.bookings.find(
+          (booking) =>
+            booking.userId === currentUserId && booking.status === "confirmed"
+        )
+      : undefined
 
-  const userBooking = class_.bookings.find(
-    (booking) =>
-      booking.userId === currentUserId && booking.status === "confirmed"
-  )
-
-  // Initialize cancel booking mutation only if there's a booking to cancel
-  const cancelBookingMutation = useCancelBookingMutation(userBooking?.id)
+  // Initialize cancel booking mutation only if there's a booking to cancel and user is logged in
+  const cancelBookingMutation =
+    userRole === "user" ? useCancelBookingMutation(userBooking?.id) : null
 
   const handleBookingChange = useCallback(
     (updatedBookings: any[]) => {
@@ -96,13 +102,16 @@ export default function ClassCard({
   )
 
   const isFull = confirmedBookings.length >= class_.maxCapacity
+  const isDisabledForUser = userRole === "user" && isFull && !userBooking
 
   return (
     <Card
       key={class_.id}
       className={`relative w-full animate-fade-down border bg-pearlVariant px-4 py-2 ${
         userBooking && "bg-rust text-pearl"
-      } ${userRole === "user" && isFull && "!opacity-50"} ${!class_.isActive && userRole === "admin" && "!opacity-70"}`}
+      } ${isDisabledForUser ? "cursor-not-allowed !opacity-50" : ""} ${
+        !class_.isActive && userRole === "admin" && "!opacity-70"
+      } ${!class_.isActive && userRole !== "admin" && "hidden"}`} // Hide inactive classes for non-admins
     >
       <div className="relative flex w-full flex-col items-start justify-between gap-3 2xl:flex-row 2xl:items-center 2xl:gap-6">
         <div className="w-auto">
@@ -144,7 +153,7 @@ export default function ClassCard({
             Instructor: {class_.instructor}
           </p>
         </div>
-        {userRole === "admin" && (
+        {userRole === "admin" && deleteClassMutation && toggleLockMutation && (
           <div className="flex w-full items-center justify-between gap-1 2xl:grid 2xl:w-auto 2xl:grid-cols-2">
             <ActionDialog
               buttons={true}
@@ -263,7 +272,7 @@ export default function ClassCard({
             />
           </div>
         )}
-        {userRole === "user" && (
+        {userRole === "user" && bookClassMutation && cancelBookingMutation && (
           <div className="absolute -right-2 top-4 flex w-auto flex-col">
             {userBooking ? (
               <ActionDialog

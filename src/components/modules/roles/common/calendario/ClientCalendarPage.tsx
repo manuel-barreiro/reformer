@@ -9,7 +9,7 @@ import { ClassWithBookings } from "./types"
 interface ClientCalendarPageProps {
   initialDate: Date
   initialClasses: ClassWithBookings[]
-  userRole: string
+  userRole: "admin" | "user" | "guest"
   userBookings: BookingWithClass[]
   currentUserId?: string
 }

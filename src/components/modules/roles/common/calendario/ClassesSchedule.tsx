@@ -19,7 +19,7 @@ interface ClassesScheduleProps {
   isLoading: boolean
   onClassChange: () => void
   updateClassBookings: (classId: string, updatedBookings: any[]) => void
-  userRole: string
+  userRole: "admin" | "user" | "guest"
   currentUserId?: string
 }
 
@@ -147,7 +147,7 @@ export default function ClassesSchedule({
         />
       )}
 
-      {userRole === "user" && (
+      {userRole !== "admin" && (
         <div className="mt-4 text-center text-xs text-gray-500">
           * Cualquier duda o consulta, contactate con nosotros.
         </div>

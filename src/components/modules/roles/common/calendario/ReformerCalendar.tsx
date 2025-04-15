@@ -17,13 +17,14 @@ import {
 } from "date-fns"
 import { utcToZonedTime } from "date-fns-tz"
 import { BookingWithClass } from "@/components/modules/roles/user/reservas/ReservasPage"
+import { es } from "date-fns/locale"
 
 interface ReformerCalendarProps {
   date: Date
   onDateChange: (date: Date) => void
   monthClasses: Class[]
   monthBookings: BookingWithClass[]
-  userRole: string
+  userRole: "admin" | "user" | "guest"
 }
 
 export default function ReformerCalendar({
@@ -168,6 +169,7 @@ export default function ReformerCalendar({
 
   return (
     <Calendar
+      locale={es}
       mode="single"
       selected={date}
       onSelect={(newDate) => newDate && onDateChange(newDate)}
