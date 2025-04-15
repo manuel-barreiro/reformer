@@ -11,7 +11,6 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import {
-  ChevronLeft,
   Edit,
   User as UserIcon,
   Package,
@@ -30,6 +29,8 @@ import {
   useAvailablePackages,
   useUpdateUser,
 } from "@/components/modules/roles/admin/usuarios/hooks/useUserQueries"
+import Image from "next/image"
+import ReformerLoader from "@/components/ui/ReformerLoader"
 
 interface UserDetailViewProps {
   userId: string
@@ -60,21 +61,8 @@ export function UserDetailView({ userId }: UserDetailViewProps) {
   }
 
   // Show loading state while data is being fetched
-  if (isUserLoading) {
-    return (
-      <div className="h-full w-full space-y-6 p-6">
-        <div className="flex items-center justify-between">
-          <div className="space-y-3">
-            <Skeleton className="h-4 w-32" />
-            <Skeleton className="h-8 w-64" />
-            <Skeleton className="h-5 w-48" />
-          </div>
-          <Skeleton className="h-10 w-32" />
-        </div>
-        <Skeleton className="h-40 w-full" />
-        <Skeleton className="h-80 w-full" />
-      </div>
-    )
+  if (isUserLoading || isPackagesLoading) {
+    return <ReformerLoader />
   }
 
   // Show error state if fetching failed
@@ -101,102 +89,93 @@ export function UserDetailView({ userId }: UserDetailViewProps) {
   const availablePackages = packagesData?.data || []
 
   return (
-    <div className="h-full w-full space-y-6 p-6">
-      {/* Header with back button and user info */}
-      <div className="flex items-center justify-between">
-        <Link
-          href="/admin/usuarios"
-          className="flex items-center text-sm text-gray-500 hover:text-gray-700"
-        >
-          <ChevronLeft className="mr-1 h-4 w-4" />
-          Volver a usuarios
-        </Link>
-      </div>
-
-      {/* User metadata card */}
-      <Card className="flex flex-col items-start justify-between bg-pearlVariant px-6 shadow-md sm:flex-row sm:items-center">
-        <div className="flex h-full w-full flex-col items-start sm:flex-row sm:items-center">
-          <CardHeader className="p-0">
-            <CardTitle className="font-marcellus text-2xl text-grey_pebble">
-              {user.name} {user.surname}
-            </CardTitle>
-            <CardDescription>
-              {" "}
-              <h3 className="font-dm_mono">[{user.email}]</h3>
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="flex h-full flex-row gap-10 p-6">
-            <div className="h-full space-y-1.5">
-              <h4 className="text-sm font-semibold">Teléfono</h4>
-              <p className="text-grey_pebble">
-                {user.phone || "No registrado"}
-              </p>
-            </div>
-            <div className="h-full space-y-1.5">
-              <h4 className="text-sm font-semibold">Rol</h4>
-              <div className="flex items-center">
-                <div
-                  className={`mr-2 rounded-full ${user.role === "admin" ? "bg-rust" : "bg-grey_pebble"} p-1`}
-                >
-                  <UserIcon className="h-3 w-3 text-pearl" />
-                </div>
-                <span className="text-grey_pebble">
-                  {user.role === "admin" ? "Administrador" : "Usuario"}
-                </span>
+    <div className="relative h-full w-full space-y-6 p-6">
+      <div className="sticky top-16 z-30 flex flex-col gap-6">
+        {/* User metadata card */}
+        <Card className="flex flex-col items-start justify-between bg-pearlVariant px-6 shadow-md sm:flex-row sm:items-center">
+          <div className="flex h-full w-full flex-col items-start sm:flex-row sm:items-center">
+            <CardHeader className="p-0">
+              <CardTitle className="font-marcellus text-2xl text-grey_pebble">
+                {user.name} {user.surname}
+              </CardTitle>
+              <CardDescription>
+                {" "}
+                <h3 className="font-dm_mono">[{user.email}]</h3>
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="flex h-full flex-row gap-10 p-6">
+              <div className="h-full space-y-1.5">
+                <h4 className="text-sm font-semibold">Teléfono</h4>
+                <p className="text-grey_pebble">
+                  {user.phone || "No registrado"}
+                </p>
               </div>
-            </div>
-          </CardContent>
-        </div>
-        <Button
-          onClick={() => setIsDetailModalOpen(true)}
-          className="bg-rust text-pearl hover:bg-rust/90"
-          disabled={updateUserMutation.isPending}
-        >
-          <Edit className="mr-2 h-4 w-4" />
-          Editar Usuario
-        </Button>
-      </Card>
-
-      {/* Activity Tabs */}
-      <Tabs defaultValue="packages" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger
-            value="packages"
-            className="data-[state=active]:bg-rust data-[state=active]:text-pearl"
+              <div className="h-full space-y-1.5">
+                <h4 className="text-sm font-semibold">Rol</h4>
+                <div className="flex items-center">
+                  <div
+                    className={`mr-2 rounded-full ${user.role === "admin" ? "bg-rust" : "bg-grey_pebble"} p-1`}
+                  >
+                    <UserIcon className="h-3 w-3 text-pearl" />
+                  </div>
+                  <span className="text-grey_pebble">
+                    {user.role === "admin" ? "Administrador" : "Usuario"}
+                  </span>
+                </div>
+              </div>
+            </CardContent>
+          </div>
+          <Button
+            onClick={() => setIsDetailModalOpen(true)}
+            className="bg-rust text-pearl hover:bg-rust/90"
+            disabled={updateUserMutation.isPending}
           >
-            <Package className="mr-2 h-4 w-4" /> Paquetes
-          </TabsTrigger>
-          <TabsTrigger
-            value="payments"
-            className="data-[state=active]:bg-rust data-[state=active]:text-pearl"
-          >
-            <CreditCard className="mr-2 h-4 w-4" /> Pagos
-          </TabsTrigger>
-          <TabsTrigger
-            value="bookings"
-            className="data-[state=active]:bg-rust data-[state=active]:text-pearl"
-          >
-            <Calendar className="mr-2 h-4 w-4" /> Reservas
-          </TabsTrigger>
-        </TabsList>
+            <Edit className="mr-2 h-4 w-4" />
+            Editar Usuario
+          </Button>
+        </Card>
 
-        <TabsContent value="packages" className="mt-4">
-          <UserPackagesTab
-            userId={userId}
-            packages={user.purchasedPackages}
-            availablePackages={availablePackages}
-            isLoading={isPackagesLoading}
-          />
-        </TabsContent>
+        {/* Activity Tabs */}
+        <Tabs defaultValue="packages" className="w-full">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger
+              value="packages"
+              className="data-[state=active]:bg-rust data-[state=active]:text-pearl"
+            >
+              <Package className="mr-2 h-4 w-4" /> Paquetes
+            </TabsTrigger>
+            <TabsTrigger
+              value="payments"
+              className="data-[state=active]:bg-rust data-[state=active]:text-pearl"
+            >
+              <CreditCard className="mr-2 h-4 w-4" /> Pagos
+            </TabsTrigger>
+            <TabsTrigger
+              value="bookings"
+              className="data-[state=active]:bg-rust data-[state=active]:text-pearl"
+            >
+              <Calendar className="mr-2 h-4 w-4" /> Reservas
+            </TabsTrigger>
+          </TabsList>
 
-        <TabsContent value="payments" className="mt-4">
-          <UserPaymentsTab userId={userId} />{" "}
-        </TabsContent>
+          <TabsContent value="packages" className="mt-4">
+            <UserPackagesTab
+              userId={userId}
+              packages={user.purchasedPackages}
+              availablePackages={availablePackages}
+              isLoading={isPackagesLoading}
+            />
+          </TabsContent>
 
-        <TabsContent value="bookings" className="mt-4">
-          <UserBookingsTab userId={userId} />{" "}
-        </TabsContent>
-      </Tabs>
+          <TabsContent value="payments" className="mt-4">
+            <UserPaymentsTab userId={userId} />{" "}
+          </TabsContent>
+
+          <TabsContent value="bookings" className="mt-4">
+            <UserBookingsTab userId={userId} />{" "}
+          </TabsContent>
+        </Tabs>
+      </div>
 
       {/* User detail modal for editing */}
       <UserDetailModal

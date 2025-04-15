@@ -29,25 +29,12 @@ export const createColumns = (
       const fullName = user.surname ? `${user.name} ${user.surname}` : user.name
 
       return (
-        <div className="flex justify-center">
-          <HoverCard>
-            <HoverCardTrigger>
-              <span className="cursor-pointer whitespace-nowrap underline">
-                {fullName.length > 20
-                  ? `${fullName.slice(0, 20)}...`
-                  : fullName}
-              </span>
-            </HoverCardTrigger>
-            <HoverCardContent className="w-auto min-w-60 bg-midnight text-pearl">
-              <div className="space-y-2">
-                <h4 className="font-marcellus text-sm font-semibold">
-                  {fullName}
-                </h4>
-                <p className="font-dm_mono text-sm">{user.email}</p>
-              </div>
-            </HoverCardContent>
-          </HoverCard>
-        </div>
+        <Link
+          href={`/admin/usuarios/${user.id}`}
+          className="whitespace-nowrap underline hover:text-blue-600"
+        >
+          {fullName}
+        </Link>
       )
     },
   },

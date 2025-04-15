@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/hover-card"
 import { getFullName } from "@/components/modules/roles/admin/pagos/lib/getFullName"
 import { Badge } from "@/components/ui/badge"
+import Link from "next/link"
 
 export const createColumns = (
   onOpenDetailModal: (payment: Payment & { user: User }) => void
@@ -22,25 +23,14 @@ export const createColumns = (
     cell: ({ row }) => {
       const user = row.original.user
       return (
-        <div className="flex justify-center">
-          <HoverCard>
-            <HoverCardTrigger>
-              <span className="cursor-pointer whitespace-nowrap underline">
-                {getFullName(user).length > 20
-                  ? `${getFullName(user).slice(0, 20)}...`
-                  : getFullName(user)}
-              </span>
-            </HoverCardTrigger>
-            <HoverCardContent className="w-auto min-w-60 bg-midnight text-pearl">
-              <div className="space-y-2">
-                <h4 className="font-marcellus text-sm font-semibold">
-                  {getFullName(user)}
-                </h4>
-                <p className="font-dm_mono text-sm">{user.email}</p>
-              </div>
-            </HoverCardContent>
-          </HoverCard>
-        </div>
+        <Link
+          href={`/admin/usuarios/${user.id}`}
+          className="whitespace-nowrap underline hover:text-blue-600"
+        >
+          {getFullName(user).length > 20
+            ? `${getFullName(user).slice(0, 20)}...`
+            : getFullName(user)}
+        </Link>
       )
     },
     enableSorting: true,

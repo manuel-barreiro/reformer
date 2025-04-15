@@ -7,7 +7,9 @@ import { utcToLocal } from "@/lib/timezone-utils"
 import { useUserBookings } from "../hooks/useUserQueries"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useEffect } from "react"
-import { ReusableTable } from "@/components/ui/ReusableTable"
+// Import ReformerTable and remove ReusableTable
+import { ReformerTable } from "@/components/ui/table/ReformerTable"
+// import { ReusableTable } from "@/components/ui/ReusableTable"
 import { userBookingsColumns } from "@/components/modules/roles/admin/usuarios/columns/user-bookings-columns"
 
 interface ClassWithDetails extends Class {
@@ -90,11 +92,22 @@ export function UserBookingsTab({ userId }: UserBookingsTabProps) {
     }
   }
 
+  // Define columns
+  const columns = userBookingsColumns(
+    formatDate,
+    formatTime,
+    formatBookingStatus,
+    getStatusBadgeColor
+  )
+
+  // Define filter keys - Empty array to hide search bar
+  const filterKeys: string[] = []
+
   // Loading state
   if (isLoading) {
     return (
       <div className="space-y-4">
-        <h3 className="text-xl font-bold">Reservas</h3>
+        <Skeleton className="h-8 w-24" /> {/* Skeleton for title */}
         <Skeleton className="h-40 w-full" />
       </div>
     )
@@ -122,24 +135,36 @@ export function UserBookingsTab({ userId }: UserBookingsTabProps) {
 
   return (
     <div className="space-y-4">
-      <h3 className="text-xl font-bold">Reservas</h3>
+      {/* Title is now passed as children to ReformerTable */}
+      {/* Removed the outer h3 */}
 
-      {bookings.length === 0 ? (
-        <div className="rounded-md border p-8 text-center">
-          <p className="text-grey_pebble">
-            No hay reservas registradas para este usuario
-          </p>
+      {bookings.length === 0 && !isLoading ? (
+        // Show message if no bookings
+        <div className="space-y-4">
+          <h3 className="text-xl font-bold">Reservas</h3>{" "}
+          {/* Keep title here when no data */}
+          <div className="rounded-md border p-8 text-center">
+            <p className="text-grey_pebble">
+              No hay reservas registradas para este usuario
+            </p>
+          </div>
         </div>
       ) : (
-        <ReusableTable
-          columns={userBookingsColumns(
-            formatDate,
-            formatTime,
-            formatBookingStatus,
-            getStatusBadgeColor
-          )}
+        // Render table if bookings exist
+        <ReformerTable
+          columns={columns}
           data={bookings}
-        />
+          filterKeys={filterKeys} // Pass empty array to hide search
+          noResultsMessage="No se encontraron reservas."
+          isLoading={isLoading} // Pass loading state
+          initialPageSize={10} // Adjust as needed for tabs
+        >
+          {/* Children: Title */}
+          <div className="flex w-full flex-col items-start justify-between gap-3 lg:flex-row">
+            <h3 className="text-xl font-bold">Reservas</h3>
+            {/* No button needed here */}
+          </div>
+        </ReformerTable>
       )}
     </div>
   )

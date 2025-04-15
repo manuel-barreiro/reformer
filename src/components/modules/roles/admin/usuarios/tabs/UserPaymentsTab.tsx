@@ -7,7 +7,9 @@ import { es } from "date-fns/locale"
 import { utcToLocal } from "@/lib/timezone-utils"
 import { useUserPayments } from "../hooks/useUserQueries"
 import { useEffect } from "react"
-import { ReusableTable } from "@/components/ui/ReusableTable"
+// Import ReformerTable and remove ReusableTable
+import { ReformerTable } from "@/components/ui/table/ReformerTable"
+// import { ReusableTable } from "@/components/ui/ReusableTable"
 import { userPaymentsColumns } from "@/components/modules/roles/admin/usuarios/columns/user-payments-columns"
 
 interface UserPaymentsTabProps {
@@ -83,11 +85,21 @@ export function UserPaymentsTab({ userId }: UserPaymentsTabProps) {
     }
   }
 
+  // Define columns
+  const columns = userPaymentsColumns(
+    formatDate,
+    formatPaymentStatus,
+    getStatusBadgeColor
+  )
+
+  // Define filter keys - Empty array to hide search bar
+  const filterKeys: string[] = []
+
   // Loading state
   if (isLoading) {
     return (
       <div className="space-y-4">
-        <h3 className="text-xl font-bold">Pagos</h3>
+        <Skeleton className="h-8 w-24" /> {/* Skeleton for title */}
         <Skeleton className="h-40 w-full" />
       </div>
     )
@@ -115,23 +127,36 @@ export function UserPaymentsTab({ userId }: UserPaymentsTabProps) {
 
   return (
     <div className="space-y-4">
-      <h3 className="text-xl font-bold">Pagos</h3>
+      {/* Title is now passed as children to ReformerTable */}
+      {/* Removed the outer h3 */}
 
-      {payments.length === 0 ? (
-        <div className="rounded-md border p-8 text-center">
-          <p className="text-grey_pebble">
-            No hay pagos registrados para este usuario
-          </p>
+      {payments.length === 0 && !isLoading ? (
+        // Show message if no payments
+        <div className="space-y-4">
+          <h3 className="text-xl font-bold">Pagos</h3>{" "}
+          {/* Keep title here when no data */}
+          <div className="rounded-md border p-8 text-center">
+            <p className="text-grey_pebble">
+              No hay pagos registrados para este usuario
+            </p>
+          </div>
         </div>
       ) : (
-        <ReusableTable
-          columns={userPaymentsColumns(
-            formatDate,
-            formatPaymentStatus,
-            getStatusBadgeColor
-          )}
+        // Render table if payments exist
+        <ReformerTable
+          columns={columns}
           data={payments}
-        />
+          filterKeys={filterKeys} // Pass empty array to hide search
+          noResultsMessage="No se encontraron pagos."
+          isLoading={isLoading} // Pass loading state
+          initialPageSize={10} // Adjust as needed for tabs
+        >
+          {/* Children: Title */}
+          <div className="flex w-full flex-col items-start justify-between gap-3 lg:flex-row">
+            <h3 className="text-xl font-bold">Pagos</h3>
+            {/* No button needed here */}
+          </div>
+        </ReformerTable>
       )}
     </div>
   )
