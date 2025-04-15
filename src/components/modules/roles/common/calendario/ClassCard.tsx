@@ -352,12 +352,11 @@ export default function ClassCard({
           </div>
         )}
       </div>
-      {userRole === "admin" && (
-        <Progress
-          value={(confirmedBookings.length / class_.maxCapacity) * 100}
-          className="absolute left-0 right-0 top-0 h-1 w-full rounded-b-none rounded-t-md"
-        />
-      )}
+
+      <Progress
+        value={(confirmedBookings.length / class_.maxCapacity) * 100}
+        className="absolute left-0 right-0 top-0 h-1 w-full rounded-b-none rounded-t-md"
+      />
     </Card>
   )
 }

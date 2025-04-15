@@ -32,7 +32,7 @@ export default async function ProfilePage() {
       }
 
   return (
-    <section className="h-full">
+    <section className="h-full p-4 lg:p-10">
       <UserInfoForm userInfo={userInfo} />
     </section>
   )
