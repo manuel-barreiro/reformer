@@ -85,10 +85,17 @@ export default auth((req) => {
       if (nextUrl.pathname === "/admin") {
         return NextResponse.redirect(new URL("/admin/pagos", nextUrl))
       }
+
+      // Specific redirect for /calendario when user is admin
+      if (nextUrl.pathname === "/calendario") {
+        return NextResponse.redirect(new URL("/admin/calendario", nextUrl))
+      }
+
       // Redirect admin to /admin/pagos if they try to access user routes
       if (userRoutes.includes(nextUrl.pathname)) {
         return NextResponse.redirect(new URL("/admin/pagos", nextUrl))
       }
+
       // Allow admin to access admin routes
       if (adminRoutes.includes(nextUrl.pathname)) {
         return NextResponse.next()

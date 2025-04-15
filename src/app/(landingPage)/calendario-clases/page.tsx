@@ -1,56 +1,77 @@
 import { Suspense } from "react"
-import ClientCalendarPage from "@/components/modules/roles/common/calendario/ClientCalendarPage"
+import { ClassWithBookings } from "@/components/modules/roles/common/calendario/types"
 import { getClasses } from "@/actions/class"
 import { startOfMonth, endOfMonth } from "date-fns"
 import ErrorBoundary from "@/components/modules/roles/common/calendario/ErrorBoundary"
-import { getUserBookingsInRange } from "@/actions/booking-actions"
 import { auth } from "@/auth"
 import ReformerLoader from "@/components/ui/ReformerLoader"
-import { BookingWithClass } from "@/components/modules/roles/user/reservas/ReservasPage" // Import the type if not already imported
+import { BookingWithClass } from "@/components/modules/roles/user/reservas/ReservasPage"
+import { redirect } from "next/navigation"
+import ClientCalendarPage from "@/components/modules/roles/common/calendario/ClientCalendarPage"
+import Link from "next/link" // Import Link
 
 export default async function CalendarPage() {
-  // Removed userRole prop, we'll determine it from session
+  const session = await auth()
+  console.log("Session object:", session)
+
+  // --- Redirect Logic ---
+  if (session?.user) {
+    const userRole = session.user.role
+    console.log("User is logged in. User data:", session.user)
+    console.log("Determined user role:", userRole)
+
+    if (userRole === "admin" || userRole === "user") {
+      console.log("Redirecting to /calendario...")
+      redirect("/calendario")
+    } else {
+      console.log("Role is not admin or user, treating as guest.")
+    }
+  } else {
+    console.log("User is not logged in (guest).")
+  }
+  // --- End Redirect Logic ---
+
+  // --- Guest Logic ---
   const initialDate = new Date()
   const monthStart = startOfMonth(initialDate)
   const monthEnd = endOfMonth(initialDate)
+  const currentUserId = undefined
+  const actualUserRole = "guest"
+  const initialBookings: BookingWithClass[] = []
 
-  // Fetch classes - this should be accessible to everyone
-  const initialClasses = await getClasses(monthStart, monthEnd)
-
-  const session = await auth()
-  const currentUserId = session?.user?.id
-  let initialBookings: BookingWithClass[] = [] // Default to empty array for guests
-  let actualUserRole: "admin" | "user" | "guest" = "guest" // Default role
-
-  // Only attempt to fetch bookings and determine user/admin role if logged in
-  if (session?.user) {
-    try {
-      // Fetch bookings for the logged-in user
-      initialBookings = await getUserBookingsInRange(monthStart, monthEnd)
-      // Determine role based on your session/auth logic
-      // Example: assuming session.user.role exists
-      actualUserRole = session.user.role === "admin" ? "admin" : "user"
-    } catch (error) {
-      console.error("Error fetching user bookings:", error)
-      // Optionally handle the error, but the function call should now be safe
-      initialBookings = [] // Fallback to empty array on error
-      actualUserRole = "guest" // Fallback role on error? Or keep as user/admin? Adjust as needed.
-    }
+  // Use the correct type for initialClasses
+  let initialClasses: ClassWithBookings[] = []
+  try {
+    // Fetch classes - ensure getClasses returns Promise<ClassWithBookings[]>
+    initialClasses = await getClasses(monthStart, monthEnd)
+  } catch (error) {
+    console.error("Error fetching initial classes for guest view:", error)
   }
 
+  // This return is only reached by guests
   return (
-    <ErrorBoundary>
-      <Suspense fallback={<ReformerLoader />}>
-        <div className="flex min-h-screen items-center justify-center">
+    <div className="flex min-h-screen flex-col items-start justify-center bg-pearl">
+      {" "}
+      {/* Added background and text color */}
+      <div className="my-4">
+        {" "}
+        {/* Add margin below the link */}
+        <Link href="/" className="px-4 text-midnight hover:underline lg:p-10">
+          &larr; Volver a la página principal
+        </Link>
+      </div>
+      <ErrorBoundary>
+        <Suspense fallback={<ReformerLoader />}>
+          {/* Removed the outer div to avoid double centering */}
           <ClientCalendarPage
-            currentUserId={currentUserId} // Pass ID (will be undefined for guests)
+            currentUserId={currentUserId}
             initialDate={initialDate}
             initialClasses={initialClasses}
-            userRole={actualUserRole} // Pass the determined role
-            userBookings={initialBookings} // Pass fetched bookings or empty array
+            userRole={actualUserRole}
+            userBookings={initialBookings}
           />
-        </div>
-      </Suspense>
-    </ErrorBoundary>
+        </Suspense>
+      </ErrorBoundary>
+    </div>
   )
 }
