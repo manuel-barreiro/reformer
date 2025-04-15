@@ -79,9 +79,10 @@ const userMenuItems = [
 
 const secondaryNavItems = [
   {
-    title: "Ayuda",
-    url: "#",
+    title: "Terminos y condiciones",
+    url: "#", // Keep a placeholder URL or remove if not needed
     icon: Info,
+    isDialogTrigger: true, // Add this flag
   },
 ]
 

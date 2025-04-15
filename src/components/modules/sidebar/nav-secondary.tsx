@@ -1,7 +1,7 @@
 "use client"
 import * as React from "react"
 import { type LucideIcon } from "lucide-react"
-
+import { TermsAndConditionsDialog } from "@/components/modules/roles/common/TermsAndConditionsDialog"
 import {
   SidebarGroup,
   SidebarGroupContent,
@@ -18,6 +18,7 @@ export function NavSecondary({
     title: string
     url: string
     icon: LucideIcon
+    isDialogTrigger?: boolean // Add the optional flag here
   }[]
 } & React.ComponentPropsWithoutRef<typeof SidebarGroup>) {
   return (
@@ -26,12 +27,26 @@ export function NavSecondary({
         <SidebarMenu>
           {items.map((item) => (
             <SidebarMenuItem key={item.title}>
-              <SidebarMenuButton asChild size="sm">
-                <a href={item.url}>
-                  <item.icon />
-                  <span>{item.title}</span>
-                </a>
-              </SidebarMenuButton>
+              {item.isDialogTrigger ? (
+                // If it's a dialog trigger, wrap with the dialog
+                <TermsAndConditionsDialog>
+                  <SidebarMenuButton
+                    size="sm"
+                    className="w-full cursor-pointer"
+                  >
+                    <item.icon />
+                    <span>{item.title}</span>
+                  </SidebarMenuButton>
+                </TermsAndConditionsDialog>
+              ) : (
+                // Otherwise, render as a link
+                <SidebarMenuButton asChild size="sm">
+                  <a href={item.url}>
+                    <item.icon />
+                    <span>{item.title}</span>
+                  </a>
+                </SidebarMenuButton>
+              )}
             </SidebarMenuItem>
           ))}
         </SidebarMenu>

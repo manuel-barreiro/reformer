@@ -4,7 +4,7 @@ import React from "react"
 
 export default function DiscountCoupon() {
   return (
-    <div className="flex h-auto w-full max-w-[450px] flex-col items-start justify-evenly gap-3 border-[2px] border-grey_pebble bg-midnight/60 px-5 py-6 md:px-10">
+    <div className="flex h-full w-full max-w-[450px] flex-col items-start justify-evenly gap-3 border-[2px] border-grey_pebble bg-midnight/60 px-5 py-6 md:px-10">
       <p className="font-dm_mono">¿Tenés un cupón de descuento?</p>
       <div className="relative h-auto w-full">
         <Input

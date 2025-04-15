@@ -27,7 +27,7 @@ export default function CheckoutPage({
   return (
     <section
       ref={sectionRef}
-      className="relative flex h-auto min-h-[100dvh] w-full cursor-default flex-col items-center justify-start gap-10 overflow-hidden bg-black/80 px-10 py-10 font-dm_sans text-pearl lg:px-14 lg:py-14"
+      className="relative flex h-auto min-h-[100vh] w-full cursor-default flex-col items-center justify-start gap-10 overflow-hidden bg-black/80 p-4 font-dm_sans text-pearl lg:px-14 lg:py-14"
     >
       <motion.div className="absolute -z-10 h-[110%] w-full" style={{ top: y }}>
         <Image
@@ -39,7 +39,7 @@ export default function CheckoutPage({
         />
       </motion.div>
 
-      <div className="grid h-auto w-auto max-w-[900px] grid-cols-1 justify-items-stretch gap-6 md:grid-cols-2 md:gap-2">
+      <div className="grid h-full w-auto max-w-[900px] grid-cols-1 justify-items-stretch gap-6 md:grid-cols-2 md:gap-2">
         <div className="flex flex-grow flex-col gap-2">
           <OrderSummary
             classPackages={classPackages}
