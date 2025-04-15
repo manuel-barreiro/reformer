@@ -2,6 +2,9 @@ import { BankTransferIcon, CashIcon, CreditCardIcon } from "@/assets/icons"
 import { Separator } from "@/components/ui/separator"
 import { Loader2 } from "lucide-react"
 import React, { useState } from "react"
+import { Checkbox } from "@/components/ui/checkbox" // Assuming you have this component
+import { Label } from "@/components/ui/label" // Assuming you have this component
+import { TermsAndConditionsDialog } from "@/components/modules/roles/common/TermsAndConditionsDialog"
 
 export default function FinalCheckout({
   selectedPackage,
@@ -11,8 +14,10 @@ export default function FinalCheckout({
   onCheckout: () => Promise<void>
 }) {
   const [isLoading, setIsLoading] = useState(false)
+  const [termsAccepted, setTermsAccepted] = useState(false) // State for checkbox
 
   const handleCheckout = async () => {
+    if (!termsAccepted) return // Prevent checkout if terms not accepted
     setIsLoading(true)
     try {
       await onCheckout()
@@ -49,11 +54,29 @@ export default function FinalCheckout({
           </div>
           <Separator className="h-[1px] w-full rounded-full bg-pearl/70" />
         </div>
+        {/* Terms and Conditions Checkbox */}
+        <div className="mt-4 flex items-center space-x-2">
+          <Checkbox
+            id="terms"
+            checked={termsAccepted}
+            onCheckedChange={(checked) => setTermsAccepted(Boolean(checked))}
+            className="border-pearl data-[state=checked]:bg-pearl data-[state=checked]:text-midnight"
+          />
+          <Label htmlFor="terms" className="text-sm font-medium leading-none">
+            Acepto los{" "}
+            <TermsAndConditionsDialog>
+              <span className="cursor-pointer font-bold underline hover:text-pearlVariant2">
+                términos y condiciones
+              </span>
+            </TermsAndConditionsDialog>{" "}
+            de Reformer.
+          </Label>
+        </div>
       </div>
 
       <button
         onClick={handleCheckout}
-        disabled={isLoading}
+        disabled={isLoading || !termsAccepted} // Disable if loading or terms not accepted
         className="w-full flex-1 border-t-[2px] border-grey_pebble p-6 font-dm_sans text-lg font-bold duration-300 ease-in-out hover:bg-pearlVariant2 hover:text-midnight disabled:cursor-not-allowed disabled:opacity-50"
       >
         {isLoading ? (
