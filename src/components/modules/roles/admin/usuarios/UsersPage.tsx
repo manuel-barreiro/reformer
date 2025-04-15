@@ -56,8 +56,7 @@ export function UsersPage({ initialUsers }: UsersPageProps) {
   const filterKeys: string[] = ["name", "surname", "email"]
 
   return (
-    // Adjust padding/min-height as needed, ReformerTable provides its own structure
-    <div className="h-auto w-full space-y-4 lg:p-10">
+    <>
       <ReformerTable
         columns={columns}
         data={filteredData} // Pass the role-filtered data
@@ -73,6 +72,6 @@ export function UsersPage({ initialUsers }: UsersPageProps) {
         </h2>
       </ReformerTable>
       {/* PaginationControls are now rendered inside ReformerTable */}
-    </div>
+    </>
   )
 }

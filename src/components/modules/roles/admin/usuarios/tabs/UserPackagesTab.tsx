@@ -247,7 +247,7 @@ export function UserPackagesTab({
       {packages.length === 0 && !isLoading ? ( // Added !isLoading check
         // Show message and button if no packages
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
+          <div className="flex w-full flex-col items-start justify-between gap-3 lg:flex-row">
             <h3 className="text-xl font-bold">Paquetes</h3>
             {/* Assign Package Dialog Trigger Button */}
             <Dialog
@@ -256,12 +256,11 @@ export function UserPackagesTab({
             >
               <DialogTrigger asChild>
                 <Button
-                  className="flex items-center justify-center bg-midnight font-dm_mono text-pearl hover:bg-midnight/90"
+                  className="flex w-full items-center justify-center bg-midnight font-dm_mono text-pearl hover:bg-midnight/90 lg:w-auto"
                   disabled={assignPackageMutation.isPending}
                 >
                   <Plus className="mr-2 h-4 w-4" />
-                  <span className="hidden lg:inline">Asignar paquete</span>
-                  <span className="lg:hidden">Asignar</span>
+                  <span className="inline">Asignar paquete</span>
                 </Button>
               </DialogTrigger>
               {/* Assign Package Dialog Content */}
@@ -363,12 +362,11 @@ export function UserPackagesTab({
             >
               <DialogTrigger asChild>
                 <Button
-                  className="flex items-center justify-center bg-midnight font-dm_mono text-pearl hover:bg-midnight/90"
+                  className="flex w-full items-center justify-center bg-midnight font-dm_mono text-pearl hover:bg-midnight/90 lg:w-auto"
                   disabled={assignPackageMutation.isPending}
                 >
                   <Plus className="mr-2 h-4 w-4" />
-                  <span className="hidden lg:inline">Asignar paquete</span>
-                  <span className="lg:hidden">Asignar</span>
+                  <span className="inline">Asignar paquete</span>
                 </Button>
               </DialogTrigger>
               {/* Assign Package Dialog Content */}

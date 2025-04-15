@@ -68,7 +68,7 @@ export function UserDetailView({ userId }: UserDetailViewProps) {
   // Show error state if fetching failed
   if (userError || !userData?.success) {
     return (
-      <div className="flex h-full w-full flex-col items-center justify-center p-6">
+      <div className="flex h-full w-full flex-col items-center justify-center p-4 lg:p-10">
         <h2 className="mb-4 text-2xl font-bold text-rust">
           Error al cargar los datos del usuario
         </h2>
@@ -89,10 +89,10 @@ export function UserDetailView({ userId }: UserDetailViewProps) {
   const availablePackages = packagesData?.data || []
 
   return (
-    <div className="relative h-full w-full space-y-6 p-6">
+    <div className="relative h-full w-full space-y-6 p-4 lg:p-10 lg:pt-0">
       <div className="sticky top-16 z-30 flex flex-col gap-6">
         {/* User metadata card */}
-        <Card className="flex flex-col items-start justify-between bg-pearlVariant px-6 shadow-md sm:flex-row sm:items-center">
+        <Card className="flex flex-col items-start justify-between bg-pearlVariant px-6 py-6 shadow-md sm:flex-row sm:items-center sm:py-0">
           <div className="flex h-full w-full flex-col items-start sm:flex-row sm:items-center">
             <CardHeader className="p-0">
               <CardTitle className="font-marcellus text-2xl text-grey_pebble">
@@ -127,7 +127,7 @@ export function UserDetailView({ userId }: UserDetailViewProps) {
           </div>
           <Button
             onClick={() => setIsDetailModalOpen(true)}
-            className="bg-rust text-pearl hover:bg-rust/90"
+            className="w-full bg-rust text-pearl hover:bg-rust/90 sm:w-auto"
             disabled={updateUserMutation.isPending}
           >
             <Edit className="mr-2 h-4 w-4" />

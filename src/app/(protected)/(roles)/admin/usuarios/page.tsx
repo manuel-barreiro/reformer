@@ -15,7 +15,9 @@ export default async function PaymentsPage() {
 
   return (
     <Suspense fallback={<ReformerLoader />}>
-      <UsersPage initialUsers={users} />
+      <section className="h-auto w-full space-y-4 p-4 lg:p-10">
+        <UsersPage initialUsers={users} />
+      </section>
     </Suspense>
   )
 }

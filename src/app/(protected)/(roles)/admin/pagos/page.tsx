@@ -1,7 +1,5 @@
 import { Suspense } from "react"
-import { PaymentsTable } from "@/components/modules/roles/admin/pagos/PaymentsTable"
 import { getPayments } from "@/actions/payment-actions"
-import { Skeleton } from "@/components/ui/skeleton"
 import { PaymentsPage } from "@/components/modules/roles/admin/pagos/PaymentsPage"
 import ReformerLoader from "@/components/ui/ReformerLoader"
 

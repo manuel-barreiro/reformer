@@ -98,7 +98,7 @@ export function PaymentsPage({
     "user.name", // Add user's name (nested)
     "user.surname", // Add user's surname (nested) - if applicable
     "user.email", // Add user's email (nested)
-  ] // <--- Removed 'as const'
+  ]
 
   return (
     <>
@@ -116,13 +116,10 @@ export function PaymentsPage({
           <h2 className="font-marcellus text-2xl font-bold uppercase">Pagos</h2>
           <Button
             onClick={() => setIsAddModalOpen(true)}
-            className="flex items-center justify-center bg-midnight font-dm_mono text-pearl hover:bg-midnight/90" // Adjusted style to match example
+            className="flex w-full items-center justify-center bg-midnight font-dm_mono text-pearl hover:bg-midnight/90 lg:w-auto"
           >
-            <Plus className="mr-2 h-4 w-4" /> {/* Added margin */}
-            <span className="hidden lg:inline">Agregar pago</span>{" "}
-            {/* Use inline for better control */}
-            <span className="lg:hidden">Agregar</span>{" "}
-            {/* Shorter text for small screens */}
+            <Plus className="mr-2 h-4 w-4" />
+            <span className="inline">Cargar Pago | Asignar Paquete</span>{" "}
           </Button>
         </div>
       </ReformerTable>

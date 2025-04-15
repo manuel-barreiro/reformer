@@ -114,7 +114,7 @@ export function ReformerTable<TData, TValue>({
     <div className="w-full space-y-4">
       {/* ... header section with children and search input ... */}
       <div className="flex w-full flex-col items-start justify-between gap-3 lg:flex-row">
-        {children && <div className="flex-grow">{children}</div>}
+        {children && <div className="w-full flex-grow">{children}</div>}
         {/* Conditionally render search bar */}
         {showSearchBar && (
           <div className="flex w-full items-center gap-2 lg:w-auto lg:flex-shrink-0">
