@@ -40,7 +40,7 @@ export default async function AppLayout({
         </header>
         <div
           className={cn(
-            "flex h-full flex-1 flex-col items-center justify-center gap-4",
+            "flex h-full flex-1 flex-col items-center justify-start gap-4",
             user.role === "admin" ? "pt-0" : "pt-0"
           )}
         >

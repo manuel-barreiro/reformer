@@ -29,23 +29,23 @@ const headerTexts: HeaderTextItem[] = [
     url: "/perfil",
   },
   {
-    title: "Pagos",
+    title: "Admin | Pagos",
     url: "/admin/pagos",
   },
   {
-    title: "Paquetes",
+    title: "Admin | Paquetes",
     url: "/admin/paquetes",
   },
   {
-    title: "Calendario",
+    title: "Admin | Calendario",
     url: "/admin/calendario",
   },
   {
-    title: "Usuarios",
+    title: "Admin | Usuarios",
     url: "/admin/usuarios",
   },
   {
-    title: "Categorias",
+    title: "Admin | Categorias",
     url: "/admin/categorias",
   },
   // Dynamic route definition - place it before more general ones if needed,

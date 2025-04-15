@@ -132,95 +132,89 @@ export function ReformerTable<TData, TValue>({
       </div>
 
       {/* Table Area */}
-      <div className="overflow-hidden rounded-md border">
-        <ScrollArea
-          className="w-full whitespace-nowrap"
-          style={{ height: "400px" }}
-        >
-          <Table className="min-w-full">
-            {/* ... TableHeader ... */}
-            <TableHeader className="sticky top-0 z-10 bg-pearlVariant3 font-dm_sans font-black text-midnight">
-              {table.getHeaderGroups().map((headerGroup) => (
-                <TableRow key={headerGroup.id}>
-                  {headerGroup.headers.map((header) => (
-                    <TableHead
-                      key={header.id}
-                      className={`px-3 py-2 text-center font-dm_sans text-xs font-semibold uppercase tracking-wider text-midnight ${
-                        header.column.getCanSort()
-                          ? "cursor-pointer select-none"
-                          : ""
-                      }`}
-                      style={{ whiteSpace: "nowrap" }}
-                      onClick={header.column.getToggleSortingHandler()}
+      <div className="relative grid h-[55vh] w-full min-w-full grid-cols-1 overflow-auto rounded-md">
+        <Table>
+          {/* ... TableHeader ... */}
+          <TableHeader className="sticky top-0 z-10 bg-pearlVariant3 font-dm_sans font-black text-midnight">
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id}>
+                {headerGroup.headers.map((header) => (
+                  <TableHead
+                    key={header.id}
+                    className={`px-3 py-2 text-center font-dm_sans text-xs font-semibold uppercase tracking-wider text-midnight ${
+                      header.column.getCanSort()
+                        ? "cursor-pointer select-none"
+                        : ""
+                    }`}
+                    style={{ whiteSpace: "nowrap" }}
+                    onClick={header.column.getToggleSortingHandler()}
+                  >
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
+                    {{
+                      asc: " ▲",
+                      desc: " ▼",
+                    }[header.column.getIsSorted() as string] ?? null}
+                  </TableHead>
+                ))}
+              </TableRow>
+            ))}
+          </TableHeader>
+          {/* ... TableBody ... */}
+          <TableBody className="bg-pearlVariant text-sm text-tableContent">
+            {isLoading ? (
+              Array.from({ length: initialPageSize }).map((_, index) => (
+                <TableRow
+                  key={`skeleton-${index}`}
+                  className="border-b border-grey_pebble/20"
+                >
+                  {columns.map((column, colIndex) => (
+                    <TableCell
+                      key={`skeleton-cell-${index}-${colIndex}`}
+                      className="p-3 text-center"
                     >
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                      {{
-                        asc: " ▲",
-                        desc: " ▼",
-                      }[header.column.getIsSorted() as string] ?? null}
-                    </TableHead>
+                      <Skeleton className="h-4 w-full" />
+                    </TableCell>
                   ))}
                 </TableRow>
-              ))}
-            </TableHeader>
-            {/* ... TableBody ... */}
-            <TableBody className="bg-pearlVariant text-sm text-tableContent">
-              {isLoading ? (
-                Array.from({ length: initialPageSize }).map((_, index) => (
-                  <TableRow
-                    key={`skeleton-${index}`}
-                    className="border-b border-grey_pebble/20"
-                  >
-                    {columns.map((column, colIndex) => (
-                      <TableCell
-                        key={`skeleton-cell-${index}-${colIndex}`}
-                        className="p-3 text-center"
-                      >
-                        <Skeleton className="h-4 w-full" />
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                ))
-              ) : table.getRowModel().rows?.length ? (
-                table.getRowModel().rows.map((row) => (
-                  <TableRow
-                    key={row.id}
-                    data-state={row.getIsSelected() && "selected"}
-                    className="border-b border-grey_pebble/20 hover:bg-pearlVariant3/50"
-                  >
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell
-                        key={cell.id}
-                        className="p-3 text-center"
-                        style={{ whiteSpace: "nowrap" }}
-                      >
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext()
-                        )}
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell
-                    colSpan={columns.length}
-                    className="h-24 text-center"
-                  >
-                    {noResultsMessage}
-                  </TableCell>
+              ))
+            ) : table.getRowModel().rows?.length ? (
+              table.getRowModel().rows.map((row) => (
+                <TableRow
+                  key={row.id}
+                  data-state={row.getIsSelected() && "selected"}
+                  className="border-b border-grey_pebble/20 hover:bg-pearlVariant3/50"
+                >
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell
+                      key={cell.id}
+                      className="p-3 text-center"
+                      style={{ whiteSpace: "nowrap" }}
+                    >
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
+                    </TableCell>
+                  ))}
                 </TableRow>
-              )}
-            </TableBody>
-          </Table>
-          <ScrollBar orientation="horizontal" />
-        </ScrollArea>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell
+                  colSpan={columns.length}
+                  className="h-24 text-center"
+                >
+                  {noResultsMessage}
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
       </div>
 
       {/* Pagination */}
