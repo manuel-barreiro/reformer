@@ -3,9 +3,9 @@ import ClientCalendarPage from "./ClientCalendarPage"
 import { getClasses } from "@/actions/class"
 import { startOfMonth, endOfMonth } from "date-fns"
 import ErrorBoundary from "@/components/modules/roles/common/calendario/ErrorBoundary"
-import { Skeleton } from "@/components/ui/skeleton"
 import { getUserBookingsInRange } from "@/actions/booking-actions"
 import { auth } from "@/auth"
+import ReformerLoader from "@/components/ui/ReformerLoader"
 
 async function CalendarPage({ userRole }: { userRole: string }) {
   const initialDate = new Date()
@@ -19,11 +19,7 @@ async function CalendarPage({ userRole }: { userRole: string }) {
 
   return (
     <ErrorBoundary>
-      <Suspense
-        fallback={
-          <Skeleton className="h-full w-full rounded-lg bg-pearlVariant" />
-        }
-      >
+      <Suspense fallback={<ReformerLoader />}>
         <ClientCalendarPage
           currentUserId={currentUserId}
           initialDate={initialDate}

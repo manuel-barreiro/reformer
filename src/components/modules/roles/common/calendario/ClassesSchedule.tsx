@@ -63,9 +63,9 @@ export default function ClassesSchedule({
     : []
 
   return (
-    <div className="flex w-full flex-col justify-between gap-4 text-grey_pebble">
+    <div className="flex w-full flex-col gap-4 text-grey_pebble">
       <div className="flex flex-col gap-3">
-        <div className="flex h-full items-center justify-between gap-5 font-dm_sans">
+        <div className="flex h-full items-center gap-5 font-dm_sans">
           <div className="flex items-baseline gap-2 text-xl">
             <span className="font-semibold capitalize">
               {date?.toLocaleDateString("es-ES", {
@@ -99,8 +99,8 @@ export default function ClassesSchedule({
         </Tabs>
       </div>
 
-      <ScrollArea className="h-full w-full overflow-y-auto lg:max-h-[350px] 2xl:pr-4">
-        <div className="space-y-2 py-5">
+      <ScrollArea className="h-full w-full overflow-y-auto lg:max-h-[400px] 2xl:pr-4">
+        <div className="flex-grow space-y-2 py-5">
           {isLoading ? (
             Array(3)
               .fill(null)

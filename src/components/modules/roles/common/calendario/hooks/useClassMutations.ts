@@ -102,10 +102,10 @@ export function useClassMutations(date: Date, onClassChange: () => void) {
       onSuccess: (result) => {
         if (result.success) {
           toast({
-            title: class_.isActive ? "Clase bloqueada" : "Clase desbloqueada",
+            title: class_.isActive ? "Clase desbloqueada" : "Clase bloqueada",
             description: class_.isActive
-              ? "La clase ha sido bloqueada y no será visible para los usuarios."
-              : "La clase ha sido desbloqueada y ahora es visible para los usuarios.",
+              ? "La clase ha sido desbloqueada y ahora es visible para los usuarios."
+              : "La clase ha sido bloqueada y ya no es visible para los usuarios.",
             variant: "reformer",
           })
           queryClient.invalidateQueries({ queryKey: ["classes", monthKey] })
